@@ -171,7 +171,7 @@ class DiscoveryAgent:
                 )
 
             if isinstance(action, DoneAction):
-                verified, detail = await self._verify_done(action, input_bindings)
+                verified, detail = await self._verify_done(action, input_bindings, outputs)
                 if verified:
                     run.success = True
                     run.done_summary = action.success_summary
@@ -326,17 +326,37 @@ class DiscoveryAgent:
             return ExecutableAction(kind="wait", wait_ms=min(action.milliseconds, self.settings.max_wait_action_ms))
         raise ValueError(f"unsupported action {action.action}")
 
-    async def _verify_done(self, action: DoneAction, bindings: dict[str, str]) -> tuple[bool, str]:
+    async def _verify_done(
+        self, action: DoneAction, bindings: dict[str, str], extracted_outputs: dict[str, str]
+    ) -> tuple[bool, str]:
         """Never trust `done` blindly: check the proposed success condition
-        against the live UI (rejecting conditions that embed sensitive values)."""
+        against the live UI, and reject conditions that embed concrete runtime
+        values — bound inputs or extracted outputs — because those verify one
+        invocation, not the reusable flow."""
         suggested = action.suggested_success_condition
         if suggested is None:
             return False, "no success condition was provided"
-        if any(v and v in suggested.value for v in bindings.values()):
-            return False, "success condition must not embed concrete invocation values"
+        if self._embeds_runtime_value(suggested.value, bindings, extracted_outputs):
+            return False, (
+                "success condition must not embed concrete invocation or extracted values; "
+                "reference stable UI text or the URL instead"
+            )
         condition = ConditionSpec(kind=suggested.kind, value=suggested.value, timeout_ms=2000)
         result = await self.surface.evaluate_condition(condition)
         return result.satisfied, result.detail or "condition evaluated"
+
+    @staticmethod
+    def _embeds_runtime_value(text: str, bindings: dict[str, str], extracted_outputs: dict[str, str]) -> bool:
+        normalized_text = text.replace("$", "").replace(",", "")
+        for value in list(bindings.values()) + list(extracted_outputs.values()):
+            if not value:
+                continue
+            normalized_value = value.replace("$", "").replace(",", "").strip()
+            if len(normalized_value) < 3:
+                continue
+            if value in text or normalized_value in normalized_text:
+                return True
+        return False
 
     async def _give_up(self, run: RecordedRun, reason_code: str, message: str) -> DiscoveryOutcome:
         run.finished_at = datetime.now(timezone.utc)

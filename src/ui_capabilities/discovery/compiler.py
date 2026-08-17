@@ -56,16 +56,12 @@ class ArtifactCompiler:
             raise CompileError("no executable steps survived normalization")
 
         bindings = run.input_bindings
-        sensitive_values = [
-            bindings[s.name]
-            for s in run.input_specs
-            if s.sensitive and s.name in bindings and bindings[s.name]
-        ]
-        # extracted values are sensitive by default in this domain; they must
-        # never be baked into the reusable artifact either
-        for recorded in run.steps:
-            if recorded.result is not None and recorded.result.extracted_text:
-                sensitive_values.append(recorded.result.extracted_text.lstrip("$"))
+        # Every invocation-specific runtime value — sensitive bindings and all
+        # extracted values (sensitive by default in this domain) — must be
+        # parameterized or excluded wherever it would otherwise be persisted:
+        # step values, locator strategies, descriptions, checkpoints, success
+        # conditions, and metadata. The final serialized scan is the backstop.
+        runtime_values = self._collect_runtime_values(run)
 
         steps: list[StepSpec] = []
         outputs: list[OutputSpec] = []
@@ -76,7 +72,7 @@ class ArtifactCompiler:
         route_patterns.add(self._parameterize_path(entry.path or "/", bindings))
 
         for ordinal, recorded in enumerate(kept, start=1):
-            step = self._compile_step(ordinal, recorded, run, bindings)
+            step = self._compile_step(ordinal, recorded, run, bindings, runtime_values)
             steps.append(step)
             used_actions.add(step.action)
             if recorded.after is not None:
@@ -93,7 +89,7 @@ class ArtifactCompiler:
                     )
                 )
 
-        success_conditions = self._success_conditions(run, bindings)
+        success_conditions = self._success_conditions(run, bindings, runtime_values)
         max_risk = RiskLevel.SAFE
         for step in steps:
             if risk_exceeds(step.risk, max_risk):
@@ -135,8 +131,36 @@ class ArtifactCompiler:
             ),
         )
 
-        self._assert_no_sensitive_values(artifact, sensitive_values)
+        self._assert_no_sensitive_values(artifact, runtime_values)
         return artifact
+
+    @staticmethod
+    def _collect_runtime_values(run: RecordedRun) -> list[str]:
+        """All concrete invocation-specific runtime values from this run:
+        sensitive input bindings plus every extracted value (raw and with
+        common money formatting stripped, so `$2540.75` also covers `2540.75`)."""
+        values: list[str] = []
+
+        def add(value: str) -> None:
+            for variant in (value, value.lstrip("$"), value.replace("$", "").replace(",", "")):
+                variant = variant.strip()
+                if variant and len(variant) >= 3 and variant not in values:
+                    values.append(variant)
+
+        for spec in run.input_specs:
+            if spec.sensitive and run.input_bindings.get(spec.name):
+                add(run.input_bindings[spec.name])
+        for recorded in run.steps:
+            if recorded.result is not None and recorded.result.extracted_text:
+                add(recorded.result.extracted_text)
+        return values
+
+    @staticmethod
+    def _contains_runtime_value(text: str | None, runtime_values: list[str]) -> bool:
+        if not text:
+            return False
+        normalized = text.replace("$", "").replace(",", "")
+        return any(v in text or v in normalized for v in runtime_values)
 
     # ------------------------------------------------------------- selection
 
@@ -159,10 +183,17 @@ class ArtifactCompiler:
 
     # ------------------------------------------------------------ steps
 
-    def _compile_step(self, ordinal: int, recorded: RecordedStep, run: RecordedRun, bindings: dict[str, str]) -> StepSpec:
+    def _compile_step(
+        self,
+        ordinal: int,
+        recorded: RecordedStep,
+        run: RecordedRun,
+        bindings: dict[str, str],
+        runtime_values: list[str],
+    ) -> StepSpec:
         action = recorded.action
         step_id = f"s{ordinal}_{action.action}"
-        checkpoints = self._checkpoints_for(recorded, bindings)
+        checkpoints = self._checkpoints_for(recorded, bindings, runtime_values)
 
         if isinstance(action, NavigateAction):
             return StepSpec(
@@ -179,16 +210,34 @@ class ArtifactCompiler:
                 f"cannot compile step {step_id}: no durable locator strategies for the interacted element "
                 f"(action={action.action}); coordinate-only interactions must be resolved to semantic targets"
             )
+        # A locator whose identity embeds an invocation-specific runtime value
+        # (a bound sensitive input or an extracted value) is not a reusable
+        # target: keep only invocation-independent strategies, and fail loudly
+        # if none survive rather than persisting a single-invocation locator.
+        durable_strategies = [
+            s
+            for s in element.candidate_strategies
+            if not self._contains_runtime_value(s.name, runtime_values)
+            and not self._contains_runtime_value(s.value, runtime_values)
+        ]
+        if not durable_strategies:
+            raise CompileError(
+                f"cannot compile step {step_id}: every candidate locator strategy embeds an "
+                "invocation-specific runtime value; no reusable target identity exists for this element"
+            )
         if isinstance(action, ExtractAction):
             # the element's text IS the (sensitive) extracted value; identify
             # the target by stable identity, never by content
             ident = element.id_attr or element.name_attr or action.output_name
             description = f"{element.kind} '{ident}'"
         else:
-            description = self._parameterize_text(
-                f"{element.kind} '{element.accessible_name or element.text or element.id_attr}'", bindings
+            description = self._scrub_text(
+                self._parameterize_text(
+                    f"{element.kind} '{element.accessible_name or element.text or element.id_attr}'", bindings
+                ),
+                runtime_values,
             )
-        target = TargetDescriptor(description=description, strategies=element.candidate_strategies)
+        target = TargetDescriptor(description=description, strategies=durable_strategies)
 
         if isinstance(action, ClickAction):
             control_risk = self.policy.classify_control_risk(element.accessible_name or element.text)
@@ -250,25 +299,42 @@ class ArtifactCompiler:
 
     # ------------------------------------------------------------ conditions
 
-    def _checkpoints_for(self, recorded: RecordedStep, bindings: dict[str, str]) -> list[ConditionSpec]:
+    def _checkpoints_for(
+        self, recorded: RecordedStep, bindings: dict[str, str], runtime_values: list[str]
+    ) -> list[ConditionSpec]:
         if recorded.after is None or recorded.before.path == recorded.after.path:
             return []
         checkpoints = [
             ConditionSpec(kind=ConditionKind.URL_MATCHES, value=self._parameterize_path(recorded.after.path, bindings))
         ]
         heading = recorded.after.heading
-        if heading and not self._contains_binding(heading, bindings):
+        if (
+            heading
+            and not self._contains_binding(heading, bindings)
+            and not self._contains_runtime_value(heading, runtime_values)
+        ):
             checkpoints.append(ConditionSpec(kind=ConditionKind.TEXT_PRESENT, value=heading))
         return checkpoints
 
-    def _success_conditions(self, run: RecordedRun, bindings: dict[str, str]) -> list[ConditionSpec]:
+    def _success_conditions(
+        self, run: RecordedRun, bindings: dict[str, str], runtime_values: list[str]
+    ) -> list[ConditionSpec]:
         conditions: list[ConditionSpec] = []
         if run.final_state is not None:
             conditions.append(
                 ConditionSpec(kind=ConditionKind.URL_MATCHES, value=self._parameterize_path(run.final_state.path, bindings))
             )
+        # The model's suggested condition is only reusable if it references
+        # stable UI, not this invocation's concrete values (e.g. a success
+        # condition of "text_present: <the extracted balance>" verifies one
+        # member's balance, not the flow — drop it and rely on structural
+        # conditions instead).
         suggested = run.suggested_success_condition
-        if suggested is not None and not self._contains_binding(suggested.value, bindings):
+        if (
+            suggested is not None
+            and not self._contains_binding(suggested.value, bindings)
+            and not self._contains_runtime_value(suggested.value, runtime_values)
+        ):
             kind = ConditionKind.URL_MATCHES if suggested.kind == "url_matches" else ConditionKind.TEXT_PRESENT
             value = self._parameterize_path(suggested.value, bindings) if kind == ConditionKind.URL_MATCHES else suggested.value
             if not any(c.kind == kind and c.value == value for c in conditions):
@@ -282,6 +348,15 @@ class ArtifactCompiler:
     @staticmethod
     def _contains_binding(text: str, bindings: dict[str, str]) -> bool:
         return any(v and v in text for v in bindings.values())
+
+    @staticmethod
+    def _scrub_text(text: str, runtime_values: list[str]) -> str:
+        """Replace any remaining concrete runtime value in free text (e.g. a
+        target description) with a neutral marker."""
+        for value in runtime_values:
+            if value in text:
+                text = text.replace(value, "[dynamic-value]")
+        return text
 
     @staticmethod
     def _parameterize_path(path: str, bindings: dict[str, str]) -> str:
