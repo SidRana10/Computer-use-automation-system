@@ -120,24 +120,25 @@ async def _discover(args: argparse.Namespace) -> int:
     policy = PolicyEngine(default_demo_policy(args.target))
     input_specs = _input_specs_for(sorted(inputs.keys()), redactor)
 
-    if args.model_adapter == "anthropic":
-        if not settings.anthropic_api_key:
-            print(
-                "ANTHROPIC_API_KEY is not set. Set it in the environment or .env for genuine discovery,\n"
-                "or use --model-adapter fake for the offline scripted test double (not valid as evidence).",
-                file=sys.stderr,
-            )
-            return 2
-        from .discovery.anthropic_client import AnthropicModelAdapter
-
-        model = AnthropicModelAdapter(settings.anthropic_api_key, settings.discovery_model, redactor)
-        print(f"discovery model: {settings.discovery_model}")
-    elif args.model_adapter == "fake":
+    # Genuine providers go through the factory (fails loudly on missing keys);
+    # scripted test doubles must be requested explicitly by name and are never
+    # a fallback for genuine discovery.
+    adapter_name = args.model_adapter or settings.llm_provider
+    if adapter_name == "fake":
         model = ScriptedBalanceModel()
         print("WARNING: scripted fake model adapter (test double) — output is not valid discovery evidence")
-    else:
+    elif adapter_name == "fake-subaccount":
         model = ScriptedSubAccountModel()
         print("WARNING: scripted fake-subaccount model adapter (test double) — not valid discovery evidence")
+    else:
+        from .discovery.providers import ProviderConfigError, create_model_adapter, provider_model_name
+
+        try:
+            model = create_model_adapter(adapter_name, settings, redactor)
+        except ProviderConfigError as exc:
+            print(str(exc), file=sys.stderr)
+            return 2
+        print(f"discovery provider: {adapter_name} (model: {provider_model_name(adapter_name, settings)})")
 
     surface = PlaywrightWebSurface(settings, evidence, headless=args.headless or None)
     handoff = None
@@ -262,7 +263,13 @@ def build_parser() -> argparse.ArgumentParser:
     disc.add_argument("--capability-id", required=True)
     disc.add_argument("--input", action="append", metavar="NAME=VALUE", help="invocation input binding (repeatable)")
     disc.add_argument("--output", help="artifact output path (default artifacts/<capability_id>.v1.json)")
-    disc.add_argument("--model-adapter", choices=["anthropic", "fake", "fake-subaccount"], default="anthropic")
+    disc.add_argument(
+        "--model-adapter",
+        choices=["gemini", "anthropic", "fake", "fake-subaccount"],
+        default=None,
+        help="LLM provider for discovery (default: LLM_PROVIDER env, gemini). "
+        "'fake*' are offline test doubles, never valid as genuine evidence.",
+    )
     disc.add_argument("--headless", action="store_true")
     disc.add_argument("--no-operator", action="store_true", help="skip the in-process operator console")
 

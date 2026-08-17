@@ -1,12 +1,19 @@
 # UI Capabilities — discover once, replay deterministically
 
 A small end-to-end computer-use system for legacy back-office applications that
-have no API. An LLM (Claude) **discovers** how to complete a natural-language
-goal on a live UI once; the successful run is **compiled** into a typed,
-versioned, parameterized **capability artifact**; production execution is a
+have no API. An LLM **discovers** how to complete a natural-language goal on a
+live UI once; the successful run is **compiled** into a typed, versioned,
+parameterized **capability artifact**; production execution is a
 **deterministic replay** of that artifact with **zero LLM decisions**, explicit
 error/outcome handling, configurable safety guardrails, and a **same-session
 human handoff** path for risky or stuck situations.
+
+Discovery is provider-pluggable behind one adapter seam: **Google Gemini
+(`gemini-3-flash-preview`, free tier) is the default provider and the runtime
+model used for the submitted genuine evidence**; Anthropic Claude remains
+available via `LLM_PROVIDER=anthropic`. Development of this repository was
+AI-assisted (Claude Code / Claude Fable 5). Deterministic replay invokes no
+LLM of any kind.
 
 > The model discovers. The artifact is the capability. Deterministic replay is
 > production execution.
@@ -19,7 +26,8 @@ CLI (uicap)
    v                                               v
 DiscoveryAgent --(one structured action/turn)-- ReplayEngine  (no LLM here)
    |   ^                                           |
-   |   | Claude (Messages API, strict tools)       |
+   |   | LLM provider (Gemini default | Anthropic) |
+   |   |   forced function calling, strict tools   |
    |   +--- screenshot + semantic inventory        |
    +---------------------+-------------------------+
                          v
@@ -37,7 +45,7 @@ everything     -> RunLogger/EvidenceManager -> evidence/runs/<run_id>/ (JSONL, s
 ```
 
 - `src/ui_capabilities/models/` — typed schemas: actions, artifact, conditions, results, interventions
-- `src/ui_capabilities/discovery/` — agent loop, Anthropic adapter, scripted test doubles, recorder, compiler
+- `src/ui_capabilities/discovery/` — agent loop, provider factory + Gemini/Anthropic adapters, scripted test doubles, recorder, compiler
 - `src/ui_capabilities/replay/` — binder, error classifier, bounded recovery, replay engine (no model client)
 - `src/ui_capabilities/policy/` — allowlist policy engine + central redactor
 - `src/ui_capabilities/handoff/` — control-owner state machine, intervention store, operator console
@@ -48,8 +56,9 @@ everything     -> RunLogger/EvidenceManager -> evidence/runs/<run_id>/ (JSONL, s
 
 - Python 3.12
 - Playwright Chromium (installed below)
-- An Anthropic API key — **only** for the genuine discovery run; tests and
-  replay never call the API.
+- A Google Gemini API key (free tier: https://aistudio.google.com/apikey) —
+  **only** for the genuine discovery run; tests and replay never call any LLM
+  API. Optionally an Anthropic key instead (`LLM_PROVIDER=anthropic`).
 
 ## Setup
 
@@ -58,7 +67,7 @@ python3.12 -m venv .venv
 source .venv/bin/activate
 pip install -e '.[dev]'
 playwright install chromium
-cp .env.example .env   # then put your ANTHROPIC_API_KEY in .env (never committed)
+cp .env.example .env   # then put your GEMINI_API_KEY in .env (never committed)
 ```
 
 Troubleshooting: if `import ui_capabilities` fails after an editable install,
@@ -88,13 +97,17 @@ uicap discover \
   --output artifacts/member.get_savings_balance.v1.json
 ```
 
-Each turn Claude receives a screenshot plus a compact semantic element
-inventory and returns exactly one structured action (strict tool schema —
-never code); every action is policy-checked before Playwright executes it. On
-success the run is compiled into `artifacts/member.get_savings_balance.v1.json`
-— open it: `member_id` is a typed input, not an embedded literal; targets are
-ordered locator-strategy chains; checkpoints, error rules, policy and
-provenance are explicit.
+Each turn the model (Gemini `gemini-3-flash-preview` by default) receives a
+screenshot plus a compact semantic element inventory and returns exactly one
+structured action via forced function calling (strict tool schema — never
+code); every action is Pydantic-validated and policy-checked before Playwright
+executes it. On success the run is compiled into
+`artifacts/member.get_savings_balance.v1.json` — open it: `member_id` is a
+typed input, not an embedded literal; targets are ordered locator-strategy
+chains; checkpoints, error rules, policy and provenance are explicit.
+
+To use Anthropic Claude instead, set `LLM_PROVIDER=anthropic` (plus
+`ANTHROPIC_API_KEY`) or pass `--model-adapter anthropic`.
 
 Offline test double (wiring demo only — **not** valid discovery evidence):
 
@@ -186,7 +199,7 @@ pytest -q
 state-machine units, plus live-browser integration tests (deterministic replay
 with a different member, business outcome, both recoverable conditions, injected
 hard failure, discovery policy blocking, full same-session handoff). No test
-calls the Anthropic API.
+calls any LLM API.
 
 ## Evidence
 
@@ -194,12 +207,17 @@ Committed evidence is produced by a real run of:
 
 ```bash
 uicap demo-app &                      # if not already running
-python scripts/capture_evidence.py    # requires ANTHROPIC_API_KEY
+python scripts/capture_evidence.py    # requires GEMINI_API_KEY (default provider)
 ```
+
+The genuine discovery run uses Gemini `gemini-3-flash-preview` (or
+`--provider anthropic` with an Anthropic key). The script **fails loudly** if
+the selected provider's key is absent — it never falls back to a scripted
+model for genuine evidence.
 
 | File | Proves |
 |---|---|
-| `evidence/discovery_run.jsonl` | genuine Claude-driven discovery: per-step observations, proposed structured actions, policy decisions, results (redacted) |
+| `evidence/discovery_run.jsonl` | genuine LLM-driven discovery (Gemini): per-step observations, proposed structured actions, policy decisions, results (redacted) |
 | `evidence/discovery_trace.zip` | Playwright trace of the discovery session |
 | `evidence/example_capability.json` | the compiled artifact: typed contract, parameterized inputs, locator chains, checkpoints, error rules, policy, provenance |
 | `evidence/replay_success.jsonl` | deterministic LLM-free replay with a *different* member (M-10003) |

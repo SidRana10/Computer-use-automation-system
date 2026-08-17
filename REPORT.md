@@ -9,6 +9,16 @@ pipeline, and the `SurfaceAdapter` — and deliberately share nothing about
 decision-making: the discovery agent holds the only model client in the
 system, and the replay engine cannot even represent one.
 
+Discovery is provider-pluggable behind a single `ModelAdapter` seam with a
+factory that knows two genuine providers: Google Gemini
+(`gemini-3-flash-preview`, the default and the runtime model used for the
+submitted genuine evidence) and Anthropic Claude as an optional alternative.
+Both expose the same eight narrow UI-action tools via forced function calling
+and share one validation path; a missing API key fails loudly, and the
+scripted test double can never be substituted for a genuine provider.
+(Development of the repository itself was AI-assisted with Claude Code /
+Claude Fable 5; deterministic replay invokes no LLM from any provider.)
+
 Everything runs local-first in one process per command: the synthetic target
 app (FastAPI/Jinja, deliberately legacy-styled), the automation core, and a
 minimal operator console that shares the automation's event loop so both see

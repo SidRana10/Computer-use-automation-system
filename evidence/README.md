@@ -1,17 +1,24 @@
 # Evidence
 
 **Status: the genuine discovery evidence has not been captured yet** — it
-requires a real `ANTHROPIC_API_KEY`, and nothing here is fabricated.
+requires a real LLM API key, and nothing here is fabricated.
 
-To produce the full canonical evidence set (genuine Claude-driven discovery,
+The runtime discovery model for the submitted genuine evidence is **Google
+Gemini (`gemini-3-flash-preview`, free tier)**; Anthropic Claude is available
+as an optional alternative provider (`--provider anthropic`). Development of
+the repository was AI-assisted (Claude Code / Claude Fable 5). Deterministic
+replay invokes no LLM regardless of provider.
+
+To produce the full canonical evidence set (genuine LLM-driven discovery,
 then the LLM-free replays), run from the repo root with the demo app up:
 
 ```bash
 uicap demo-app &                    # target app on :8001
-python scripts/capture_evidence.py  # needs ANTHROPIC_API_KEY in env/.env
+python scripts/capture_evidence.py  # needs GEMINI_API_KEY in env/.env
 ```
 
-That writes, into this directory:
+The script fails loudly if the selected provider's API key is absent and never
+falls back to a scripted model. It writes, into this directory:
 
 - `discovery_run.jsonl` — genuine discovery run (redacted structured log)
 - `discovery_trace.zip` — Playwright trace of the discovery session

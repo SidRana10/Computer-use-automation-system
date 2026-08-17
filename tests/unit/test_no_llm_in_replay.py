@@ -13,7 +13,15 @@ import ui_capabilities
 
 PACKAGE_ROOT = Path(ui_capabilities.__file__).parent
 LLM_FREE_PACKAGES = ["replay", "surfaces", "policy", "handoff", "observability", "models"]
-FORBIDDEN_TOKENS = ["anthropic", "AnthropicModelAdapter", "messages.create"]
+FORBIDDEN_TOKENS = [
+    "anthropic",
+    "AnthropicModelAdapter",
+    "messages.create",
+    "genai",
+    "gemini",
+    "GeminiModelAdapter",
+    "generate_content",
+]
 
 
 def test_replay_and_support_packages_never_reference_a_model_client():
@@ -32,9 +40,9 @@ def test_replay_engine_constructor_has_no_model_parameter():
     assert "model" not in params and "model_adapter" not in params
 
 
-def test_importing_replay_does_not_import_anthropic():
+def test_importing_replay_does_not_import_any_llm_sdk():
     for mod in list(sys.modules):
-        if mod.startswith("anthropic"):
+        if mod.startswith("anthropic") or mod.startswith("google.genai") or mod == "google":
             del sys.modules[mod]
     import importlib
 
@@ -42,3 +50,4 @@ def test_importing_replay_does_not_import_anthropic():
 
     importlib.reload(engine)
     assert not any(m.startswith("anthropic") for m in sys.modules), "importing the replay engine pulled in the anthropic SDK"
+    assert not any(m.startswith("google.genai") for m in sys.modules), "importing the replay engine pulled in the google-genai SDK"

@@ -37,7 +37,7 @@ Claude Code: maintain this file as work progresses. Do not mark a milestone comp
 - [x] Tracing/evidence hooks (Playwright tracing per run)
 
 ## M4 — LLM discovery
-- [x] Anthropic client configurable by env (`DISCOVERY_MODEL=claude-fable-5`)
+- [x] Provider-pluggable model adapters: Gemini (`GEMINI_MODEL=gemini-3-flash-preview`, default) and Anthropic (`DISCOVERY_MODEL=claude-fable-5`), selected via `LLM_PROVIDER`; missing keys fail loudly, no fake fallback
 - [x] Strict/Pydantic-validated action contract (one tool per action kind)
 - [x] Observe → decide → policy → act loop
 - [x] Max steps + timeout + repeated-state detection + error/denial budgets
@@ -100,8 +100,10 @@ Claude Code: maintain this file as work progresses. Do not mark a milestone comp
 - [x] evidence tooling validated end-to-end via `scripts/capture_evidence.py --fake` (dry run, clearly labeled)
 - [x] exact demo commands validated from clean setup
 
-**Genuine evidence:** with the demo app running and `ANTHROPIC_API_KEY` set, run
-`python scripts/capture_evidence.py`. No evidence has been fabricated; the
+**Genuine evidence:** with the demo app running and `GEMINI_API_KEY` set (the
+default Gemini provider; or `ANTHROPIC_API_KEY` with `--provider anthropic`),
+run `python scripts/capture_evidence.py`. It fails loudly without a key and
+never falls back to a scripted model. No evidence has been fabricated; the
 committed evidence set is produced only by that real run.
 
 ## M10 — Final audit
