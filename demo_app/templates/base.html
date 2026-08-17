@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Northstar Credit Union &mdash; Member Servicing Console (Demo)</title>
+  <style>
+    body { font-family: Verdana, Geneva, sans-serif; font-size: 12px; background: #e8e4d8; margin: 0; }
+    #shell { width: 860px; margin: 0 auto; background: #ffffff; border: 1px solid #999; }
+    #banner { background: #1f3a5f; color: #fff; padding: 8px 12px; }
+    #banner h1 { font-size: 15px; margin: 0; }
+    #banner .demo-tag { color: #ffd76e; font-size: 10px; }
+    #navbar { background: #d6d0c0; padding: 4px 12px; border-bottom: 1px solid #999; }
+    #navbar a { margin-right: 14px; color: #1f3a5f; }
+    #content { padding: 14px; }
+    table.legacy { border-collapse: collapse; margin-top: 8px; }
+    table.legacy th, table.legacy td { border: 1px solid #aaa; padding: 4px 10px; text-align: left; }
+    table.legacy th { background: #efece2; }
+    .msg-error { color: #8a1f11; background: #fbe3e4; border: 1px solid #8a1f11; padding: 6px 10px; display: inline-block; }
+    .msg-note { color: #514721; background: #fff6bf; border: 1px solid #dfc35a; padding: 6px 10px; display: inline-block; }
+    #footer { border-top: 1px solid #999; padding: 6px 12px; color: #666; font-size: 10px; background: #f4f1e8; }
+    input, select { font-size: 12px; }
+    .btn { font-size: 12px; padding: 2px 10px; }
+  </style>
+</head>
+<body>
+<div id="shell">
+  <div id="banner">
+    <h1>Northstar Credit Union &mdash; Member Servicing Console</h1>
+    <span class="demo-tag">FICTIONAL DEMO ENVIRONMENT &mdash; ALL DATA IS SYNTHETIC</span>
+  </div>
+  <div id="navbar">
+    <a href="/">Dashboard</a>
+    <a href="/members/search">Member Search</a>
+  </div>
+  <div id="content">
+    <table width="100%"><tr><td>
+    {% block content %}{% endblock %}
+    </td></tr></table>
+  </div>
+  <div id="footer">
+    Northstar Servicing Console &middot; Build 4.2.19-legacy &middot; Fictional demonstration application. No real member data.
+  </div>
+</div>
+</body>
+</html>

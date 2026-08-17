@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Session Notice</h2>
+<p class="msg-note">Your session has been idle. Continue session?</p>
+<form method="post" action="/session/continue">
+  <input type="hidden" name="next" value="{{ next_url }}">
+  <button type="submit" class="btn">Continue</button>
+</form>
+{% endblock %}

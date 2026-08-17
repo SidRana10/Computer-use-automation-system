@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Permission Denied</h2>
+<p class="msg-error">You do not have permission to open sub-accounts for this member.</p>
+<p><a href="/members/{{ member.member_id }}">Back to Member Summary</a></p>
+{% endblock %}

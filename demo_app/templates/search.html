@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Member Search</h2>
+{% if error %}<p class="msg-error">{{ error }}</p>{% endif %}
+<form method="get" action="/members/search">
+  <table class="legacy">
+    <tr>
+      <td><label for="member-id-field">Member ID</label></td>
+      <td><input type="text" id="member-id-field" name="member_id" placeholder="Enter member number (e.g. M-12345)" size="24"></td>
+      <td><button type="submit" class="btn">Search</button></td>
+    </tr>
+  </table>
+</form>
+<p class="msg-note">Search by exact member identifier. Format: M-#####.</p>
+{% endblock %}
