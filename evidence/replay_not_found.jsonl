@@ -1,0 +1,10 @@
+{"ts": "2026-08-17T20:36:20.457627+00:00", "run_id": "rep-27a3927767", "event": "replay_started", "capability_id": "member.get_savings_balance", "capability_version": "1.0.0", "inputs": ["member_id"]}
+{"ts": "2026-08-17T20:36:21.023413+00:00", "run_id": "rep-27a3927767", "event": "policy_checked", "step_id": "s1_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-08-17T20:36:21.096597+00:00", "run_id": "rep-27a3927767", "event": "target_resolved", "step_id": "s1_click", "strategy": "role_name"}
+{"ts": "2026-08-17T20:36:21.105400+00:00", "run_id": "rep-27a3927767", "event": "step_completed", "step_id": "s1_click", "attempts": 0}
+{"ts": "2026-08-17T20:36:21.105677+00:00", "run_id": "rep-27a3927767", "event": "policy_checked", "step_id": "s2_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-08-17T20:36:21.119110+00:00", "run_id": "rep-27a3927767", "event": "target_resolved", "step_id": "s2_fill", "strategy": "role_name"}
+{"ts": "2026-08-17T20:36:21.119401+00:00", "run_id": "rep-27a3927767", "event": "step_completed", "step_id": "s2_fill", "attempts": 0}
+{"ts": "2026-08-17T20:36:21.119554+00:00", "run_id": "rep-27a3927767", "event": "policy_checked", "step_id": "s3_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-08-17T20:36:21.172081+00:00", "run_id": "rep-27a3927767", "event": "target_resolved", "step_id": "s3_click", "strategy": "role_name"}
+{"ts": "2026-08-17T20:36:26.178462+00:00", "run_id": "rep-27a3927767", "event": "business_outcome", "step_id": "s3_click", "code": "MEMBER_NOT_FOUND"}

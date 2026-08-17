@@ -1,0 +1,464 @@
+{
+  "schema_version": "1.0",
+  "capability_id": "member.get_savings_balance",
+  "capability_version": "1.0.0",
+  "name": "Member Get Savings Balance",
+  "description": "Look up member {member_id} and return their current savings balance.",
+  "approval_state": "draft",
+  "risk_level": "reversible",
+  "target": {
+    "app_id": "northstar_member_servicing_demo",
+    "vendor_family": "northstar_servicing",
+    "surface_kind": "web",
+    "entry_point": "http://127.0.0.1:8001",
+    "compatible_variants": [],
+    "app_fingerprint": {
+      "app_title": "Northstar Credit Union — Member Servicing Console (Demo)",
+      "build_marker": "4.2.19-legacy"
+    }
+  },
+  "contract": {
+    "inputs": [
+      {
+        "name": "member_id",
+        "type": "string",
+        "required": true,
+        "description": "Member identifier in the demo format M-#####",
+        "sensitive": true,
+        "pattern": "M-\\d{5}",
+        "minimum": null,
+        "maximum": null
+      }
+    ],
+    "outputs": [
+      {
+        "name": "savings_balance",
+        "type": "string",
+        "description": "Extracted from step s5_extract",
+        "sensitive": true,
+        "source_step_id": "s5_extract"
+      }
+    ]
+  },
+  "preconditions": [],
+  "steps": [
+    {
+      "id": "s1_click",
+      "name": "Click Member Search",
+      "action": "click",
+      "target": {
+        "description": "link 'Member Search'",
+        "strategies": [
+          {
+            "kind": "role_name",
+            "role": "link",
+            "name": "Member Search",
+            "value": null,
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          },
+          {
+            "kind": "text",
+            "role": null,
+            "name": null,
+            "value": "Member Search",
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          }
+        ]
+      },
+      "value": null,
+      "url_template": null,
+      "output_name": null,
+      "output_type": null,
+      "timeout_ms": null,
+      "risk": "safe",
+      "checkpoint_after": [
+        {
+          "kind": "url_matches",
+          "target": null,
+          "value": "/members/search",
+          "timeout_ms": null
+        },
+        {
+          "kind": "text_present",
+          "target": null,
+          "value": "Member Search",
+          "timeout_ms": null
+        }
+      ],
+      "on_error": null
+    },
+    {
+      "id": "s2_fill",
+      "name": "Fill Member ID",
+      "action": "fill",
+      "target": {
+        "description": "textbox 'Member ID'",
+        "strategies": [
+          {
+            "kind": "role_name",
+            "role": "textbox",
+            "name": "Member ID",
+            "value": null,
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          },
+          {
+            "kind": "label",
+            "role": null,
+            "name": null,
+            "value": "Member ID",
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          },
+          {
+            "kind": "placeholder",
+            "role": null,
+            "name": null,
+            "value": "Enter member number (e.g. M-12345)",
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          },
+          {
+            "kind": "stable_attribute",
+            "role": null,
+            "name": null,
+            "value": "member_id",
+            "attribute": "name",
+            "exact": true,
+            "confidence": null
+          },
+          {
+            "kind": "stable_attribute",
+            "role": null,
+            "name": null,
+            "value": "member-id-field",
+            "attribute": "id",
+            "exact": true,
+            "confidence": null
+          }
+        ]
+      },
+      "value": {
+        "kind": "input",
+        "name": "member_id"
+      },
+      "url_template": null,
+      "output_name": null,
+      "output_type": null,
+      "timeout_ms": null,
+      "risk": "reversible",
+      "checkpoint_after": [],
+      "on_error": null
+    },
+    {
+      "id": "s3_click",
+      "name": "Click Search",
+      "action": "click",
+      "target": {
+        "description": "button 'Search'",
+        "strategies": [
+          {
+            "kind": "role_name",
+            "role": "button",
+            "name": "Search",
+            "value": null,
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          },
+          {
+            "kind": "text",
+            "role": null,
+            "name": null,
+            "value": "Search",
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          }
+        ]
+      },
+      "value": null,
+      "url_template": null,
+      "output_name": null,
+      "output_type": null,
+      "timeout_ms": null,
+      "risk": "safe",
+      "checkpoint_after": [
+        {
+          "kind": "url_matches",
+          "target": null,
+          "value": "/members/*",
+          "timeout_ms": null
+        },
+        {
+          "kind": "text_present",
+          "target": null,
+          "value": "Member Summary",
+          "timeout_ms": null
+        }
+      ],
+      "on_error": null
+    },
+    {
+      "id": "s4_click",
+      "name": "Click Accounts",
+      "action": "click",
+      "target": {
+        "description": "link 'Accounts'",
+        "strategies": [
+          {
+            "kind": "role_name",
+            "role": "link",
+            "name": "Accounts",
+            "value": null,
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          },
+          {
+            "kind": "text",
+            "role": null,
+            "name": null,
+            "value": "Accounts",
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          }
+        ]
+      },
+      "value": null,
+      "url_template": null,
+      "output_name": null,
+      "output_type": null,
+      "timeout_ms": null,
+      "risk": "safe",
+      "checkpoint_after": [
+        {
+          "kind": "url_matches",
+          "target": null,
+          "value": "/members/*/accounts",
+          "timeout_ms": null
+        },
+        {
+          "kind": "text_present",
+          "target": null,
+          "value": "Accounts",
+          "timeout_ms": null
+        }
+      ],
+      "on_error": null
+    },
+    {
+      "id": "s5_extract",
+      "name": "Extract savings_balance",
+      "action": "extract",
+      "target": {
+        "description": "cell 'acct-sav-balance'",
+        "strategies": [
+          {
+            "kind": "stable_attribute",
+            "role": null,
+            "name": null,
+            "value": "acct-sav-balance",
+            "attribute": "id",
+            "exact": true,
+            "confidence": null
+          }
+        ]
+      },
+      "value": null,
+      "url_template": null,
+      "output_name": "savings_balance",
+      "output_type": "string",
+      "timeout_ms": null,
+      "risk": "safe",
+      "checkpoint_after": [],
+      "on_error": null
+    }
+  ],
+  "success_conditions": [
+    {
+      "kind": "url_matches",
+      "target": null,
+      "value": "/members/*/accounts",
+      "timeout_ms": null
+    },
+    {
+      "kind": "text_present",
+      "target": null,
+      "value": "Savings",
+      "timeout_ms": null
+    }
+  ],
+  "error_rules": [
+    {
+      "code": "MEMBER_NOT_FOUND",
+      "classification": "business_outcome",
+      "when": [
+        {
+          "kind": "text_present",
+          "target": null,
+          "value": "No member was found for that identifier.",
+          "timeout_ms": 400
+        }
+      ],
+      "recovery": [],
+      "max_attempts": 0,
+      "caller_message": "No member matched the supplied identifier."
+    },
+    {
+      "code": "VALIDATION_REJECTED",
+      "classification": "business_outcome",
+      "when": [
+        {
+          "kind": "text_present",
+          "target": null,
+          "value": "Member ID must match M-#####.",
+          "timeout_ms": 400
+        }
+      ],
+      "recovery": [],
+      "max_attempts": 0,
+      "caller_message": "The supplied member identifier failed validation."
+    },
+    {
+      "code": "PERMISSION_DENIED",
+      "classification": "business_outcome",
+      "when": [
+        {
+          "kind": "text_present",
+          "target": null,
+          "value": "You do not have permission",
+          "timeout_ms": 400
+        }
+      ],
+      "recovery": [],
+      "max_attempts": 0,
+      "caller_message": "The operator role is not permitted to perform this action for this member."
+    },
+    {
+      "code": "KNOWN_INTERSTITIAL",
+      "classification": "recoverable",
+      "when": [
+        {
+          "kind": "text_present",
+          "target": null,
+          "value": "Your session has been idle. Continue session?",
+          "timeout_ms": 400
+        }
+      ],
+      "recovery": [
+        {
+          "kind": "dismiss",
+          "target": {
+            "description": "Continue-session button on idle interstitial",
+            "strategies": [
+              {
+                "kind": "role_name",
+                "role": "button",
+                "name": "Continue",
+                "value": null,
+                "attribute": null,
+                "exact": true,
+                "confidence": null
+              },
+              {
+                "kind": "text",
+                "role": null,
+                "name": null,
+                "value": "Continue",
+                "attribute": null,
+                "exact": true,
+                "confidence": null
+              }
+            ]
+          },
+          "wait_ms": null
+        }
+      ],
+      "max_attempts": 2,
+      "caller_message": "Known idle-session interstitial was dismissed."
+    },
+    {
+      "code": "TRANSIENT_LOAD",
+      "classification": "recoverable",
+      "when": [
+        {
+          "kind": "text_present",
+          "target": null,
+          "value": "Accounts are loading.",
+          "timeout_ms": 400
+        }
+      ],
+      "recovery": [
+        {
+          "kind": "wait",
+          "target": null,
+          "wait_ms": 1200
+        },
+        {
+          "kind": "reload",
+          "target": null,
+          "wait_ms": null
+        }
+      ],
+      "max_attempts": 2,
+      "caller_message": "Transient load state; waited, refreshed, and retried."
+    },
+    {
+      "code": "SESSION_EXPIRED",
+      "classification": "hard_failure",
+      "when": [
+        {
+          "kind": "text_present",
+          "target": null,
+          "value": "Your session has expired.",
+          "timeout_ms": 400
+        }
+      ],
+      "recovery": [],
+      "max_attempts": 0,
+      "caller_message": "The console session expired; no credential-free recovery exists, so this run stops."
+    }
+  ],
+  "policy": {
+    "allowed_domains": [
+      "127.0.0.1"
+    ],
+    "allowed_route_patterns": [
+      "/",
+      "/members/*",
+      "/members/*/accounts",
+      "/members/search",
+      "/session/**"
+    ],
+    "allowed_actions": [
+      "assert",
+      "click",
+      "extract",
+      "fill",
+      "wait_for"
+    ],
+    "max_unattended_risk": "reversible",
+    "require_human_for": [
+      "risky",
+      "irreversible"
+    ]
+  },
+  "provenance": {
+    "discovery_run_id": "disc-3b572d9b32",
+    "discovered_at": "2026-08-17T20:36:18.951580Z",
+    "discovery_model": "gemini:gemini-3.6-flash",
+    "source_app_fingerprint": {
+      "app_title": "Northstar Credit Union — Member Servicing Console (Demo)",
+      "build_marker": "4.2.19-legacy"
+    }
+  }
+}

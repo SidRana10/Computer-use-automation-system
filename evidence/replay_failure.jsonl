@@ -1,0 +1,12 @@
+{"ts": "2026-08-17T20:36:26.708731+00:00", "run_id": "rep-7a593d2f17", "event": "replay_started", "capability_id": "member.get_savings_balance", "capability_version": "1.0.0", "inputs": ["member_id"]}
+{"ts": "2026-08-17T20:36:27.257290+00:00", "run_id": "rep-7a593d2f17", "event": "policy_checked", "step_id": "s1_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-08-17T20:36:27.308811+00:00", "run_id": "rep-7a593d2f17", "event": "target_resolved", "step_id": "s1_click", "strategy": "role_name"}
+{"ts": "2026-08-17T20:36:27.319178+00:00", "run_id": "rep-7a593d2f17", "event": "step_completed", "step_id": "s1_click", "attempts": 0}
+{"ts": "2026-08-17T20:36:27.319347+00:00", "run_id": "rep-7a593d2f17", "event": "policy_checked", "step_id": "s2_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-08-17T20:36:27.338747+00:00", "run_id": "rep-7a593d2f17", "event": "target_resolved", "step_id": "s2_fill", "strategy": "role_name"}
+{"ts": "2026-08-17T20:36:27.339178+00:00", "run_id": "rep-7a593d2f17", "event": "step_completed", "step_id": "s2_fill", "attempts": 0}
+{"ts": "2026-08-17T20:36:27.339295+00:00", "run_id": "rep-7a593d2f17", "event": "policy_checked", "step_id": "s3_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-08-17T20:36:27.387360+00:00", "run_id": "rep-7a593d2f17", "event": "target_resolved", "step_id": "s3_click", "strategy": "role_name"}
+{"ts": "2026-08-17T20:36:27.398408+00:00", "run_id": "rep-7a593d2f17", "event": "step_completed", "step_id": "s3_click", "attempts": 0}
+{"ts": "2026-08-17T20:36:27.398553+00:00", "run_id": "rep-7a593d2f17", "event": "policy_checked", "step_id": "s4_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-08-17T20:36:35.013721+00:00", "run_id": "rep-7a593d2f17", "event": "hard_failure", "step_id": "s4_click", "code": "TARGET_NOT_FOUND", "expected": "link 'Accounts' resolvable by strategies ['role_name', 'text']", "observed": "no strategy of ['role_name', 'text'] matched within 5000ms", "recovery_attempts": 0}

@@ -1,0 +1,28 @@
+{"ts": "2026-08-17T21:57:49.106135+00:00", "run_id": "rep-ff489aceae", "event": "replay_started", "capability_id": "member.open_sub_account", "capability_version": "1.0.0", "inputs": ["account_type", "member_id"]}
+{"ts": "2026-08-17T21:57:49.784904+00:00", "run_id": "rep-ff489aceae", "event": "policy_checked", "step_id": "s1_navigate", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-08-17T21:57:49.822951+00:00", "run_id": "rep-ff489aceae", "event": "step_completed", "step_id": "s1_navigate", "attempts": 0}
+{"ts": "2026-08-17T21:57:49.823140+00:00", "run_id": "rep-ff489aceae", "event": "policy_checked", "step_id": "s2_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-08-17T21:57:49.831572+00:00", "run_id": "rep-ff489aceae", "event": "target_resolved", "step_id": "s2_fill", "strategy": "label"}
+{"ts": "2026-08-17T21:57:49.831783+00:00", "run_id": "rep-ff489aceae", "event": "step_completed", "step_id": "s2_fill", "attempts": 0}
+{"ts": "2026-08-17T21:57:49.831930+00:00", "run_id": "rep-ff489aceae", "event": "policy_checked", "step_id": "s3_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-08-17T21:57:49.880165+00:00", "run_id": "rep-ff489aceae", "event": "target_resolved", "step_id": "s3_click", "strategy": "role_name"}
+{"ts": "2026-08-17T21:57:49.890212+00:00", "run_id": "rep-ff489aceae", "event": "step_completed", "step_id": "s3_click", "attempts": 0}
+{"ts": "2026-08-17T21:57:49.890349+00:00", "run_id": "rep-ff489aceae", "event": "policy_checked", "step_id": "s4_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-08-17T21:57:49.949351+00:00", "run_id": "rep-ff489aceae", "event": "target_resolved", "step_id": "s4_click", "strategy": "role_name"}
+{"ts": "2026-08-17T21:57:49.960379+00:00", "run_id": "rep-ff489aceae", "event": "step_completed", "step_id": "s4_click", "attempts": 0}
+{"ts": "2026-08-17T21:57:49.960531+00:00", "run_id": "rep-ff489aceae", "event": "policy_checked", "step_id": "s5_select", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-08-17T21:57:49.966470+00:00", "run_id": "rep-ff489aceae", "event": "target_resolved", "step_id": "s5_select", "strategy": "label"}
+{"ts": "2026-08-17T21:57:49.966586+00:00", "run_id": "rep-ff489aceae", "event": "step_completed", "step_id": "s5_select", "attempts": 0}
+{"ts": "2026-08-17T21:57:49.966830+00:00", "run_id": "rep-ff489aceae", "event": "policy_checked", "step_id": "s6_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-08-17T21:57:50.008683+00:00", "run_id": "rep-ff489aceae", "event": "target_resolved", "step_id": "s6_click", "strategy": "role_name"}
+{"ts": "2026-08-17T21:57:50.022387+00:00", "run_id": "rep-ff489aceae", "event": "step_completed", "step_id": "s6_click", "attempts": 0}
+{"ts": "2026-08-17T21:57:50.022539+00:00", "run_id": "rep-ff489aceae", "event": "policy_checked", "step_id": "s7_click", "allowed": false, "requires_human": true, "code": "HUMAN_APPROVAL_REQUIRED"}
+{"ts": "2026-08-17T21:57:50.050329+00:00", "run_id": "rep-ff489aceae", "event": "intervention_created", "intervention_id": "int-393da177", "step_id": "s7_click", "reason_code": "HUMAN_APPROVAL_REQUIRED", "reason": "Step 's7_click' is irreversible; policy requires a human operator to perform it.", "control_owner": "PAUSED", "operator_url": "http://127.0.0.1:8002"}
+{"ts": "2026-08-17T21:58:13.902962+00:00", "run_id": "rep-ff489aceae", "event": "control_owner_changed", "to": "HUMAN", "intervention_id": "int-393da177", "operator_id": "local-operator"}
+{"ts": "2026-08-17T21:59:11.339161+00:00", "run_id": "rep-ff489aceae", "event": "control_owner_changed", "to": "PAUSED", "intervention_id": "int-393da177", "human_events": 2}
+{"ts": "2026-08-17T21:59:11.351671+00:00", "run_id": "rep-ff489aceae", "event": "control_owner_changed", "to": "AUTOMATION", "intervention_id": "int-393da177"}
+{"ts": "2026-08-17T21:59:11.351792+00:00", "run_id": "rep-ff489aceae", "event": "human_completed_step", "step_id": "s7_click", "intervention_id": "int-393da177", "events": 2}
+{"ts": "2026-08-17T21:59:11.351895+00:00", "run_id": "rep-ff489aceae", "event": "policy_checked", "step_id": "s8_extract", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-08-17T21:59:11.360584+00:00", "run_id": "rep-ff489aceae", "event": "target_resolved", "step_id": "s8_extract", "strategy": "stable_attribute"}
+{"ts": "2026-08-17T21:59:11.360803+00:00", "run_id": "rep-ff489aceae", "event": "step_completed", "step_id": "s8_extract", "attempts": 0}
+{"ts": "2026-08-17T21:59:11.366083+00:00", "run_id": "rep-ff489aceae", "event": "replay_succeeded", "outputs": ["confirmation_number"], "recoveries": 0}
