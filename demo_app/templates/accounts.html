@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Accounts</h2>
+<p>Member: <a href="/members/{{ member.member_id }}">{{ member.display_name }}</a></p>
+<table class="legacy">
+  <tr>
+    <th>Account</th>
+    <th>Status</th>
+    <th>Current Balance</th>
+  </tr>
+  {% for account in member.accounts %}
+  <tr>
+    <td>{{ account.account_kind }}</td>
+    <td>{{ account.status }}</td>
+    <td id="acct-{{ account.slug }}-balance">${{ "%.2f"|format(account.balance) }}</td>
+  </tr>
+  {% endfor %}
+</table>
+<p><a href="/members/{{ member.member_id }}">Back to Member Summary</a></p>
+{% endblock %}

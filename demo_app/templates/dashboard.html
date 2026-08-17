@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Dashboard</h2>
+<p>Welcome to the member servicing console. {{ member_count }} synthetic members are on file.</p>
+<table class="legacy">
+  <tr><th>Common tasks</th></tr>
+  <tr><td><a href="/members/search">Search members by ID</a></td></tr>
+</table>
+{% endblock %}

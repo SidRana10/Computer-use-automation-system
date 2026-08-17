@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Review New Sub-Account</h2>
+<table class="legacy">
+  <tr><th>Member</th><td>{{ member.display_name }} ({{ member.member_id }})</td></tr>
+  <tr><th>Account Type</th><td>{{ pending.account_type }}</td></tr>
+  <tr><th>Nickname</th><td>{{ pending.nickname or "&mdash;"|safe }}</td></tr>
+</table>
+<p class="msg-note">Please review carefully. Opening a sub-account takes effect immediately.</p>
+<form method="post" action="/members/{{ member.member_id }}/subaccounts/confirm">
+  <button type="submit" class="btn">Confirm Open Account</button>
+</form>
+<p><a href="/members/{{ member.member_id }}">Cancel</a></p>
+{% endblock %}

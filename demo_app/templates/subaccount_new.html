@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Open Sub-Account</h2>
+<p>Member: {{ member.display_name }} ({{ member.member_id }})</p>
+<form method="post" action="/members/{{ member.member_id }}/subaccounts/review">
+  <table class="legacy">
+    <tr>
+      <td><label for="account-type-field">Account Type</label></td>
+      <td>
+        <select id="account-type-field" name="account_type">
+          <option value="Holiday Savings">Holiday Savings</option>
+          <option value="Vacation Club">Vacation Club</option>
+          <option value="Emergency Fund">Emergency Fund</option>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td><label for="nickname-field">Nickname (optional)</label></td>
+      <td><input type="text" id="nickname-field" name="nickname" size="24"></td>
+    </tr>
+  </table>
+  <p><button type="submit" class="btn">Review</button></p>
+</form>
+{% endblock %}

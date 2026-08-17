@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Sub-Account Opened</h2>
+<p class="msg-note">Sub-account opened successfully.</p>
+<table class="legacy">
+  <tr><th>Confirmation #</th><td id="confirmation-number">{{ confirmation }}</td></tr>
+  <tr><th>Member</th><td>{{ member.display_name }}</td></tr>
+</table>
+<p><a href="/members/{{ member.member_id }}">Back to Member Summary</a></p>
+{% endblock %}

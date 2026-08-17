@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Member Summary</h2>
+<table class="legacy">
+  <tr><th>Member ID</th><td>{{ member.member_id }}</td></tr>
+  <tr><th>Name</th><td>{{ member.display_name }}</td></tr>
+  <tr><th>Standing</th><td>{{ member.standing }}</td></tr>
+  <tr><th>Member since</th><td>{{ member.joined }}</td></tr>
+</table>
+<p>
+  {% if missing_accounts_control %}
+    <span class="msg-note">Accounts (temporarily unavailable)</span>
+  {% else %}
+    <a href="/members/{{ member.member_id }}/accounts">Accounts</a>
+  {% endif %}
+  &nbsp;|&nbsp;
+  <a href="/members/{{ member.member_id }}/subaccounts/new">Open Sub-Account</a>
+</p>
+{% endblock %}
