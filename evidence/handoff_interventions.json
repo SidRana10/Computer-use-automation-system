@@ -1,0 +1,45 @@
+[
+  {
+    "intervention_id": "int-393da177",
+    "run_id": "rep-ff489aceae",
+    "mode": "replay",
+    "capability_id": "member.open_sub_account",
+    "goal_summary": "Opens a sub-account of the requested type; the final confirmation is irreversible and requires a human operator.",
+    "step_id": "s7_click",
+    "reason_code": "HUMAN_APPROVAL_REQUIRED",
+    "reason_message": "Step 's7_click' is irreversible; policy requires a human operator to perform it.",
+    "control_owner": "AUTOMATION",
+    "screenshot_path": "evidence/runs/rep-ff489aceae/screenshots/intervention_s7_click.png",
+    "current_url": "http://127.0.0.1:8001/members/[REDACTED]/subaccounts/review",
+    "created_at": "2026-08-17T21:57:50.050074Z",
+    "status": "resolved",
+    "operator_id": "local-operator",
+    "operator_note": "note",
+    "human_events": [
+      {
+        "event": "click",
+        "tag": "button",
+        "text": "Confirm Open Account",
+        "aria_label": null,
+        "name": null,
+        "value_changed": null,
+        "value": null,
+        "url": null,
+        "timestamp": "2026-08-17T21:58:45.109Z"
+      },
+      {
+        "event": "navigation",
+        "tag": null,
+        "text": null,
+        "aria_label": null,
+        "name": null,
+        "value_changed": null,
+        "value": null,
+        "url": "/members/[REDACTED]/subaccounts/confirmed",
+        "timestamp": "2026-08-17T21:58:45.153Z"
+      }
+    ],
+    "before_screenshot": "evidence/runs/rep-ff489aceae/screenshots/intervention_s7_click.png",
+    "after_screenshot": "evidence/runs/rep-ff489aceae/screenshots/resume_int-393da177.png"
+  }
+]

@@ -10,9 +10,10 @@ decision-making: the discovery agent holds the only model client in the
 system, and the replay engine cannot even represent one.
 
 Discovery is provider-pluggable behind a single `ModelAdapter` seam with a
-factory that knows two genuine providers: Google Gemini
-(`gemini-3-flash-preview`, the default and the runtime model used for the
-submitted genuine evidence) and Anthropic Claude as an optional alternative.
+factory that knows two genuine providers: Google Gemini (the default provider;
+`gemini-3.6-flash` is the runtime model that produced the submitted genuine
+evidence, as recorded in the artifact's provenance) and Anthropic Claude as an
+optional alternative.
 Both expose the same eight narrow UI-action tools via forced function calling
 and share one validation path; a missing API key fails loudly, and the
 scripted test double can never be substituted for a genuine provider.
@@ -144,7 +145,8 @@ production version would put ownership behind durable session leases.
 # 6. Safety
 
 The model proposes; deterministic code decides. Every action — model-proposed
-in discovery, artifact-declared in replay — passes the PolicyEngine before the
+in discovery, artifact-declared in replay, or taken during bounded recovery —
+passes the PolicyEngine before the
 surface executes: HTTP(S)-only, host/port allowlist, glob route allowlist
 (re-checked after navigation, so injected redirects can't silently escape),
 action-kind allowlist, and risk gating. Risk has four classes; risky and
@@ -152,7 +154,9 @@ irreversible require a human. Declared step risk can only raise the effective
 class, and a deterministic control-text classifier ("confirm open account" →
 irreversible) provides a floor during discovery, when no annotation exists
 yet. Artifact policy composes with global policy by intersection — a
-capability can narrow privileges, never broaden them. The model's action
+capability can narrow privileges, never broaden them; route containment is
+decided by the route-pattern semantics themselves, so a capability cannot
+introduce a route the global policy forbids. The model's action
 schema contains no shell/JS/code tool at all.
 
 Privacy: one central redactor is the only path to disk. It redacts by

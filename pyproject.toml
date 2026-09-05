@@ -10,7 +10,9 @@ requires-python = ">=3.12"
 dependencies = [
     "pydantic>=2.7",
     "anthropic>=0.40",
-    "google-genai>=1.0",
+    # 2.18 is the line this project is tested against; the Gemini adapter uses
+    # FunctionDeclaration(parameters_json_schema=...) and client.aio.
+    "google-genai>=2.18",
     "playwright>=1.45",
     "fastapi>=0.111",
     "uvicorn>=0.30",

@@ -27,3 +27,4 @@ demo_app_state.json
 playwright-report/
 test-results/
 evidence-dryrun/
+evidence-success-backup/

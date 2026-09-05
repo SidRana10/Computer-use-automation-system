@@ -68,15 +68,32 @@ class PolicyConfig(BaseModel):
         )
 
 
+_PROBE = "uicapprobe"
+
+
+def _probe_paths(pattern: str) -> list[str]:
+    """Representative concrete paths the pattern can match, derived from its
+    own glob semantics (`**` spans any suffix, `*` spans one segment)."""
+    if "**" in pattern:
+        expansions = ["", _PROBE, f"{_PROBE}/{_PROBE}b"]
+        candidates = [pattern.replace("**", exp) for exp in expansions]
+    else:
+        candidates = [pattern]
+    return [c.replace("*", _PROBE) for c in candidates]
+
+
 def _pattern_within(candidate: str, allowed: list[str]) -> bool:
-    """A capability route pattern is acceptable if some global pattern admits
-    its literal prefix (e.g. `/members/*/accounts` under `/members/**`)."""
-    literal_prefix = candidate.split("*")[0]
-    return any(
-        route_pattern_to_regex(g).match(literal_prefix)
-        or literal_prefix.startswith(g.split("*")[0])
-        for g in allowed
-    )
+    """True only if EVERY concrete path the candidate can match is also
+    admitted by some global pattern.
+
+    A capability may narrow global route privileges, never broaden them, so
+    containment is decided by the route-pattern semantics themselves — never
+    by a literal string prefix, which would let `/anything/**` slip through
+    whenever the global policy allows `/`.
+    """
+    regexes = [route_pattern_to_regex(g) for g in allowed]
+    probes = _probe_paths(candidate)
+    return bool(probes) and all(any(r.match(probe) for r in regexes) for probe in probes)
 
 
 def default_demo_policy(target_base_url: str = "http://127.0.0.1:8001") -> PolicyConfig:

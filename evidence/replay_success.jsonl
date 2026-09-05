@@ -1,0 +1,17 @@
+{"ts": "2026-08-17T20:36:19.307300+00:00", "run_id": "rep-57abda71ba", "event": "replay_started", "capability_id": "member.get_savings_balance", "capability_version": "1.0.0", "inputs": ["member_id"]}
+{"ts": "2026-08-17T20:36:19.975249+00:00", "run_id": "rep-57abda71ba", "event": "policy_checked", "step_id": "s1_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-08-17T20:36:20.054729+00:00", "run_id": "rep-57abda71ba", "event": "target_resolved", "step_id": "s1_click", "strategy": "role_name"}
+{"ts": "2026-08-17T20:36:20.063671+00:00", "run_id": "rep-57abda71ba", "event": "step_completed", "step_id": "s1_click", "attempts": 0}
+{"ts": "2026-08-17T20:36:20.063830+00:00", "run_id": "rep-57abda71ba", "event": "policy_checked", "step_id": "s2_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-08-17T20:36:20.076761+00:00", "run_id": "rep-57abda71ba", "event": "target_resolved", "step_id": "s2_fill", "strategy": "role_name"}
+{"ts": "2026-08-17T20:36:20.077042+00:00", "run_id": "rep-57abda71ba", "event": "step_completed", "step_id": "s2_fill", "attempts": 0}
+{"ts": "2026-08-17T20:36:20.077148+00:00", "run_id": "rep-57abda71ba", "event": "policy_checked", "step_id": "s3_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-08-17T20:36:20.139641+00:00", "run_id": "rep-57abda71ba", "event": "target_resolved", "step_id": "s3_click", "strategy": "role_name"}
+{"ts": "2026-08-17T20:36:20.151370+00:00", "run_id": "rep-57abda71ba", "event": "step_completed", "step_id": "s3_click", "attempts": 0}
+{"ts": "2026-08-17T20:36:20.151558+00:00", "run_id": "rep-57abda71ba", "event": "policy_checked", "step_id": "s4_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-08-17T20:36:20.193017+00:00", "run_id": "rep-57abda71ba", "event": "target_resolved", "step_id": "s4_click", "strategy": "role_name"}
+{"ts": "2026-08-17T20:36:20.201722+00:00", "run_id": "rep-57abda71ba", "event": "step_completed", "step_id": "s4_click", "attempts": 0}
+{"ts": "2026-08-17T20:36:20.201865+00:00", "run_id": "rep-57abda71ba", "event": "policy_checked", "step_id": "s5_extract", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-08-17T20:36:20.204483+00:00", "run_id": "rep-57abda71ba", "event": "target_resolved", "step_id": "s5_extract", "strategy": "stable_attribute"}
+{"ts": "2026-08-17T20:36:20.204573+00:00", "run_id": "rep-57abda71ba", "event": "step_completed", "step_id": "s5_extract", "attempts": 0}
+{"ts": "2026-08-17T20:36:20.206072+00:00", "run_id": "rep-57abda71ba", "event": "replay_succeeded", "outputs": ["savings_balance"], "recoveries": 0}

@@ -8,12 +8,13 @@ parameterized **capability artifact**; production execution is a
 error/outcome handling, configurable safety guardrails, and a **same-session
 human handoff** path for risky or stuck situations.
 
-Discovery is provider-pluggable behind one adapter seam: **Google Gemini
-(`gemini-3-flash-preview`, free tier) is the default provider and the runtime
-model used for the submitted genuine evidence**; Anthropic Claude remains
-available via `LLM_PROVIDER=anthropic`. Development of this repository was
-AI-assisted (Claude Code / Claude Fable 5). Deterministic replay invokes no
-LLM of any kind.
+Discovery is provider-pluggable behind one adapter seam: **Google Gemini is the
+default provider, and `gemini-3.6-flash` (free tier) is the runtime model used
+for the submitted genuine evidence** — set via `GEMINI_MODEL`, which
+`.env.example` ships. Anthropic Claude remains available via
+`LLM_PROVIDER=anthropic`. Development of this repository was AI-assisted
+(Claude Code / Claude Fable 5); that is a development tool, distinct from the
+runtime discovery provider. Deterministic replay invokes no LLM of any kind.
 
 > The model discovers. The artifact is the capability. Deterministic replay is
 > production execution.
@@ -97,14 +98,16 @@ uicap discover \
   --output artifacts/member.get_savings_balance.v1.json
 ```
 
-Each turn the model (Gemini `gemini-3-flash-preview` by default) receives a
-screenshot plus a compact semantic element inventory and returns exactly one
-structured action via forced function calling (strict tool schema — never
-code); every action is Pydantic-validated and policy-checked before Playwright
-executes it. On success the run is compiled into
+Each turn the model (Gemini, `gemini-3.6-flash` in the submitted evidence)
+receives a screenshot plus a compact semantic element inventory and returns
+exactly one structured action via forced function calling (strict tool schema —
+never code); every action is Pydantic-validated and policy-checked before
+Playwright executes it. On success the run is compiled into
 `artifacts/member.get_savings_balance.v1.json` — open it: `member_id` is a
 typed input, not an embedded literal; targets are ordered locator-strategy
-chains; checkpoints, error rules, policy and provenance are explicit.
+chains; checkpoints, error rules, policy and provenance are explicit. The
+artifact's `provenance.discovery_model` records exactly which model produced
+it.
 
 To use Anthropic Claude instead, set `LLM_PROVIDER=anthropic` (plus
 `ANTHROPIC_API_KEY`) or pass `--model-adapter anthropic`.
@@ -123,44 +126,65 @@ uicap discover \
 
 ## Demo: deterministic replay (no LLM)
 
+**No API key needed for anything below.** `evidence/example_capability.json` is
+the committed artifact compiled from the genuine Gemini run, so every replay
+demo works from a fresh clone without running discovery first. (If you did run
+discovery above, `artifacts/member.get_savings_balance.v1.json` is the
+equivalent freshly-compiled file.)
+
 Replay the artifact with a **different** member — proving the capability is
 parameterized, not a recorded literal:
 
 ```bash
 uicap replay \
-  --artifact artifacts/member.get_savings_balance.v1.json \
+  --artifact evidence/example_capability.json \
   --input member_id=M-10003
 ```
 
-Returns `status=success` with `outputs.savings_balance=87.12`. There is no
-model decision call anywhere in this path (enforced by construction and by
+Returns `status=success` with `"savings_balance": "$87.12"` — M-10003's
+balance, not the member discovery ran against. The submitted artifact declares
+`savings_balance` as a **string**, because that is the output type the
+discovery model chose for the extract step, so the value is returned exactly as
+the UI renders it; the type is part of the artifact contract and a re-recorded
+capability could declare `decimal` instead. There is no model decision call
+anywhere in this path (enforced by construction and by
 `tests/unit/test_no_llm_in_replay.py`).
 
 ## Demo: business outcome vs failure
 
 ```bash
 uicap replay \
-  --artifact artifacts/member.get_savings_balance.v1.json \
+  --artifact evidence/example_capability.json \
   --input member_id=M-40400
 ```
 
 → `status=business_outcome, code=MEMBER_NOT_FOUND` — a legitimate result the
 calling agent needs, not a crash.
 
-Recoverable conditions (bounded, recorded recovery):
+Recoverable condition (bounded, recorded recovery):
 
 ```bash
-uicap replay --artifact artifacts/member.get_savings_balance.v1.json \
-  --input member_id=M-10001 --demo-interstitial   # known idle dialog → dismissed
-uicap replay --artifact artifacts/member.get_savings_balance.v1.json \
-  --input member_id=M-10001 --demo-slow           # transient load → wait+reload
+uicap replay --artifact evidence/example_capability.json \
+  --input member_id=M-10001 --demo-interstitial
 ```
+
+→ `status=success` with `recoveries: [{code: KNOWN_INTERSTITIAL, outcome:
+recovered}]` — the known idle dialog was dismissed and the step retried.
+
+There is also a transient-load knob (`--demo-slow`). With this particular
+artifact it returns `status=failure, code=POLICY_BLOCKED`, because the
+capability's declared policy never included `navigate` (the discovery model
+reached every page by clicking links), so its reload recovery is not
+authorized. That is the policy boundary working as intended — recovery gets no
+weaker path to the browser than an ordinary step. The successful
+wait-and-reload recovery path is covered by the test suite, which uses a
+fixture artifact that does declare `navigate`.
 
 Injected hard failure (deterministic simulation for evidence):
 
 ```bash
 uicap replay \
-  --artifact artifacts/member.get_savings_balance.v1.json \
+  --artifact evidence/example_capability.json \
   --input member_id=M-10003 \
   --demo-failure missing_accounts_control
 ```
@@ -210,19 +234,38 @@ uicap demo-app &                      # if not already running
 python scripts/capture_evidence.py    # requires GEMINI_API_KEY (default provider)
 ```
 
-The genuine discovery run uses Gemini `gemini-3-flash-preview` (or
-`--provider anthropic` with an Anthropic key). The script **fails loudly** if
-the selected provider's key is absent — it never falls back to a scripted
-model for genuine evidence.
+The committed evidence was produced with Gemini `gemini-3.6-flash` (set via
+`GEMINI_MODEL`); `--provider anthropic` with an Anthropic key is the
+alternative. The script **fails loudly** if the selected provider's key is
+absent — it never falls back to a scripted model for genuine evidence.
 
 | File | Proves |
 |---|---|
-| `evidence/discovery_run.jsonl` | genuine LLM-driven discovery (Gemini): per-step observations, proposed structured actions, policy decisions, results (redacted) |
+| `evidence/discovery_run.jsonl` | genuine LLM-driven discovery (`gemini:gemini-3.6-flash`, recorded in the log): per-step observations, proposed structured actions, policy decisions, results (redacted) |
 | `evidence/discovery_trace.zip` | Playwright trace of the discovery session |
-| `evidence/example_capability.json` | the compiled artifact: typed contract, parameterized inputs, locator chains, checkpoints, error rules, policy, provenance |
-| `evidence/replay_success.jsonl` | deterministic LLM-free replay with a *different* member (M-10003) |
-| `evidence/replay_not_found.jsonl` | expected business outcome (`MEMBER_NOT_FOUND`), not a crash |
-| `evidence/replay_failure.jsonl` + `failure_screenshot.png` | injected hard failure with step/expected/observed + richer signal |
+| `evidence/example_capability.json` | the compiled artifact: typed contract, parameterized inputs, locator chains, checkpoints, error rules, policy, provenance (including the discovery model) |
+| `evidence/replay_success.jsonl` | deterministic replay containing no model call of any kind — only policy checks, target resolutions, and step completions |
+| `evidence/replay_not_found.jsonl` | expected business outcome (`MEMBER_NOT_FOUND`) at step `s3_click`, not a crash |
+| `evidence/replay_failure.jsonl` + `failure_screenshot.png` | injected hard failure (`TARGET_NOT_FOUND` at `s4_click`) with expected/observed + screenshot |
+| `evidence/handoff_run.jsonl` | same-session handoff run `rep-ff489aceae`: policy refuses `s7_click` unattended, intervention raised, ownership `PAUSED → HUMAN → PAUSED → AUTOMATION`, `human_completed_step` with 2 events, then `replay_succeeded` |
+| `evidence/handoff_interventions.json` | the intervention record: reason, redacted URL, and the two captured human actions — a `click` on "Confirm Open Account" and the resulting `navigation`, with no typed values |
+| `evidence/handoff_intervention_screenshot.png` | live session paused on the review screen, irreversible step not executed by automation |
+| `evidence/handoff_resume_screenshot.png` | same session after the human confirmed, showing the confirmation page automation then revalidated |
+| `evidence/handoff_trace.zip` | Playwright trace spanning the whole handoff |
+
+Reading the logs honestly: invocation inputs and extracted outputs are redacted
+in every log, so the replay logs do not themselves display the member ID. That
+the replays ran against **M-10003** rather than the discovery member is shown
+by `capture_evidence.py`'s arguments, by the returned balance matching
+M-10003's fixture, and visibly by `failure_screenshot.png`.
+
+The handoff evidence proves the human acted *after* claiming control: the
+captured click is timestamped inside the HUMAN window, and the `navigation`
+event shows capture surviving the page load the click caused.
+
+What the committed evidence does **not** cover: recoverable conditions and
+policy blocking are exercised by the test suite rather than by a committed
+evidence file.
 
 `scripts/capture_evidence.py --fake` exercises the same pipeline with the
 scripted test double (dry run into `evidence-dryrun/`, never committed as

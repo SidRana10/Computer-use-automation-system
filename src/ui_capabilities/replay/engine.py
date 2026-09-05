@@ -257,8 +257,27 @@ class ReplayEngine:
                 budget = min(rule.max_attempts or self.settings.max_recovery_attempts, max_attempts) or max_attempts
                 if attempts < budget:
                     attempts += 1
-                    notes = await perform_recovery(self.surface, rule)
-                    self.logger.event("recovery_attempted", step_id=step.id, code=rule.code, attempt=attempts, notes=notes)
+                    recovery = await perform_recovery(self.surface, rule, policy)
+                    self.logger.event(
+                        "recovery_attempted",
+                        step_id=step.id,
+                        code=rule.code,
+                        attempt=attempts,
+                        notes=recovery.notes,
+                        denied=recovery.denied_action,
+                    )
+                    if recovery.denied:
+                        raise _StepOutcome(
+                            await self._hard_failure(
+                                artifact,
+                                step_id=step.id,
+                                code=FailureCode.POLICY_BLOCKED,
+                                expected=f"recovery {rule.code} ({recovery.denied_action}) permitted by effective policy",
+                                observed=recovery.denial.reason,
+                                recovery_attempts=attempts,
+                            )
+                        )
+                    notes = recovery.notes
                     # recovery may already have restored the expected state
                     if await self._first_failing_checkpoint(step) is None and (result.ok or step.action in ("navigate", "click")):
                         recoveries.append(RecoveryRecord(step_id=step.id, code=rule.code, attempts=attempts, outcome="recovered"))

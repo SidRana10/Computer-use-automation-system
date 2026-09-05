@@ -37,7 +37,7 @@ Claude Code: maintain this file as work progresses. Do not mark a milestone comp
 - [x] Tracing/evidence hooks (Playwright tracing per run)
 
 ## M4 — LLM discovery
-- [x] Provider-pluggable model adapters: Gemini (`GEMINI_MODEL=gemini-3-flash-preview`, default) and Anthropic (`DISCOVERY_MODEL=claude-fable-5`), selected via `LLM_PROVIDER`; missing keys fail loudly, no fake fallback
+- [x] Provider-pluggable model adapters: Gemini (default provider; `GEMINI_MODEL=gemini-3.6-flash` produced the submitted evidence) and Anthropic (`DISCOVERY_MODEL=claude-fable-5`), selected via `LLM_PROVIDER`; missing keys fail loudly, no fake fallback
 - [x] Strict/Pydantic-validated action contract (one tool per action kind)
 - [x] Observe → decide → policy → act loop
 - [x] Max steps + timeout + repeated-state detection + error/denial budgets
@@ -93,18 +93,23 @@ Claude Code: maintain this file as work progresses. Do not mark a milestone comp
 ## M9 — Submission artifacts
 - [x] `README.md`
 - [x] `REPORT.md` exact seven headings
-- [ ] `/evidence/example_capability.json` — **requires genuine API run** (see below)
-- [ ] `/evidence/discovery_run.jsonl` — **requires genuine API run**
-- [ ] `/evidence/replay_success.jsonl` — captured together with the genuine run
-- [ ] `/evidence/replay_not_found.jsonl` / `replay_failure.jsonl` / `failure_screenshot.png` — captured together with the genuine run
+- [x] `/evidence/example_capability.json` — compiled from genuine run `disc-3b572d9b32`
+- [x] `/evidence/discovery_run.jsonl` — genuine Gemini `gemini-3.6-flash` discovery
+- [x] `/evidence/replay_success.jsonl` — LLM-free replay, different member than discovery
+- [x] `/evidence/replay_not_found.jsonl` / `replay_failure.jsonl` / `failure_screenshot.png`
+- [x] `/evidence/discovery_trace.zip`
 - [x] evidence tooling validated end-to-end via `scripts/capture_evidence.py --fake` (dry run, clearly labeled)
 - [x] exact demo commands validated from clean setup
+- [x] handoff evidence — `handoff_run.jsonl`, `handoff_interventions.json`,
+      both handoff screenshots and `handoff_trace.zip` from run `rep-ff489aceae`
+      (2 captured human events, full ownership cycle, revalidated completion)
+- [ ] recoverable-condition and policy-block evidence files — test-covered only
 
-**Genuine evidence:** with the demo app running and `GEMINI_API_KEY` set (the
-default Gemini provider; or `ANTHROPIC_API_KEY` with `--provider anthropic`),
-run `python scripts/capture_evidence.py`. It fails loudly without a key and
-never falls back to a scripted model. No evidence has been fabricated; the
-committed evidence set is produced only by that real run.
+**Genuine evidence:** captured from a real run of
+`python scripts/capture_evidence.py` (demo app running, `GEMINI_API_KEY` set;
+or `ANTHROPIC_API_KEY` with `--provider anthropic`). It fails loudly without a
+key and never falls back to a scripted model. No evidence has been fabricated
+or hand-edited.
 
 ## M10 — Final audit
 - [x] requirements audit (inline, against docs/01 traceability)
@@ -112,4 +117,5 @@ committed evidence set is produced only by that real run.
 - [x] test review (inline, against docs/09 plan)
 - [x] no secrets in repository
 - [x] git status clean except intentional files
-- [x] final end-to-end demo succeeds (offline path; genuine-evidence command pending API key)
+- [x] final end-to-end demo succeeds, including the genuine Gemini discovery run
+- [x] read-only evidence audit performed against the captured evidence set
