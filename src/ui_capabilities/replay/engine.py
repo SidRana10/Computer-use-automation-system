@@ -13,9 +13,9 @@ apply bounded recovery, and log everything. Returns one structured RunResult.
 from __future__ import annotations
 
 from ..config import Settings
-from ..models.artifact import CapabilityArtifact, StepSpec
+from ..models.artifact import CapabilityArtifact, ErrorRule, StepSpec
 from ..models.conditions import ConditionSpec
-from ..models.errors import ErrorClassification, FailureCode
+from ..models.errors import ErrorClassification, FailureCode, RiskLevel, risk_exceeds
 from ..models.intervention import RunMode
 from ..models.results import (
     BusinessOutcomeResult,
@@ -196,8 +196,21 @@ class ReplayEngine:
         if step.on_error is not None:
             max_attempts = min(max_attempts, step.on_error.max_attempts)
 
+        # Once a risky/irreversible action has been dispatched, its effect may
+        # already exist on the target even if the response never arrived. From
+        # that point automation may re-observe and classify, but must never
+        # dispatch the same action again.
+        effective_risk = step.risk
+        heuristic = policy.classify_control_risk(step.target.description if step.target else None)
+        if risk_exceeds(heuristic, effective_risk):
+            effective_risk = heuristic
+        write_once = effective_risk in (RiskLevel.RISKY, RiskLevel.IRREVERSIBLE)
+        dispatched_write = False
+
         attempts = 0
         while True:
+            if write_once:
+                dispatched_write = True
             result = await self.surface.execute(executable)
             # a navigation/click may have been redirected: the landed URL must
             # still be inside policy (docs/06 — no silent off-policy redirects)
@@ -228,9 +241,13 @@ class ReplayEngine:
 
             # something is wrong: classify against declared rules
             rule = await classify_current_state(self.surface, artifact)
+            if rule is not None and rule.code in artifact.policy.escalate_on_codes:
+                await self._escalate_detected_state(artifact, step, rule, human_completions)
+                return
             if rule is not None and rule.classification == ErrorClassification.BUSINESS_OUTCOME:
                 self.logger.event("business_outcome", step_id=step.id, code=rule.code)
                 await self.surface.capture_screenshot(f"{step.id}_business_outcome")
+                await self._try_dom_snapshot(f"{step.id}_business_outcome")
                 raise _StepOutcome(
                     BusinessOutcomeResult(
                         run_id=self.evidence.run_id,
@@ -254,6 +271,8 @@ class ReplayEngine:
                     )
                 )
             if rule is not None and rule.classification == ErrorClassification.RECOVERABLE:
+                if dispatched_write:
+                    raise _StepOutcome(await self._uncertain_write(artifact, step, rule.code, attempts))
                 budget = min(rule.max_attempts or self.settings.max_recovery_attempts, max_attempts) or max_attempts
                 if attempts < budget:
                     attempts += 1
@@ -297,6 +316,10 @@ class ReplayEngine:
                 )
 
             # no declared rule matched -> unclassified hard failure
+            if dispatched_write:
+                raise _StepOutcome(
+                    await self._uncertain_write(artifact, step, result.error_code or "CHECKPOINT_FAILED", attempts)
+                )
             if not result.ok:
                 code = {
                     "TARGET_NOT_FOUND": FailureCode.TARGET_NOT_FOUND,
@@ -340,7 +363,13 @@ class ReplayEngine:
             return ExecutableAction(kind="navigate", url=url, timeout_ms=timeout)
         value = binder.resolve_value(step.value, bound) if step.value is not None else None
         kind = step.action if step.action in ("click", "fill", "select", "extract") else "wait"
-        return ExecutableAction(kind=kind, target=step.target, value=value, timeout_ms=timeout)
+        return ExecutableAction(
+            kind=kind,
+            target=step.target,
+            value=value,
+            extract_mode=step.extract_mode if step.action == "extract" else None,
+            timeout_ms=timeout,
+        )
 
     # ------------------------------------------------------------- conditions
 
@@ -351,6 +380,7 @@ class ReplayEngine:
         rule = await classify_current_state(self.surface, artifact)
         if rule is not None and rule.classification == ErrorClassification.BUSINESS_OUTCOME:
             await self.surface.capture_screenshot(f"{label.replace(' ', '_')}_business_outcome")
+            await self._try_dom_snapshot(f"{label.replace(' ', '_')}_business_outcome")
             raise _StepOutcome(
                 BusinessOutcomeResult(
                     run_id=self.evidence.run_id,
@@ -371,6 +401,13 @@ class ReplayEngine:
                 observed=result.detail or f"not satisfied at {self.surface.current_url()}",
             )
         )
+
+    async def _try_dom_snapshot(self, label: str) -> None:
+        """Best-effort redacted DOM capture; never breaks a result path."""
+        try:
+            await self.surface.capture_dom_snapshot(label)
+        except Exception:
+            pass
 
     async def _verify_fingerprint(self, artifact: CapabilityArtifact, run_id: str) -> None:
         expected_title = artifact.target.app_fingerprint.get("app_title")
@@ -400,11 +437,18 @@ class ReplayEngine:
         observed: str,
         recovery_attempts: int = 0,
     ) -> FailureResult:
+        evidence: list[str] = []
+        label = f"failure_{step_id or 'run'}"
         try:
-            screenshot = await self.surface.capture_screenshot(f"failure_{step_id or 'run'}")
-            evidence = [str(screenshot)]
+            evidence.append(str(await self.surface.capture_screenshot(label)))
         except Exception:  # browser may already be gone; failure result still returned
-            evidence = []
+            pass
+        try:
+            snapshot = await self.surface.capture_dom_snapshot(label)
+            if snapshot is not None:
+                evidence.append(str(snapshot))
+        except Exception:
+            pass
         self.logger.event(
             "hard_failure",
             step_id=step_id,
@@ -425,19 +469,80 @@ class ReplayEngine:
             evidence=evidence + self.evidence.files(),
         )
 
+    async def _uncertain_write(
+        self, artifact: CapabilityArtifact, step: StepSpec, observed_code: str, attempts: int
+    ) -> FailureResult:
+        """Terminal result for a dispatched risky/irreversible action whose
+        outcome could not be confirmed.
+
+        The action may or may not have taken effect on the target. Retrying it
+        could duplicate a posted transaction, so automation stops here and hands
+        the caller the evidence needed to reconcile the real state.
+        """
+        self.logger.event(
+            "irreversible_outcome_uncertain",
+            step_id=step.id,
+            risk=step.risk.value,
+            observed=str(observed_code),
+        )
+        return await self._hard_failure(
+            artifact,
+            step_id=step.id,
+            code=FailureCode.IRREVERSIBLE_OUTCOME_UNCERTAIN,
+            expected=f"confirmed outcome for {step.risk.value} step {step.id!r}",
+            observed=(
+                f"the action was dispatched and the resulting state could not be confirmed ({observed_code}); "
+                "automation will not repeat it — reconcile the target before retrying"
+            ),
+            recovery_attempts=attempts,
+        )
+
+    async def _escalate_detected_state(
+        self,
+        artifact: CapabilityArtifact,
+        step: StepSpec,
+        rule: "ErrorRule",
+        human_completions: list[HumanCompletionRecord],
+    ) -> None:
+        """Route a detected condition this capability declares as human-owned.
+
+        The error taxonomy still classifies *what happened*; the artifact's own
+        policy decides that this particular condition needs a person. Scoped to
+        the capability, so the same condition elsewhere stays an ordinary result.
+        """
+        self.logger.event("policy_escalation", step_id=step.id, code=rule.code, classification=rule.classification.value)
+        await self._escalate_step(
+            artifact,
+            step,
+            human_completions,
+            reason_code=rule.code,
+            reason_message=rule.caller_message,
+        )
+
     # ------------------------------------------------------------- escalation
 
-    async def _escalate_step(self, artifact: CapabilityArtifact, step: StepSpec, human_completions: list[HumanCompletionRecord]) -> None:
+    async def _escalate_step(
+        self,
+        artifact: CapabilityArtifact,
+        step: StepSpec,
+        human_completions: list[HumanCompletionRecord],
+        *,
+        reason_code: str = "HUMAN_APPROVAL_REQUIRED",
+        reason_message: str | None = None,
+    ) -> None:
+        message = reason_message or (
+            f"Step {step.id!r} is {step.risk.value}; policy requires a human operator to perform it."
+        )
         if self.handoff is None:
             raise _StepOutcome(
                 EscalatedResult(
                     run_id=self.evidence.run_id,
                     capability_id=artifact.capability_id,
                     capability_version=artifact.capability_version,
-                    code="HUMAN_APPROVAL_REQUIRED",
+                    code=reason_code,
                     intervention_id="",
                     step_id=step.id,
-                    message=f"step {step.id} ({step.risk.value}) requires a human operator, and no handoff channel is available",
+                    message=f"{message} No handoff channel is available.",
                 )
             )
         intervention = await self.handoff.request_intervention(
@@ -446,8 +551,8 @@ class ReplayEngine:
             capability_id=artifact.capability_id,
             goal_summary=artifact.description,
             step_id=step.id,
-            reason_code="HUMAN_APPROVAL_REQUIRED",
-            reason_message=f"Step {step.id!r} is {step.risk.value}; policy requires a human operator to perform it.",
+            reason_code=reason_code,
+            reason_message=message,
         )
         resolution = await self.handoff.wait(intervention.intervention_id)
         if resolution == "aborted":
@@ -456,7 +561,7 @@ class ReplayEngine:
                     run_id=self.evidence.run_id,
                     capability_id=artifact.capability_id,
                     capability_version=artifact.capability_version,
-                    code="HUMAN_APPROVAL_REQUIRED",
+                    code=reason_code,
                     intervention_id=intervention.intervention_id,
                     step_id=step.id,
                     message="operator aborted the run",

@@ -1,0 +1,13 @@
+{"ts": "2026-09-05T18:13:28.747939+00:00", "run_id": "rep-2da52668df", "event": "replay_started", "capability_id": "meridian.sign_on", "capability_version": "1.0.0", "inputs": ["branch", "operator_id", "password"]}
+{"ts": "2026-09-05T18:13:29.397841+00:00", "run_id": "rep-2da52668df", "event": "policy_checked", "step_id": "s1_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T18:13:29.407116+00:00", "run_id": "rep-2da52668df", "event": "target_resolved", "step_id": "s1_fill", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T18:13:29.407294+00:00", "run_id": "rep-2da52668df", "event": "step_completed", "step_id": "s1_fill", "attempts": 0}
+{"ts": "2026-09-05T18:13:29.407373+00:00", "run_id": "rep-2da52668df", "event": "policy_checked", "step_id": "s2_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T18:13:29.428012+00:00", "run_id": "rep-2da52668df", "event": "target_resolved", "step_id": "s2_fill", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T18:13:29.428241+00:00", "run_id": "rep-2da52668df", "event": "step_completed", "step_id": "s2_fill", "attempts": 0}
+{"ts": "2026-09-05T18:13:29.428334+00:00", "run_id": "rep-2da52668df", "event": "policy_checked", "step_id": "s3_select", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T18:13:29.431453+00:00", "run_id": "rep-2da52668df", "event": "target_resolved", "step_id": "s3_select", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T18:13:29.431564+00:00", "run_id": "rep-2da52668df", "event": "step_completed", "step_id": "s3_select", "attempts": 0}
+{"ts": "2026-09-05T18:13:29.431629+00:00", "run_id": "rep-2da52668df", "event": "policy_checked", "step_id": "s4_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T18:13:29.874184+00:00", "run_id": "rep-2da52668df", "event": "target_resolved", "step_id": "s4_click", "strategy": "role_name"}
+{"ts": "2026-09-05T18:13:34.920041+00:00", "run_id": "rep-2da52668df", "event": "business_outcome", "step_id": "s4_click", "code": "BAD_LOGIN"}

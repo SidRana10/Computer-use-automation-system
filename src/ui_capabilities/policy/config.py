@@ -96,13 +96,28 @@ def _pattern_within(candidate: str, allowed: list[str]) -> bool:
     return bool(probes) and all(any(r.match(probe) for r in regexes) for probe in probes)
 
 
+def default_port_for(target_base_url: str) -> int:
+    """The port a URL actually resolves to.
+
+    `urlparse().port` is None when the URL omits it, so a scheme-aware default
+    is required: PolicyEngine.check_url resolves an https URL to 443, and a
+    policy that assumed 80 would block every https target outright.
+    """
+    from urllib.parse import urlparse
+
+    parsed = urlparse(target_base_url)
+    if parsed.port:
+        return parsed.port
+    return 443 if parsed.scheme == "https" else 80
+
+
 def default_demo_policy(target_base_url: str = "http://127.0.0.1:8001") -> PolicyConfig:
     from urllib.parse import urlparse
 
     parsed = urlparse(target_base_url)
     return PolicyConfig(
         allowed_domains=[parsed.hostname or "127.0.0.1", "localhost"],
-        allowed_ports=[parsed.port or 80],
+        allowed_ports=[default_port_for(target_base_url)],
         allowed_route_patterns=["/", "/members/**", "/session/**", "/demo-note"],
         allowed_actions=["navigate", "click", "fill", "select", "extract", "wait_for", "assert", "wait"],
         max_unattended_risk=RiskLevel.REVERSIBLE,

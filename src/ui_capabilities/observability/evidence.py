@@ -10,8 +10,10 @@ class EvidenceManager:
         self.run_id = run_id
         self.run_dir = Path(base_dir) / "runs" / run_id
         self.screenshot_dir = self.run_dir / "screenshots"
+        self.dom_dir = self.run_dir / "dom"
         self.run_dir.mkdir(parents=True, exist_ok=True)
         self.screenshot_dir.mkdir(parents=True, exist_ok=True)
+        self.dom_dir.mkdir(parents=True, exist_ok=True)
 
     @property
     def log_path(self) -> Path:
@@ -22,8 +24,14 @@ class EvidenceManager:
         return self.run_dir / "trace.zip"
 
     def screenshot_path(self, label: str) -> Path:
-        safe = "".join(c if c.isalnum() or c in "-_" else "_" for c in label)
-        return self.screenshot_dir / f"{safe}.png"
+        return self.screenshot_dir / f"{_safe(label)}.png"
+
+    def dom_snapshot_path(self, label: str) -> Path:
+        return self.dom_dir / f"{_safe(label)}.html"
 
     def files(self) -> list[str]:
         return sorted(str(p) for p in self.run_dir.rglob("*") if p.is_file())
+
+
+def _safe(label: str) -> str:
+    return "".join(c if c.isalnum() or c in "-_" else "_" for c in label)

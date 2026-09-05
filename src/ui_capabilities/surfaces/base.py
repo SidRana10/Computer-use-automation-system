@@ -27,6 +27,7 @@ class ObservedElement(BaseModel):
     name_attr: str | None = None
     id_attr: str | None = None
     options: list[str] = []
+    option_values: list[str] = []  # submitted values; stable when captions embed live data
     candidate_strategies: list[LocatorStrategy] = []
 
 
@@ -51,6 +52,9 @@ class ExecutableAction(BaseModel):
     element_ref: str | None = None
     target: TargetDescriptor | None = None
     value: str | None = None
+    # extract only: read rendered text, a form control's current value, or a
+    # whole table as structured rows.
+    extract_mode: Literal["text", "value", "table"] | None = None
     wait_ms: int | None = None
     timeout_ms: int | None = None
 
@@ -74,6 +78,8 @@ class SurfaceAdapter(Protocol):
     async def evaluate_condition(self, condition: ConditionSpec) -> ConditionResult: ...
 
     async def capture_screenshot(self, label: str) -> Path: ...
+
+    async def capture_dom_snapshot(self, label: str) -> Path | None: ...
 
     async def start_trace(self) -> None: ...
 

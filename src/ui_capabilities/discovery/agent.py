@@ -71,6 +71,7 @@ class DiscoveryAgent:
         evidence: EvidenceManager,
         redactor: Redactor,
         handoff=None,  # HandoffManager | None; optional to keep tests light
+        fingerprint_extractor=None,  # (title, visible_text) -> dict[str, str]
     ):
         self.surface = surface
         self.model = model
@@ -80,6 +81,9 @@ class DiscoveryAgent:
         self.evidence = evidence
         self.redactor = redactor
         self.handoff = handoff
+        # Marker extraction differs per target (Northstar prints "Build x.y.z",
+        # MERIDIAN prints "Member Services Platform vX"); the profile owns it.
+        self._fingerprint_extractor = fingerprint_extractor
 
     async def run(
         self,
@@ -281,6 +285,8 @@ class DiscoveryAgent:
     # ------------------------------------------------------------------ utils
 
     def _fingerprint_app(self, observation: Observation) -> dict[str, str]:
+        if self._fingerprint_extractor is not None:
+            return self._fingerprint_extractor(observation.title, observation.visible_text_summary)
         fp = {"app_title": observation.title}
         match = _BUILD_MARKER_RE.search(observation.visible_text_summary)
         if match:

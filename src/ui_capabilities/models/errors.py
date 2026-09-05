@@ -58,6 +58,9 @@ class FailureCode(StrEnum):
     SESSION_EXPIRED = "SESSION_EXPIRED"
     POLICY_BLOCKED = "POLICY_BLOCKED"
     RETRY_EXHAUSTED = "RETRY_EXHAUSTED"
+    # A risky/irreversible action was dispatched and the resulting state could
+    # not be confirmed. Automation must never re-dispatch it (see docs/05).
+    IRREVERSIBLE_OUTCOME_UNCERTAIN = "IRREVERSIBLE_OUTCOME_UNCERTAIN"
     INVOCATION_INVALID = "INVOCATION_INVALID"
     ARTIFACT_INVALID = "ARTIFACT_INVALID"
     EXECUTION_ERROR = "EXECUTION_ERROR"

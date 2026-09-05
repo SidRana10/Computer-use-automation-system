@@ -41,4 +41,5 @@ testpaths = ["tests"]
 pythonpath = ["src", "."]
 markers = [
     "integration: tests that launch the demo app and a real (headless) browser",
+    "live: tests that reach the hosted MERIDIAN sample application (opt in with MERIDIAN_LIVE=1)",
 ]

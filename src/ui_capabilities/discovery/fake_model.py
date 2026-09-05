@@ -140,6 +140,64 @@ class ScriptedSubAccountModel:
         return RequestHumanAction(reason_code="blocked", message="Scripted flow has no next action for this page")
 
 
+class ScriptedMeridianSignOnModel:
+    """Scripted MERIDIAN sign-on — TEST DOUBLE ONLY.
+
+    Exists to prove the real pipeline (discovery loop -> recorder -> compiler ->
+    deterministic replay) works against MERIDIAN's markup without spending an
+    API call, and to de-risk the genuine run. Like every double here it can
+    never stand in for genuine discovery evidence: the artifact it compiles
+    records this class as the model.
+
+    It addresses controls the way the live target actually exposes them: this
+    application renders no ids, labels or ARIA, so the fields are found by their
+    form `name` attribute and the button by its `value` caption.
+    """
+
+    name = "fake-meridian-signon"
+
+    def __init__(self) -> None:
+        self._done = {"operator": False, "password": False, "branch": False, "submit": False}
+
+    @staticmethod
+    def _by_name(observation: Observation, name: str) -> ObservedElement | None:
+        return next((el for el in observation.elements if el.name_attr == name), None)
+
+    async def next_action(self, observation: Observation, context: TurnContext) -> DiscoveryAction:
+        if "/menu" in observation.path:
+            return DoneAction(
+                success_summary="Signed on to MERIDIAN and reached the main menu",
+                suggested_success_condition=SuggestedCondition(kind="text_present", value="MAIN MENU"),
+            )
+        if not self._done["operator"] and (el := self._by_name(observation, "operator")):
+            self._done["operator"] = True
+            return FillAction(
+                element_ref=el.ref,
+                value_source=ValueSource(input_name="operator_id"),
+                rationale_summary="Enter the supplied operator id",
+            )
+        if not self._done["password"] and (el := self._by_name(observation, "password")):
+            self._done["password"] = True
+            return FillAction(
+                element_ref=el.ref,
+                value_source=ValueSource(input_name="password"),
+                rationale_summary="Enter the supplied operator password",
+            )
+        if not self._done["branch"] and (el := self._by_name(observation, "branch")):
+            self._done["branch"] = True
+            return SelectAction(
+                element_ref=el.ref,
+                value_source=ValueSource(input_name="branch"),
+                rationale_summary="Choose the supplied branch",
+            )
+        if not self._done["submit"]:
+            button = _find(observation, kind="button", name_contains="Sign On")
+            if button:
+                self._done["submit"] = True
+                return ClickAction(element_ref=button.ref, rationale_summary="Submit sign-on")
+        return RequestHumanAction(reason_code="blocked", message="Scripted flow has no next action for this page")
+
+
 class RogueModel:
     """Adversarial test double: immediately proposes an off-policy navigation.
     Exists to prove the policy gate blocks before the surface executes."""

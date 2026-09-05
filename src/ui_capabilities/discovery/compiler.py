@@ -28,7 +28,7 @@ from ..models.artifact import (
 )
 from ..models.conditions import ConditionKind, ConditionSpec
 from ..models.errors import CompileError, RiskLevel, risk_exceeds
-from ..models.targets import TargetDescriptor
+from ..models.targets import LocatorKind, LocatorStrategy, TargetDescriptor
 from ..policy.engine import PolicyEngine
 from .recorder import RecordedRun, RecordedStep
 
@@ -62,6 +62,11 @@ class ArtifactCompiler:
         # step values, locator strategies, descriptions, checkpoints, success
         # conditions, and metadata. The final serialized scan is the backstop.
         runtime_values = self._collect_runtime_values(run)
+        # Declared credential inputs (operator id/password): environment-
+        # supplied and constant, never invocation-varying identity data. Used
+        # only to resolve a narrow, specific collision — see
+        # _is_static_credential_identity.
+        credential_values = self._collect_credential_values(run)
 
         steps: list[StepSpec] = []
         outputs: list[OutputSpec] = []
@@ -72,12 +77,12 @@ class ArtifactCompiler:
         route_patterns.add(self._parameterize_path(entry.path or "/", bindings))
 
         for ordinal, recorded in enumerate(kept, start=1):
-            step = self._compile_step(ordinal, recorded, run, bindings, runtime_values)
+            step = self._compile_step(ordinal, recorded, run, bindings, runtime_values, credential_values)
             steps.append(step)
             used_actions.add(step.action)
             if recorded.after is not None:
                 route_patterns.add(self._parameterize_path(recorded.after.path, bindings))
-            if isinstance(recorded.action, ExtractAction):
+            if isinstance(recorded.action, ExtractAction) and not step.internal:
                 output_type: ValueType = recorded.action.output_type
                 outputs.append(
                     OutputSpec(
@@ -131,7 +136,7 @@ class ArtifactCompiler:
             ),
         )
 
-        self._assert_no_sensitive_values(artifact, runtime_values)
+        self._assert_no_sensitive_values(artifact, runtime_values, credential_values)
         return artifact
 
     @staticmethod
@@ -154,6 +159,45 @@ class ArtifactCompiler:
             if recorded.result is not None and recorded.result.extracted_text:
                 add(recorded.result.extracted_text)
         return values
+
+    @staticmethod
+    def _collect_credential_values(run: RecordedRun) -> frozenset[str]:
+        """Bound values of inputs the target profile declares as credentials
+        (`InputSpec.credential=True`) — environment-supplied, constant across
+        invocations, never invocation-varying identity data. A strict subset of
+        `_collect_runtime_values`, used only by `_is_static_credential_identity`."""
+        values: set[str] = set()
+        for spec in run.input_specs:
+            if spec.credential and run.input_bindings.get(spec.name):
+                values.add(run.input_bindings[spec.name])
+        return frozenset(values)
+
+    @staticmethod
+    def _is_static_credential_identity(strategy: LocatorStrategy, credential_values: frozenset[str]) -> bool:
+        """True only for a `stable_attribute name=...` locator whose value
+        happens to exactly equal a declared credential's bound value.
+
+        An HTML `name` attribute is fixed page structure — the same string
+        regardless of what value is ever typed into the field — unlike an
+        accessible name/text/label, which is rendered and can genuinely embed
+        live data (the concern D014 exists for). When a credential's value
+        coincidentally equals that fixed string (MERIDIAN's password field is
+        `name="password"`, and the demo credential is also literally
+        "password"), that is two independent strings colliding, not the
+        locator embedding invocation-specific identity.
+
+        Deliberately narrow: only this one locator kind/attribute, only exact
+        equality (never substring containment), only against values from
+        inputs explicitly declared as credentials — never member numbers or
+        any other invocation-varying sensitive input, which remain fully
+        subject to D014.
+        """
+        return (
+            strategy.kind == LocatorKind.STABLE_ATTRIBUTE
+            and strategy.attribute == "name"
+            and strategy.value is not None
+            and strategy.value in credential_values
+        )
 
     @staticmethod
     def _contains_runtime_value(text: str | None, runtime_values: list[str]) -> bool:
@@ -190,6 +234,7 @@ class ArtifactCompiler:
         run: RecordedRun,
         bindings: dict[str, str],
         runtime_values: list[str],
+        credential_values: frozenset[str],
     ) -> StepSpec:
         action = recorded.action
         step_id = f"s{ordinal}_{action.action}"
@@ -214,11 +259,17 @@ class ArtifactCompiler:
         # (a bound sensitive input or an extracted value) is not a reusable
         # target: keep only invocation-independent strategies, and fail loudly
         # if none survive rather than persisting a single-invocation locator.
+        # The one narrow exception is a static `name=` DOM attribute that
+        # happens to collide with a declared credential's value — see
+        # _is_static_credential_identity.
         durable_strategies = [
             s
             for s in element.candidate_strategies
-            if not self._contains_runtime_value(s.name, runtime_values)
-            and not self._contains_runtime_value(s.value, runtime_values)
+            if self._is_static_credential_identity(s, credential_values)
+            or (
+                not self._contains_runtime_value(s.name, runtime_values)
+                and not self._contains_runtime_value(s.value, runtime_values)
+            )
         ]
         if not durable_strategies:
             raise CompileError(
@@ -273,6 +324,7 @@ class ArtifactCompiler:
                 target=target,
                 output_name=action.output_name,
                 output_type=action.output_type,
+                extract_mode=action.extract_mode,
                 checkpoint_after=[],
             )
 
@@ -385,13 +437,114 @@ class ArtifactCompiler:
         return path
 
     @staticmethod
-    def _assert_no_sensitive_values(artifact: CapabilityArtifact, sensitive_values: list[str]) -> None:
-        serialized = artifact.model_dump_json()
-        for value in sensitive_values:
-            if value in serialized:
+    def _declared_vocabulary(path: str) -> bool:
+        """True for fields that are declared vocabulary rather than run-derived data.
+
+        The scan below exists to catch a concrete runtime value persisted where a
+        *value* belongs. A handful of fields can never hold run-derived data no
+        matter what the run observed:
+
+        * `contract.inputs[i].name` / `outputs[i].name` and an `InputValueRef`'s
+          `name` — these are the declared parameter names. A step referring to an
+          input by name is parameterization succeeding, not leaking.
+        * those specs' `description` — authored by the input registry.
+        * `error_rules` in full — produced by the target profile's rule factory,
+          which takes no run input at all.
+
+        Everything else stays scanned. Without this, a credential that happens to
+        equal a schema term (MERIDIAN's demo password is the literal word
+        "password") makes the parameter *name* look like a leak and no capability
+        taking credentials could ever compile.
+        """
+        if path.startswith(".error_rules"):
+            return True
+        if re.match(r"^\.contract\.(inputs|outputs)\[\d+\]\.(name|description)$", path):
+            return True
+        if re.match(r"^\.steps\[\d+\]\.value\.name$", path):
+            return True
+        return False
+
+    @staticmethod
+    def _strip_input_placeholders(text: str, input_names: list[str]) -> str:
+        """Remove `{name}` placeholder syntax for every declared input before
+        the final leak scan.
+
+        `_parameterize_text` and `_url_template` both render a bound value as
+        the literal syntax `{that_value's_input_name}`. When an input's value
+        happens to equal its own name (MERIDIAN's password credential is the
+        literal word "password"), that placeholder trivially contains the
+        substring "password" — indistinguishable, by containment alone, from
+        an actual leaked value. Stripping the placeholder syntax first is safe:
+        a genuine leaked value is never wrapped in the exact literal syntax
+        `{its_own_declared_input_name}` unless the templating mechanism itself
+        produced it.
+        """
+        for name in input_names:
+            text = text.replace("{" + name + "}", "")
+        return text
+
+    @staticmethod
+    def _credential_identity_paths(artifact: CapabilityArtifact, credential_values: frozenset[str]) -> set[str]:
+        """Exact JSON paths of `stable_attribute name=` strategies whose value
+        is a declared credential's bound value — the only locations such a
+        value may legitimately survive into the artifact. See
+        `_is_static_credential_identity` for why this is safe.
+        """
+        paths: set[str] = set()
+        if not credential_values:
+            return paths
+        for step_index, step in enumerate(artifact.steps):
+            if step.target is None:
+                continue
+            for strategy_index, strategy in enumerate(step.target.strategies):
+                if (
+                    strategy.kind == LocatorKind.STABLE_ATTRIBUTE
+                    and strategy.attribute == "name"
+                    and strategy.value in credential_values
+                ):
+                    paths.add(f".steps[{step_index}].target.strategies[{strategy_index}].value")
+        return paths
+
+    @classmethod
+    def _assert_no_sensitive_values(
+        cls,
+        artifact: CapabilityArtifact,
+        sensitive_values: list[str],
+        credential_values: frozenset[str] = frozenset(),
+    ) -> None:
+        if not sensitive_values:
+            return
+        # Re-derived from the FINAL artifact, independent of how compilation
+        # got here: a credential value may survive only at the exact locations
+        # that are structurally verified, right now, to be a static `name=`
+        # DOM attribute — never merely because compilation intended it to.
+        exempt_paths = cls._credential_identity_paths(artifact, credential_values)
+        blob = json.loads(artifact.model_dump_json())
+
+        def walk(node, path=""):
+            if isinstance(node, dict):
+                for key, item in node.items():
+                    yield from walk(item, f"{path}.{key}")
+            elif isinstance(node, list):
+                for index, item in enumerate(node):
+                    yield from walk(item, f"{path}[{index}]")
+            elif isinstance(node, str):
+                yield path, node
+
+        input_names = [spec.name for spec in artifact.contract.inputs]
+
+        for path, text in walk(blob):
+            if cls._declared_vocabulary(path):
+                continue
+            scannable = cls._strip_input_placeholders(text, input_names)
+            for value in sensitive_values:
+                if value not in scannable:
+                    continue
+                if value in credential_values and path in exempt_paths:
+                    continue
                 raise CompileError(
-                    "compiled artifact embeds a sensitive invocation value; refusing to save. "
-                    "This indicates a parameterization gap."
+                    f"compiled artifact embeds a sensitive invocation value at {path or '<root>'}; "
+                    "refusing to save. This indicates a parameterization gap."
                 )
 
 

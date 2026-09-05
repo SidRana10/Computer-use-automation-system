@@ -3,6 +3,7 @@ browser action if the invocation does not satisfy the contract."""
 
 from __future__ import annotations
 
+import json
 import re
 from urllib.parse import urlparse, urlunparse
 
@@ -81,6 +82,11 @@ _MONEY_JUNK = re.compile(r"[$,\s]")
 
 def coerce_output(name: str, raw: str, value_type: ValueType):
     text = raw.strip()
+    if value_type == "json":
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError as exc:
+            raise OutputCoercionError(f"output {name!r}: extracted text is not valid JSON ({exc.msg})") from None
     try:
         if value_type == "decimal":
             return float(_MONEY_JUNK.sub("", text))

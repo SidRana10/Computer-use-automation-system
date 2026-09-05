@@ -12,7 +12,7 @@ from pathlib import Path
 import ui_capabilities
 
 PACKAGE_ROOT = Path(ui_capabilities.__file__).parent
-LLM_FREE_PACKAGES = ["replay", "surfaces", "policy", "handoff", "observability", "models"]
+LLM_FREE_PACKAGES = ["replay", "surfaces", "policy", "handoff", "observability", "models", "targets"]
 FORBIDDEN_TOKENS = [
     "anthropic",
     "AnthropicModelAdapter",

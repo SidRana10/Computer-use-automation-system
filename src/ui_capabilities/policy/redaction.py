@@ -34,13 +34,28 @@ SECRET_PATTERNS = [
 
 
 class Redactor:
-    """Redacts by sensitive key names, secret patterns, and registered
-    concrete sensitive values (e.g. bound invocation inputs, extracted
-    sensitive outputs)."""
+    """Redacts by sensitive key names, secret patterns, registered concrete
+    sensitive values (bound invocation inputs, extracted outputs), and
+    target-declared text patterns.
 
-    def __init__(self, extra_sensitive_keys: tuple[str, ...] = ()):
+    Registered values only cover data the run itself supplied or read. A live
+    target also renders data the run never touches — session identifiers,
+    per-transaction tokens, other members' contact details and balances — and
+    those reach durable evidence through page text and DOM snapshots. A target
+    profile declares patterns for that class; without them the registered-value
+    mechanism alone is not sufficient.
+    """
+
+    def __init__(
+        self,
+        extra_sensitive_keys: tuple[str, ...] = (),
+        text_patterns: tuple[str | re.Pattern[str], ...] = (),
+    ):
         self._key_parts = tuple(k.lower() for k in SENSITIVE_KEY_PARTS + extra_sensitive_keys)
         self._sensitive_values: list[str] = []
+        self._text_patterns: list[re.Pattern[str]] = [
+            pat if isinstance(pat, re.Pattern) else re.compile(pat) for pat in text_patterns
+        ]
 
     def register_sensitive_value(self, value: Any) -> None:
         """Register a concrete runtime value (never persisted) so any string
@@ -56,6 +71,8 @@ class Redactor:
     def redact_text(self, text: str) -> str:
         for pattern in SECRET_PATTERNS:
             text = pattern.sub(REDACTED, text)
+        for pattern in self._text_patterns:
+            text = pattern.sub(_keep_group_prefix, text)
         for value in self._sensitive_values:
             if value in text:
                 text = text.replace(value, REDACTED)
@@ -73,3 +90,15 @@ class Redactor:
         if isinstance(obj, str):
             return self.redact_text(obj)
         return obj
+
+
+def _keep_group_prefix(match: re.Match[str]) -> str:
+    """Replace a pattern match with the redaction marker.
+
+    A pattern may capture a leading group it wants preserved (e.g. the literal
+    `value="` of a hidden token field) so the surrounding markup stays readable
+    while the secret itself is removed.
+    """
+    if match.groups():
+        return f"{match.group(1)}{REDACTED}"
+    return REDACTED

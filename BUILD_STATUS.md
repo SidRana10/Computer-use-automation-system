@@ -137,21 +137,30 @@ corrected at P9.
 - [x] Phase-1 build-control docs marked historical
 - [x] no source or application behavior changed
 
-## M12 — P1 reconnaissance (complete) and core seams (not started)
+## M12 — P1: MERIDIAN adapter, core seams, sign-on (implemented, awaiting review)
 - [x] live MERIDIAN reconnaissance: all 14 open questions answered with evidence
 - [x] scope corrected from reconnaissance findings (see D018)
-- [ ] G5 target profile registry + HTTPS/443 policy fix (Northstar left in place)
-- [ ] G3 hidden-value internal extraction (`_token`), `value` mode only
-- [ ] G7 structured table extraction (variable share/result sets)
-- [ ] G4 irreversible-write no-repeat invariant
-- [ ] G8 artifact-scoped supervisor escalation routing
-- [ ] G10 row-relative locator via the existing CSS strategy (documented last resort)
-- [ ] G11 observation fixes (h1, submit `value`, name/id in inventory, select by value)
-- [ ] G12 profile-driven redaction: DOM snapshots + screenshot masking
-- [ ] G6a DOM snapshot evidence (run index deferred to the service phases)
-- [ ] profile-driven fingerprint recognition
-- [ ] CLI target/profile selection
-- [ ] MERIDIAN sign-on capability artifact
+- [x] G5 target profile registry + HTTPS/443 policy fix (Northstar left in place)
+- [x] G3 hidden-value internal extraction (`value` mode + `internal` steps)
+- [x] G7 structured table extraction (`json` output type, variable-length rows)
+- [x] G4 irreversible-write no-repeat invariant (`IRREVERSIBLE_OUTCOME_UNCERTAIN`)
+- [x] G8 artifact-scoped supervisor escalation routing (`escalate_on_codes`)
+- [x] G10 row-relative locators via the existing CSS strategy — no new kind (D019)
+- [x] G11 observation fixes (h1 via profile, submit `value`, name/id in inventory, select by value)
+- [x] G12 profile-driven redaction: DOM snapshot scrubbing + screenshot masking
+- [x] G6a DOM snapshot evidence (run index deferred to the service phases)
+- [x] profile-driven fingerprint recognition
+- [x] CLI target/profile selection (`--app`)
+- [x] MERIDIAN sign-on capability artifact + live teller/supervisor verification
+- [x] P1 audit: Playwright traces disabled for MERIDIAN (D021)
+- [x] P1 audit: sensitive-value scan narrowed to run-derived fields (D022)
+- [x] canonical `meridian.sign_on` is genuinely discovery-generated: Gemini
+      gemini-3.6-flash, run disc-1d408f679a, compiled via unmodified
+      ArtifactCompiler, deterministic replay verified for teller + supervisor
+      (D025)
+- [x] P1 audit: narrow credential/field-name locator exemption (D024) resolves
+      the D023 collision without weakening D014
+- 226 offline tests passing (123 Phase-1 unchanged + 103 new); 232 with live tests
 
 Explicitly NOT in P1 (deferred or dropped on evidence): parameterized locators
 (G1), StepOutputRef (G2), session manager, frame support (G9), run index (G6b),

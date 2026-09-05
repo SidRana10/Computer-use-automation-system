@@ -20,7 +20,10 @@ from .targets import TargetDescriptor
 
 SCHEMA_VERSION = "1.0"
 
-ValueType = Literal["string", "integer", "decimal", "boolean"]
+# `json` exists for outputs whose shape is a variable-length list the UI
+# renders as a table (e.g. a member's shares); inputs stay scalar.
+ValueType = Literal["string", "integer", "decimal", "boolean", "json"]
+ExtractMode = Literal["text", "value", "table"]
 
 # Artifact step actions. `done`/`request_human` are discovery control signals
 # and never become artifact steps.
@@ -59,9 +62,26 @@ class InputSpec(BaseModel):
     required: bool = True
     description: str
     sensitive: bool = False
+    # A credential is environment-supplied and constant across invocations
+    # (an operator id/password), never invocation-varying identity data (a
+    # member number). The distinction matters to the compiler's runtime-value
+    # scan: see ArtifactCompiler._is_static_credential_identity.
+    credential: bool = False
     pattern: str | None = None
     minimum: float | None = None
     maximum: float | None = None
+
+    @model_validator(mode="after")
+    def _inputs_are_scalar(self) -> "InputSpec":
+        if self.type == "json":
+            raise ValueError("invocation inputs must be scalar; `json` is an output-only type")
+        return self
+
+    @model_validator(mode="after")
+    def _credential_implies_sensitive(self) -> "InputSpec":
+        if self.credential and not self.sensitive:
+            raise ValueError("a credential input must also be marked sensitive")
+        return self
 
 
 class OutputSpec(BaseModel):
@@ -132,6 +152,12 @@ class StepSpec(BaseModel):
     url_template: str | None = None  # navigate only; {name} placeholders bind inputs
     output_name: str | None = None
     output_type: ValueType | None = None
+    extract_mode: ExtractMode | None = None  # extract steps only; defaults to "text"
+    # An internal extract captures a runtime value the flow needs (e.g. the
+    # page's current transaction token) without publishing it in the
+    # capability contract. It is registered with the redactor, never returned
+    # to callers, and never persisted.
+    internal: bool = False
     timeout_ms: int | None = None
     risk: RiskLevel = RiskLevel.SAFE
     checkpoint_after: list[ConditionSpec] = []
@@ -145,6 +171,8 @@ class StepSpec(BaseModel):
             raise ValueError(f"step {self.id!r}: navigate requires url_template")
         if self.action == "extract" and not self.output_name:
             raise ValueError(f"step {self.id!r}: extract requires output_name")
+        if self.action != "extract" and (self.extract_mode is not None or self.internal):
+            raise ValueError(f"step {self.id!r}: extract_mode/internal are only valid on extract steps")
         if self.action in {"fill", "select"} and self.value is None:
             raise ValueError(f"step {self.id!r}: {self.action} requires a value")
         return self
@@ -159,6 +187,13 @@ class CapabilityPolicy(BaseModel):
     allowed_actions: list[str]
     max_unattended_risk: RiskLevel = RiskLevel.REVERSIBLE
     require_human_for: list[RiskLevel] = [RiskLevel.RISKY, RiskLevel.IRREVERSIBLE]
+    # Error-rule codes this capability declares as requiring a human/supervisor.
+    # Escalation stays a policy decision: the error taxonomy still describes
+    # *what happened*, this declares *who must handle it*, and it is scoped to
+    # one capability so a detected condition never implies escalation fleet-wide.
+    # Escalating is strictly more conservative than failing, so this can only
+    # narrow what automation does unattended.
+    escalate_on_codes: list[str] = []
 
 
 class Provenance(BaseModel):
@@ -204,6 +239,8 @@ class CapabilityArtifact(BaseModel):
             src = next(s for s in self.steps if s.id == out.source_step_id)
             if src.action != "extract":
                 raise ValueError(f"output {out.name!r} source step {src.id!r} is not an extract step")
+            if src.internal:
+                raise ValueError(f"output {out.name!r} cannot source from internal extract step {src.id!r}")
 
         declared_outputs = {o.name for o in self.contract.outputs}
         for step in self.steps:
@@ -213,8 +250,13 @@ class CapabilityArtifact(BaseModel):
                 for ph in re.findall(r"\{([a-z_][a-z0-9_]*)\}", step.url_template):
                     if ph not in input_names:
                         raise ValueError(f"step {step.id!r} url_template references undeclared input {ph!r}")
-            if step.action == "extract" and step.output_name not in declared_outputs:
-                raise ValueError(f"extract step {step.id!r} output {step.output_name!r} not declared in contract")
+            if step.action == "extract":
+                if step.internal and step.output_name in declared_outputs:
+                    raise ValueError(
+                        f"internal extract step {step.id!r} must not publish {step.output_name!r} in the contract"
+                    )
+                if not step.internal and step.output_name not in declared_outputs:
+                    raise ValueError(f"extract step {step.id!r} output {step.output_name!r} not declared in contract")
 
         # highest step risk must not be understated at artifact level
         risks = [s.risk for s in self.steps]

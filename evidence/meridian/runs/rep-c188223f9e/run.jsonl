@@ -1,0 +1,14 @@
+{"ts": "2026-09-05T18:13:27.473954+00:00", "run_id": "rep-c188223f9e", "event": "replay_started", "capability_id": "meridian.sign_on", "capability_version": "1.0.0", "inputs": ["branch", "operator_id", "[REDACTED]"]}
+{"ts": "2026-09-05T18:13:28.260718+00:00", "run_id": "rep-c188223f9e", "event": "policy_checked", "step_id": "s1_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T18:13:28.276705+00:00", "run_id": "rep-c188223f9e", "event": "target_resolved", "step_id": "s1_fill", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T18:13:28.277061+00:00", "run_id": "rep-c188223f9e", "event": "step_completed", "step_id": "s1_fill", "attempts": 0}
+{"ts": "2026-09-05T18:13:28.277313+00:00", "run_id": "rep-c188223f9e", "event": "policy_checked", "step_id": "s2_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T18:13:28.305086+00:00", "run_id": "rep-c188223f9e", "event": "target_resolved", "step_id": "s2_fill", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T18:13:28.305316+00:00", "run_id": "rep-c188223f9e", "event": "step_completed", "step_id": "s2_fill", "attempts": 0}
+{"ts": "2026-09-05T18:13:28.305405+00:00", "run_id": "rep-c188223f9e", "event": "policy_checked", "step_id": "s3_select", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T18:13:28.312648+00:00", "run_id": "rep-c188223f9e", "event": "target_resolved", "step_id": "s3_select", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T18:13:28.312970+00:00", "run_id": "rep-c188223f9e", "event": "step_completed", "step_id": "s3_select", "attempts": 0}
+{"ts": "2026-09-05T18:13:28.313115+00:00", "run_id": "rep-c188223f9e", "event": "policy_checked", "step_id": "s4_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T18:13:28.513079+00:00", "run_id": "rep-c188223f9e", "event": "target_resolved", "step_id": "s4_click", "strategy": "role_name"}
+{"ts": "2026-09-05T18:13:28.522828+00:00", "run_id": "rep-c188223f9e", "event": "step_completed", "step_id": "s4_click", "attempts": 0}
+{"ts": "2026-09-05T18:13:28.523250+00:00", "run_id": "rep-c188223f9e", "event": "replay_succeeded", "outputs": [], "recoveries": 0}

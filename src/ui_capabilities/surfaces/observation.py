@@ -21,11 +21,29 @@ _ELEMENT_INFO_JS = """
     if (lab) labelText = lab.innerText.trim();
   }
   if (!labelText && el.closest('label')) labelText = el.closest('label').innerText.trim();
+  // Legacy table layouts carry the field label in the preceding cell rather
+  // than in a <label> element; fall back to it when nothing else names the
+  // control. Bounded in length so a data cell can never become a label.
+  if (!labelText) {
+    const cell = el.closest('td');
+    const prev = cell && cell.previousElementSibling;
+    if (prev && prev.tagName === 'TD' && !prev.querySelector('input,select,textarea,a,button')) {
+      const t = (prev.innerText || '').trim().replace(/\\s+/g, ' ').replace(/:$/, '');
+      if (t && t.length <= 40) labelText = t;
+    }
+  }
   let options = [];
+  let optionValues = [];
   if (tag === 'select') {
     options = Array.from(el.options).map(o => o.label || o.value).slice(0, 20);
+    // Legacy option captions embed live data (e.g. a balance); the submitted
+    // `value` is the stable identity, so both are recorded.
+    optionValues = Array.from(el.options).map(o => o.value).slice(0, 20);
   }
-  const text = (el.innerText || '').trim().replace(/\\s+/g, ' ').slice(0, 80);
+  // input[type=submit|button] renders its caption in `value`, not innerText.
+  const isValueCaptioned = tag === 'input' && ['submit', 'button', 'reset'].includes(el.type);
+  const rawText = isValueCaptioned ? (el.value || '') : (el.innerText || '');
+  const text = rawText.trim().replace(/\\s+/g, ' ').slice(0, 80);
   return {
     tag: tag,
     type: el.getAttribute('type'),
@@ -37,6 +55,7 @@ _ELEMENT_INFO_JS = """
     text: text || null,
     label: labelText,
     options: options,
+    option_values: optionValues,
     visible: !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length)
   };
 }
@@ -125,6 +144,7 @@ async def build_inventory(page: Page) -> tuple[list[ObservedElement], dict[str, 
                 name_attr=info.get("name"),
                 id_attr=info.get("id"),
                 options=info.get("options") or [],
+                option_values=info.get("option_values") or [],
                 candidate_strategies=candidate_strategies(kind, info),
             )
         )

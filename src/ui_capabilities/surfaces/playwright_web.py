@@ -26,6 +26,7 @@ from playwright.async_api import Error as PlaywrightError
 from playwright.async_api import TimeoutError as PlaywrightTimeoutError
 
 from ..config import Settings
+from ..policy.redaction import REDACTED, Redactor
 from ..models.conditions import ConditionKind, ConditionResult, ConditionSpec
 from ..observability.evidence import EvidenceManager
 from . import observation as obs
@@ -76,11 +77,58 @@ _HUMAN_CAPTURE_JS = """
 """
 
 
+# Static, trusted table serialiser — never model-generated. Uses the first row
+# as headers when it looks like a header row, so a variable-length legacy
+# table becomes typed rows instead of one opaque blob of text.
+_TABLE_ROWS_JS = """
+(el) => {
+  const table = el.tagName === 'TABLE' ? el : el.querySelector('table');
+  if (!table) return null;
+  const rows = Array.from(table.rows).slice(0, 200);
+  if (!rows.length) return [];
+  const cellText = (c) => (c.innerText || '').trim().replace(/\\s+/g, ' ');
+  const first = Array.from(rows[0].cells).map(cellText);
+  const headerish = rows[0].querySelectorAll('th').length > 0 ||
+    (rows.length > 1 && first.every(t => t.length > 0 && t.length < 40));
+  const headers = headerish
+    ? first.map((t, i) => t || ('col' + (i + 1)))
+    : first.map((_, i) => 'col' + (i + 1));
+  const body = headerish ? rows.slice(1) : rows;
+  return body.map(r => {
+    const out = {};
+    Array.from(r.cells).forEach((c, i) => { out[headers[i] || ('col' + (i + 1))] = cellText(c); });
+    return out;
+  });
+}
+"""
+
+
 class PlaywrightWebSurface:
-    def __init__(self, settings: Settings, evidence: EvidenceManager, headless: bool | None = None):
+    def __init__(
+        self,
+        settings: Settings,
+        evidence: EvidenceManager,
+        headless: bool | None = None,
+        *,
+        heading_selector: str = "h2",
+        mask_selectors: tuple[str, ...] = (),
+        redactor: "Redactor | None" = None,
+        enable_tracing: bool = True,
+    ):
         self.settings = settings
         self.evidence = evidence
         self.headless = settings.playwright_headless if headless is None else headless
+        # Which element names the page. Targets differ: one app's <h1> is a
+        # persistent banner while its content heading is <h2>, so preferring a
+        # fixed tag would silently change what every checkpoint means.
+        self.heading_selector = heading_selector
+        # CSS regions painted over in durable screenshots (session banners,
+        # member contact details, balance columns).
+        self.mask_selectors = tuple(mask_selectors)
+        self.redactor = redactor
+        # A Playwright trace is a raw recording that no redactor can reach
+        # inside; targets whose screens carry regulated data disable it.
+        self.enable_tracing = enable_tracing
         self._playwright: Playwright | None = None
         self._browser: Browser | None = None
         self._context: BrowserContext | None = None
@@ -137,9 +185,9 @@ class PlaywrightWebSurface:
         title = await page.title()
         heading = None
         try:
-            h2 = page.locator("h2").first
-            if await h2.count() > 0:
-                heading = (await h2.inner_text(timeout=1000)).strip() or None
+            node = page.locator(self.heading_selector).first
+            if await node.count() > 0:
+                heading = (await node.inner_text(timeout=1000)).strip() or None
         except PlaywrightError:
             heading = None
         parsed = urlparse(page.url)
@@ -156,8 +204,80 @@ class PlaywrightWebSurface:
         )
 
     async def capture_screenshot(self, label: str) -> Path:
+        """Screenshot with target-declared sensitive regions painted over.
+
+        Screenshots are durable evidence and cannot be scrubbed after the fact
+        the way text can, so masking happens at capture time. Playwright paints
+        each masked element before the image is encoded, so the pixels never
+        exist on disk.
+        """
         path = self.evidence.screenshot_path(label)
-        await self.page.screenshot(path=str(path))
+        masks = []
+        for selector in self.mask_selectors:
+            try:
+                locator = self.page.locator(selector)
+                if await locator.count() > 0:
+                    masks.append(locator)
+            except PlaywrightError:
+                continue  # a selector that cannot resolve simply masks nothing
+        await self.page.screenshot(path=str(path), mask=masks or None, mask_color="#111111")
+        return path
+
+    async def _masked_markup(self) -> list[tuple[str, str]]:
+        """(original, redacted) markup for every masked region on this page.
+
+        Structural rather than text-based: a region's rendered text does not
+        always appear contiguously in the markup (inline `<b>` tags and
+        entities break it up), and a `<select>` carries its data in child
+        options rather than in text at all. Replacing each element's inner
+        markup keeps the surrounding tags, so the snapshot stays well-formed
+        and still shows the page's structure.
+        """
+        pairs: list[tuple[str, str]] = []
+        seen: set[str] = set()
+        for selector in self.mask_selectors:
+            try:
+                handles = await self.page.locator(selector).element_handles()
+            except PlaywrightError:
+                continue
+            for handle in handles:
+                try:
+                    outer = await handle.evaluate("el => el.outerHTML")
+                    inner = await handle.evaluate("el => el.innerHTML")
+                except PlaywrightError:
+                    continue
+                if not outer or outer in seen or len(outer) > 200_000:
+                    continue
+                seen.add(outer)
+                redacted = outer.replace(inner, REDACTED, 1) if inner else outer
+                pairs.append((outer, redacted))
+        return pairs
+
+    async def capture_dom_snapshot(self, label: str) -> Path | None:
+        """Persist the rendered DOM, redacted through the central Redactor.
+
+        The raw DOM carries values the run never touched — session identifiers,
+        hidden transaction tokens, other members' details — so it is never
+        written unredacted.
+        """
+        try:
+            html = await self.page.content()
+        except PlaywrightError:
+            return None
+        if self.redactor is not None:
+            # Region scrubbing runs FIRST, while the markup still matches what
+            # the page renders. Doing it after pattern/value redaction would
+            # silently miss regions: replacing a member number inside
+            # "Member 100234 - Lovelace, Ada" leaves the region text no longer
+            # matching, and the name would survive.
+            # The same regions are painted over in screenshots, so one profile
+            # declaration covers both evidence types; patterns cannot express
+            # "the member name cell", but a selector can.
+            for original, redacted in await self._masked_markup():
+                html = html.replace(original, redacted)
+            html = self.redactor.redact_text(html)
+        path = self.evidence.dom_snapshot_path(label)
+        path.write_text(html, encoding="utf-8")
         return path
 
     # ------------------------------------------------------------- execution
@@ -208,19 +328,44 @@ class PlaywrightWebSurface:
                 await subject.fill(action.value or "", timeout=timeout)
                 return _done(ok=True, matched_strategy=matched)
             if action.kind == "select":
-                await subject.select_option(label=action.value, timeout=timeout)
+                # Prefer the option `value`: legacy captions embed live data
+                # (balances) and change between runs, while the value is stable.
+                try:
+                    await subject.select_option(value=action.value, timeout=timeout)
+                except PlaywrightError:
+                    await subject.select_option(label=action.value, timeout=timeout)
                 return _done(ok=True, matched_strategy=matched)
             if action.kind == "extract":
-                if isinstance(subject, ElementHandle):
-                    text = (await subject.inner_text()).strip()
-                else:
-                    text = (await subject.inner_text(timeout=timeout)).strip()
+                text = await self._extract(subject, action.extract_mode or "text", timeout)
+                if text is None:
+                    return _done(ok=False, error_code="EXECUTION_ERROR", message=f"could not extract via mode {action.extract_mode!r}")
                 return _done(ok=True, extracted_text=text, matched_strategy=matched)
             return _done(ok=False, error_code="EXECUTION_ERROR", message=f"unsupported action kind {action.kind!r}")
         except PlaywrightTimeoutError as exc:
             return _done(ok=False, error_code="TIMEOUT", message=str(exc).splitlines()[0] if str(exc) else "timeout")
         except PlaywrightError as exc:
             return _done(ok=False, error_code="EXECUTION_ERROR", message=str(exc).splitlines()[0] if str(exc) else "error")
+
+    async def _extract(self, subject, mode: str, timeout: int) -> str | None:
+        """Read one element three ways.
+
+        `text` is the rendered text. `value` reads a form control's current
+        value, which is the only way to observe a hidden field such as a
+        per-transaction token. `table` serialises a whole table to JSON rows,
+        because some lists (a member's shares, a result set) are
+        variable-length and cannot be modelled as fixed scalar outputs.
+        """
+        if mode == "text":
+            if isinstance(subject, ElementHandle):
+                return (await subject.inner_text()).strip()
+            return (await subject.inner_text(timeout=timeout)).strip()
+        if mode == "value":
+            value = await subject.evaluate("el => (el && 'value' in el) ? el.value : null")
+            return None if value is None else str(value).strip()
+        if mode == "table":
+            rows = await subject.evaluate(_TABLE_ROWS_JS)
+            return None if rows is None else json.dumps(rows, ensure_ascii=False)
+        return None
 
     # ------------------------------------------------------------ conditions
 
@@ -276,6 +421,8 @@ class PlaywrightWebSurface:
     # --------------------------------------------------------------- tracing
 
     async def start_trace(self) -> None:
+        if not self.enable_tracing:
+            return
         if self._context and not self._tracing:
             await self._context.tracing.start(screenshots=True, snapshots=True)
             self._tracing = True

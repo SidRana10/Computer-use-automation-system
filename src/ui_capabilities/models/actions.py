@@ -67,7 +67,11 @@ class ExtractAction(BaseModel):
     action: Literal["extract"] = "extract"
     element_ref: str = Field(pattern=ELEMENT_REF_PATTERN)
     output_name: str
-    output_type: Literal["string", "integer", "decimal", "boolean"] = "string"
+    output_type: Literal["string", "integer", "decimal", "boolean", "json"] = "string"
+    # How the value is read: rendered text (default), a form control's current
+    # value (needed for hidden fields such as a per-transaction token), or a
+    # whole table as structured rows (needed when a list is variable-length).
+    extract_mode: Literal["text", "value", "table"] = "text"
     rationale_summary: str = ""
 
 

@@ -23,6 +23,14 @@ class LocatorKind(StrEnum):
 
 
 # Replay preference order (docs/03): semantic first, CSS last-resort.
+#
+# On targets with no ids, labels or ARIA, CSS is sometimes the only way to
+# express a *structural* identity — e.g. "the value cell of the row whose
+# label cell reads Confirmation:". Playwright resolves `:has()` and
+# `:text-is()`, so such locators are still content-anchored rather than
+# positional, and they stay last in the chain so any semantic strategy wins
+# first. Use of a CSS strategy is logged, so reliance on it is visible as a
+# drift signal.
 LOCATOR_PRIORITY: dict[LocatorKind, int] = {
     LocatorKind.ROLE_NAME: 0,
     LocatorKind.LABEL: 1,

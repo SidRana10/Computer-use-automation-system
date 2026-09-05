@@ -20,32 +20,22 @@ from pathlib import Path
 from .config import Settings
 from .discovery.agent import DiscoveryAgent
 from .discovery.compiler import ArtifactCompiler, load_artifact, save_artifact
-from .discovery.fake_model import ScriptedBalanceModel, ScriptedSubAccountModel
-from .discovery.profiles import demo_app_error_rules
+from .discovery.fake_model import (
+    ScriptedBalanceModel,
+    ScriptedMeridianSignOnModel,
+    ScriptedSubAccountModel,
+)
 from .models.artifact import InputSpec
 from .models.errors import CompileError
 from .observability.evidence import EvidenceManager
 from .observability.logger import RunLogger
-from .policy.config import default_demo_policy
+from .policy.config import default_demo_policy  # noqa: F401  (kept for backwards compatibility)
 from .policy.engine import PolicyEngine
 from .policy.redaction import Redactor
 from .replay.engine import ReplayEngine
 from .surfaces.playwright_web import PlaywrightWebSurface
-
-KNOWN_INPUT_SPECS: dict[str, InputSpec] = {
-    "member_id": InputSpec(
-        name="member_id",
-        type="string",
-        sensitive=True,
-        pattern=r"M-\d{5}",
-        description="Member identifier in the demo format M-#####",
-    ),
-    "account_type": InputSpec(
-        name="account_type",
-        type="string",
-        description="Sub-account product type as shown in the console",
-    ),
-}
+from .targets import get_profile, profile_names
+from .targets.registry import profile_for_app_id
 
 EXIT_BY_STATUS = {"success": 0, "business_outcome": 0, "failure": 2, "escalated": 3}
 
@@ -60,11 +50,12 @@ def _parse_inputs(pairs: list[str]) -> dict[str, str]:
     return out
 
 
-def _input_specs_for(names: list[str], redactor: Redactor) -> list[InputSpec]:
+def _input_specs_for(names: list[str], redactor: Redactor, profile) -> list[InputSpec]:
     specs = []
     for name in names:
-        if name in KNOWN_INPUT_SPECS:
-            specs.append(KNOWN_INPUT_SPECS[name])
+        known = profile.spec_for(name)
+        if known is not None:
+            specs.append(known)
         else:
             specs.append(
                 InputSpec(
@@ -112,13 +103,14 @@ async def _build_handoff(settings: Settings, surface, logger, redactor, evidence
 
 async def _discover(args: argparse.Namespace) -> int:
     settings = Settings.load()
+    profile = get_profile(args.app)
     inputs = _parse_inputs(args.input or [])
     run_id = f"disc-{uuid.uuid4().hex[:10]}"
     evidence = EvidenceManager(settings.evidence_dir, run_id)
-    redactor = Redactor()
+    redactor = Redactor(text_patterns=profile.redaction_text_patterns)
     logger = RunLogger(evidence.log_path, redactor, run_id)
-    policy = PolicyEngine(default_demo_policy(args.target))
-    input_specs = _input_specs_for(sorted(inputs.keys()), redactor)
+    policy = PolicyEngine(profile.policy(args.target))
+    input_specs = _input_specs_for(sorted(inputs.keys()), redactor, profile)
 
     # Genuine providers go through the factory (fails loudly on missing keys);
     # scripted test doubles must be requested explicitly by name and are never
@@ -130,6 +122,9 @@ async def _discover(args: argparse.Namespace) -> int:
     elif adapter_name == "fake-subaccount":
         model = ScriptedSubAccountModel()
         print("WARNING: scripted fake-subaccount model adapter (test double) — not valid discovery evidence")
+    elif adapter_name == "fake-meridian-signon":
+        model = ScriptedMeridianSignOnModel()
+        print("WARNING: scripted fake-meridian-signon model adapter (test double) — not valid discovery evidence")
     else:
         from .discovery.providers import ProviderConfigError, create_model_adapter, provider_model_name
 
@@ -140,7 +135,15 @@ async def _discover(args: argparse.Namespace) -> int:
             return 2
         print(f"discovery provider: {adapter_name} (model: {provider_model_name(adapter_name, settings)})")
 
-    surface = PlaywrightWebSurface(settings, evidence, headless=args.headless or None)
+    surface = PlaywrightWebSurface(
+        settings,
+        evidence,
+        headless=args.headless or None,
+        heading_selector=profile.heading_selector,
+        mask_selectors=profile.screenshot_mask_selectors,
+        redactor=redactor,
+        enable_tracing=profile.durable_traces,
+    )
     handoff = None
     server = None
     try:
@@ -157,6 +160,7 @@ async def _discover(args: argparse.Namespace) -> int:
             evidence=evidence,
             redactor=redactor,
             handoff=handoff,
+            fingerprint_extractor=profile.fingerprint,
         )
         outcome = await agent.run(
             goal=args.goal,
@@ -164,7 +168,7 @@ async def _discover(args: argparse.Namespace) -> int:
             capability_id=args.capability_id,
             input_specs=input_specs,
             input_bindings=inputs,
-            target_app_name="Northstar Credit Union — Member Servicing Console (Demo)",
+            target_app_name=profile.display_name,
         )
         await surface.stop_trace()
 
@@ -174,9 +178,11 @@ async def _discover(args: argparse.Namespace) -> int:
             print(f"reason: {outcome.reason}")
             return 2 if outcome.status == "failed" else 3
 
-        compiler = ArtifactCompiler(policy, error_rules_factory=demo_app_error_rules)
+        compiler = ArtifactCompiler(policy, error_rules_factory=profile.error_rules_factory)
         try:
-            artifact = compiler.compile(outcome.run)
+            artifact = compiler.compile(
+                outcome.run, app_id=profile.app_id, vendor_family=profile.vendor_family
+            )
         except CompileError as exc:
             print(f"artifact compilation failed: {exc}", file=sys.stderr)
             return 2
@@ -200,9 +206,10 @@ async def _replay(args: argparse.Namespace) -> int:
     inputs = _parse_inputs(args.input or [])
     run_id = f"rep-{uuid.uuid4().hex[:10]}"
     evidence = EvidenceManager(settings.evidence_dir, run_id)
-    redactor = Redactor()
+    profile = profile_for_app_id(artifact.target.app_id) or get_profile(args.app)
+    redactor = Redactor(text_patterns=profile.redaction_text_patterns)
     logger = RunLogger(evidence.log_path, redactor, run_id)
-    policy = PolicyEngine(default_demo_policy(artifact.target.entry_point))
+    policy = PolicyEngine(profile.policy(artifact.target.entry_point))
 
     origin = artifact.target.entry_point
     demo_params: dict[str, str] = {}
@@ -219,7 +226,15 @@ async def _replay(args: argparse.Namespace) -> int:
         _post_demo_config(f"{parsed.scheme}://{parsed.netloc}", demo_params)
         print(f"demo knobs set: {demo_params} (injected simulation for evidence)")
 
-    surface = PlaywrightWebSurface(settings, evidence, headless=args.headless or None)
+    surface = PlaywrightWebSurface(
+        settings,
+        evidence,
+        headless=args.headless or None,
+        heading_selector=profile.heading_selector,
+        mask_selectors=profile.screenshot_mask_selectors,
+        redactor=redactor,
+        enable_tracing=profile.durable_traces,
+    )
     handoff = None
     server = None
     try:
@@ -258,6 +273,7 @@ def build_parser() -> argparse.ArgumentParser:
     demo.add_argument("--port", type=int, default=8001)
 
     disc = sub.add_parser("discover", help="discover a capability from a natural-language goal")
+    disc.add_argument("--app", choices=list(profile_names()), default="northstar", help="target profile")
     disc.add_argument("--goal", required=True)
     disc.add_argument("--target", required=True, help="entry point URL of the target app")
     disc.add_argument("--capability-id", required=True)
@@ -265,7 +281,7 @@ def build_parser() -> argparse.ArgumentParser:
     disc.add_argument("--output", help="artifact output path (default artifacts/<capability_id>.v1.json)")
     disc.add_argument(
         "--model-adapter",
-        choices=["gemini", "anthropic", "fake", "fake-subaccount"],
+        choices=["gemini", "anthropic", "fake", "fake-subaccount", "fake-meridian-signon"],
         default=None,
         help="LLM provider for discovery (default: LLM_PROVIDER env, gemini). "
         "'fake*' are offline test doubles, never valid as genuine evidence.",
@@ -275,6 +291,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     rep = sub.add_parser("replay", help="deterministically replay a saved artifact (no LLM)")
     rep.add_argument("--artifact", required=True)
+    rep.add_argument(
+        "--app",
+        choices=list(profile_names()),
+        default="northstar",
+        help="target profile fallback; normally derived from the artifact's app_id",
+    )
     rep.add_argument("--input", action="append", metavar="NAME=VALUE")
     rep.add_argument("--headless", action="store_true")
     rep.add_argument("--no-operator", action="store_true")

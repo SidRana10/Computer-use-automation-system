@@ -19,6 +19,7 @@ class FakeSurface:
         self.human_capture = False
         self.human_events: list[dict] = []
         self.executed: list[ExecutableAction] = []
+        self.dom_snapshots: list[Path] = []
         # simulate a server-side redirect: requested URL -> landed URL
         self.redirects: dict[str, str] = {}
 
@@ -66,6 +67,12 @@ class FakeSurface:
     async def capture_screenshot(self, label: str) -> Path:
         path = self.tmp_dir / f"{label}.png"
         path.write_bytes(b"fake-png")
+        return path
+
+    async def capture_dom_snapshot(self, label: str) -> Path:
+        path = self.tmp_dir / f"{label}.html"
+        path.write_text(f"<html><body>{self.page_text}</body></html>")
+        self.dom_snapshots.append(path)
         return path
 
     async def set_human_capture(self, enabled: bool) -> None:

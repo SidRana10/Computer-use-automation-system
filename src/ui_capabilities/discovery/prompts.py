@@ -93,8 +93,17 @@ def element_inventory_json(observation: Observation) -> str:
             item["placeholder"] = el.placeholder
         if el.text and el.text != el.accessible_name:
             item["text"] = el.text
+        # Legacy targets can have no ids, labels or ARIA at all; the form
+        # control's `name` is then the only thing distinguishing one anonymous
+        # textbox from another, so the model must be able to see it.
+        if el.name_attr:
+            item["name_attr"] = el.name_attr
+        if el.id_attr:
+            item["id_attr"] = el.id_attr
         if el.options:
             item["options"] = el.options
+        if el.option_values and el.option_values != el.options:
+            item["option_values"] = el.option_values
         items.append(item)
     return json.dumps(items, ensure_ascii=False, indent=1)
 
