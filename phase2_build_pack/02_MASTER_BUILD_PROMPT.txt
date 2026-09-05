@@ -1,0 +1,49 @@
+You have completed the architecture inspection and gap analysis. Now implement Phase 2 for MERIDIAN CORE using the existing core.
+
+Treat `phase2_build_pack/03_PHASE2_REQUIREMENTS.md` and the original Phase 2 assignment as the product specification.
+Treat the existing Phase 1 guarantees as non-negotiable unless the new assignment explicitly requires a compatible generalization.
+
+PRIMARY GOAL
+Adapt the existing system so that capabilities are discovered once against MERIDIAN CORE, recorded as typed/versioned artifacts, replayed deterministically without an LLM in the execution decision loop, exposed through a typed capability API, invoked through a thin chatbot, and observable through a lightweight dashboard.
+
+NON-NEGOTIABLE ENGINEERING PRINCIPLES
+- Do not rewrite the core if an adapter/configuration/generalization is sufficient.
+- Preserve deterministic replay as the production path.
+- Preserve PolicyEngine enforcement on every browser action, including recovery actions.
+- Preserve risk classification, human approval, pause/escalation/handoff, evidence, and redaction.
+- The API/chatbot/dashboard must not become alternate paths around guardrails.
+- No secrets or raw regulated financial data should be persisted unnecessarily.
+- Keep the chatbot and dashboard intentionally simple.
+- Prefer a thin, real implementation of every required capability over polished partial coverage.
+- Distinguish business outcomes, recoverable runtime conditions, hard failures, and escalations deliberately.
+- Keep the old Northstar behavior/tests working unless a documented compatibility change is unavoidable.
+
+IMPLEMENTATION PROCESS
+Follow `04_IMPLEMENTATION_WORKFLOW.md` in order. Work phase-by-phase. At the end of each phase:
+1. run the relevant unit/integration tests;
+2. run the full existing test suite when practical;
+3. summarize files changed and why;
+4. state whether any Phase 1 behavior was changed;
+5. record unresolved risks/assumptions;
+6. make a small commit with a descriptive message if the phase is green.
+
+Do not jump to UI polish before MERIDIAN replay and error handling are reliable.
+
+LIVE TARGET
+Use the hosted MERIDIAN CORE sample application at:
+https://web-sample.interface-hiring.com
+
+Public demo operators:
+- teller1 / password / teller
+- super1 / password / supervisor
+
+Seed members:
+100234, 100987, 101555, 102777, 103001
+
+Use the application freely; it contains no real credentials or PII.
+
+MODEL USAGE
+The coding model should remain the current model. Do not request a model switch during normal implementation. A separate Fable review will be used only at designated checkpoints.
+
+DEFINITION OF DONE
+Do not call the project complete until all criteria in `08_DEFINITION_OF_DONE.md` pass and the demo path in `07_DEMO_AND_DELIVERABLES.md` works end-to-end.

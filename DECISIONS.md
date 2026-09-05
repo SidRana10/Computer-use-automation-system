@@ -57,3 +57,45 @@ Claude Code: append only meaningful deviations or trade-offs. Keep entries conci
 ## D014 — Runtime values are excluded from every derived artifact field, not just step values
 **Decision:** The compiler now builds one set of invocation-specific runtime values per run (sensitive input bindings + all extracted values, including money-format variants) and applies it generically: model-suggested success conditions and derived checkpoints embedding a runtime value are dropped in favor of structural conditions; candidate locator strategies whose identity embeds a runtime value are filtered out (failing loudly if no invocation-independent strategy survives); free-text descriptions are scrubbed. The discovery agent likewise rejects a DONE whose success condition embeds a bound input *or extracted output*, with corrective feedback so the model can propose a stable-UI condition in the same run.
 **Reason:** The first genuine Gemini run (disc-81829dead3) proposed `text_present: <extracted balance>` as its success condition; the sensitive-value scanner correctly refused the artifact, exposing that only *input bindings* were being parameterized in derived fields. The scanner is unchanged and remains the backstop; the fix closes the gap upstream for the whole value class, not this one member/balance.
+
+## D015 — Phase 2 target profiles; Northstar retained as regression target
+**Decision:** MERIDIAN CORE is added as a second target behind a target-profile
+registry (policy factory, error rules, fingerprint, input specs, credential
+input names). The local Northstar demo app stays in the repository unchanged as
+the regression target, and its tests must keep passing.
+**Reason:** The assignment is explicitly an adaptation. Keeping Northstar green
+is the evidence that the core was genuinely reusable rather than rewritten.
+
+## D016 — Escalation stays a policy outcome, not a fourth error classification
+**Decision:** The error taxonomy remains exactly three-way (`business_outcome`,
+`recoverable`, `hard_failure`). MERIDIAN's supervisor-required state is detected
+as a normal declared rule; routing it to the human-handoff path is a *policy*
+decision (an opt-in list on the artifact's policy block), reusing the existing
+`_escalate_step` → `HandoffManager` path.
+**Reason:** "What happened" and "who must handle it" are different concerns. The
+taxonomy describes the observed state; policy decides authority. Adding a fourth
+classification would blur that and change the meaning of every existing rule.
+
+## D017 — No session manager unless MERIDIAN forces one
+**Decision:** Sign-on is modelled as an ordinary capability artifact with typed
+sensitive inputs bound from the environment by the runner; each capability
+artifact carries its own sign-on prefix so runs are hermetic. A dedicated
+session-manager module is introduced only if reconnaissance or implementation
+shows a concrete need.
+**Reason:** Introducing session infrastructure before proving it is necessary
+would be architecture for appearance. Reconnaissance confirmed sign-on is a
+plain form post and that an expired session is a full re-authentication, which
+the existing capability/error-rule seams already express.
+
+## D018 — P1 scope corrected by live reconnaissance
+**Decision:** Reconnaissance against the live MERIDIAN application removed two
+planned core changes and promoted three others. Parameterized locators (G1) and
+step-output value references (G2) are NOT implemented: every MERIDIAN locator
+keys on a static identity, member selection is a `navigate` template over a
+declared input, and the hidden `_token` is submitted by the form itself.
+Structured table extraction (G7) and the observation fixes (G11) were promoted
+to required, because share sets are variable per member (30 vs 11 observed) and
+the target has zero `id`, `aria-label`, `data-*` or `<label>` attributes.
+**Reason:** Implementing G1/G2 without a concrete MERIDIAN requirement would be
+speculative generalization; both remain available if a later phase proves them
+necessary.

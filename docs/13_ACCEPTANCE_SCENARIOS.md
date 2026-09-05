@@ -1,5 +1,7 @@
 # 13 — Acceptance Scenarios and Intended CLI
 
+> **Phase 1 historical.** This file drove the original Northstar build. Phase 2 (MERIDIAN CORE) is governed by `phase2_build_pack/`. Kept for provenance; not a current instruction.
+
 Claude Code should implement a CLI close to this contract so the README/demo is simple and reproducible. If a library-specific limitation forces a naming change, keep equivalent functionality and document it.
 
 ## Console entry point

@@ -1,0 +1,54 @@
+We are starting Phase 2 of this repository.
+
+This repository contains my completed Interface.ai take-home. Phase 2 is explicitly an adaptation of that existing system, not a rebuild.
+
+IMPORTANT: Do not implement or modify anything yet.
+
+First read and understand the repository thoroughly. At minimum inspect:
+- CLAUDE.md
+- START_HERE.md
+- BUILD_STATUS.md
+- DECISIONS.md
+- README.md
+- REPORT.md
+- docs/
+- prompts/
+- reference/
+- .claude/
+- src/
+- tests/
+- existing capability artifacts/evidence
+
+Understand specifically:
+- discovery loop
+- deterministic replay engine
+- capability artifact/schema and versioning
+- Playwright/browser surface
+- PolicyEngine and route/action restrictions
+- risk classification and approval handling
+- pause/escalation/handoff path
+- Redactor/data handling
+- evidence, screenshots, DOM snapshots, tracing and run logs
+- error taxonomy and recovery behavior
+- target-specific configuration/adapter boundaries
+- existing tests and regression guarantees
+
+Then read all files under `phase2_build_pack/`.
+
+Do not change files, install dependencies, run destructive commands, or start implementation.
+
+Return only:
+1. a concise architecture map of the existing system;
+2. components that are genuinely reusable for MERIDIAN CORE;
+3. pieces currently coupled to the original Northstar target;
+4. likely extension points for a second target;
+5. any Phase-1 instructions/docs that conflict with Phase 2 and the minimal update needed;
+6. a gap analysis with three categories:
+   A. reuse unchanged,
+   B. generalize/modify minimally,
+   C. entirely new;
+7. the smallest implementation plan that satisfies the new assignment.
+
+For every proposed change, identify the existing file/module that should own it when possible.
+
+Inspection and planning only. Do not write code yet.

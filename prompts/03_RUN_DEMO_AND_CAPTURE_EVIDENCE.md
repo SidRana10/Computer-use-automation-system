@@ -1,3 +1,5 @@
+> **Phase 1 historical.** This file drove the original Northstar build. Phase 2 (MERIDIAN CORE) is governed by `phase2_build_pack/`. Kept for provenance; not a current instruction.
+
 Run the genuine final evidence workflow for this submission. Do not fabricate or hand-edit logs to make the result look successful.
 
 Prerequisite: `ANTHROPIC_API_KEY` must already be available in my environment or `.env` (which must remain gitignored). Use `DISCOVERY_MODEL=claude-fable-5` unless repository config intentionally overrides it.

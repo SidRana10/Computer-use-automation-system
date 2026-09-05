@@ -1,5 +1,7 @@
 # 08 — Local Legacy-Style Target App Specification
 
+> **Phase 1 historical.** This file drove the original Northstar build. Phase 2 (MERIDIAN CORE) is governed by `phase2_build_pack/`. Kept for provenance; not a current instruction.
+
 ## Why a local proxy
 
 The assignment allows a local sample/mock target. Use one so the project can safely and deterministically exercise banking-like UI workflows and exceptional states without real credentials, PII, third-party ToS issues, or flaky external dependencies.

@@ -1,5 +1,7 @@
 # 14 — Suggested Evaluator Demo Script
 
+> **Phase 1 historical.** This file drove the original Northstar build. Phase 2 (MERIDIAN CORE) is governed by `phase2_build_pack/`. Kept for provenance; not a current instruction.
+
 Use this only after the project works. Keep the live demo focused on the assignment's through-line rather than showing every file.
 
 ## 0. One-sentence framing

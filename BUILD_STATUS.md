@@ -119,3 +119,51 @@ or hand-edited.
 - [x] git status clean except intentional files
 - [x] final end-to-end demo succeeds, including the genuine Gemini discovery run
 - [x] read-only evidence audit performed against the captured evidence set
+
+---
+
+# Phase 2 — MERIDIAN CORE adaptation (branch `meridian-adaptation`)
+
+Baseline recorded at P0: **123 tests passing** (`pytest -q`, 79s, 0 failures).
+Note: the "84 tests" figure in README/M8 predates later additions and is stale;
+corrected at P9.
+
+## M11 — P0 baseline and instruction reconciliation
+- [x] branch `meridian-adaptation`, working tree clean apart from `phase2_build_pack/`
+- [x] full suite run and recorded (123 passed)
+- [x] Phase-1 instructions reconciled with Phase 2 (CLAUDE.md Phase 2 section)
+- [x] `.gitignore` exception so MERIDIAN artifacts are committable
+- [x] `.env.example` MERIDIAN + service variables
+- [x] Phase-1 build-control docs marked historical
+- [x] no source or application behavior changed
+
+## M12 — P1 reconnaissance (complete) and core seams (not started)
+- [x] live MERIDIAN reconnaissance: all 14 open questions answered with evidence
+- [x] scope corrected from reconnaissance findings (see D018)
+- [ ] G5 target profile registry + HTTPS/443 policy fix (Northstar left in place)
+- [ ] G3 hidden-value internal extraction (`_token`), `value` mode only
+- [ ] G7 structured table extraction (variable share/result sets)
+- [ ] G4 irreversible-write no-repeat invariant
+- [ ] G8 artifact-scoped supervisor escalation routing
+- [ ] G10 row-relative locator via the existing CSS strategy (documented last resort)
+- [ ] G11 observation fixes (h1, submit `value`, name/id in inventory, select by value)
+- [ ] G12 profile-driven redaction: DOM snapshots + screenshot masking
+- [ ] G6a DOM snapshot evidence (run index deferred to the service phases)
+- [ ] profile-driven fingerprint recognition
+- [ ] CLI target/profile selection
+- [ ] MERIDIAN sign-on capability artifact
+
+Explicitly NOT in P1 (deferred or dropped on evidence): parameterized locators
+(G1), StepOutputRef (G2), session manager, frame support (G9), run index (G6b),
+API, chatbot, dashboard.
+
+## M13–M19 — P2..P9
+- [ ] P2 member inquiry + balances
+- [ ] P3 funds transfer
+- [ ] P4 open share / update member / place hold
+- [ ] P5 exceptional-state matrix
+- [ ] P6 runner + capability API
+- [ ] P7 chatbot
+- [ ] P8 dashboard
+- [ ] P9 integration, docs, evidence, demo hardening
+

@@ -1,3 +1,5 @@
+> **Phase 1 historical.** This file drove the original Northstar build. Phase 2 (MERIDIAN CORE) is governed by `phase2_build_pack/`. Kept for provenance; not a current instruction.
+
 Perform a submission-blocking final audit of this repository against `reference/ORIGINAL_ASSIGNMENT.txt`, `CLAUDE.md`, and `docs/01_REQUIREMENTS_TRACEABILITY.md`.
 
 This is not a documentation-only review. Inspect and run the code.

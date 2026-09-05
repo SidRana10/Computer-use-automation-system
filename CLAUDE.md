@@ -108,6 +108,49 @@ Mandatory stack:
 - Keep synthetic target data obviously fictional.
 - Tests must cover schema validation, parameter binding, locator strategy resolution where practical, policy rejection, redaction, error classification, result contracts, and at least one end-to-end deterministic replay.
 
+## Phase 2 — MERIDIAN CORE adaptation (supersedes where noted)
+
+Phase 2 adapts this system to a second, remote target: **MERIDIAN CORE**
+(`https://web-sample.interface-hiring.com`), a legacy credit-union servicing UI.
+It is an adaptation of the existing core, not a rebuild. The product spec is
+`phase2_build_pack/03_PHASE2_REQUIREMENTS.md`; the workflow is
+`phase2_build_pack/04_IMPLEMENTATION_WORKFLOW.md`.
+
+The following Phase-1 instructions are amended for Phase 2:
+
+- **Target app.** "FastAPI + Jinja2 for local target app" described the Phase-1
+  target. In Phase 2 the target is the remote MERIDIAN application; the local
+  `demo_app/` (Northstar) is retained unchanged as the **regression target**.
+  Both are reached through the same `SurfaceAdapter`, selected by a target
+  profile. Northstar behavior and its tests must keep passing.
+- **Discovery model.** `DISCOVERY_MODEL=claude-fable-5` remains the Anthropic
+  setting; per D013 the default runtime provider is Gemini (`LLM_PROVIDER`).
+  Unchanged by Phase 2.
+- **"No unnecessary microservices."** Phase 2 requires a capability API, a thin
+  chatbot, and a dashboard. These are in-process FastAPI routers sharing one
+  event loop with the automation — no queues, brokers, containers, or new
+  services. The rule still forbids infrastructure added for appearance.
+- **REPORT.md.** The seven-heading structure is a Phase-1 deliverable and stays
+  exactly as it is. The Phase-2 write-up is a separate file, `REPORT_PHASE2.md`,
+  covering the twelve points in `phase2_build_pack/07_DEMO_AND_DELIVERABLES.md`.
+- **Definition of done.** The Phase-1 definition of done is now the regression
+  baseline. Phase-2 completion is governed by
+  `phase2_build_pack/08_DEFINITION_OF_DONE.md`.
+
+Phase-2 non-negotiables, in addition to all Phase-1 ones:
+
+- Escalation stays a policy/handoff outcome. The error taxonomy remains exactly
+  three-way (`business_outcome`, `recoverable`, `hard_failure`).
+- After an irreversible POST has been dispatched and its outcome is uncertain,
+  automation must never automatically repeat it. It may re-observe, verify,
+  stop, or escalate.
+- Runtime values may be referenced by parameterized locators at replay time but
+  must never be persisted into artifacts or evidence.
+- The capability API, chatbot, and dashboard must not become paths around the
+  PolicyEngine, redaction, evidence, or handoff.
+- Every core change must be justified by a concrete MERIDIAN requirement and
+  must preserve Northstar behavior.
+
 ## Working method
 
 Before coding:

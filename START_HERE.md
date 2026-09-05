@@ -1,5 +1,7 @@
 # START HERE — Claude Code Build Pack
 
+> **Phase 1 historical.** This file drove the original Northstar build. Phase 2 (MERIDIAN CORE) is governed by `phase2_build_pack/`. Kept for provenance; not a current instruction.
+
 This folder is a build-control package for the interface.ai engineering take-home assignment in `reference/ORIGINAL_ASSIGNMENT.txt`.
 
 ## Intended usage

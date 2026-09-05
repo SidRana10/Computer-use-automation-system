@@ -1,0 +1,33 @@
+Read every file under `phase2_build_pack/` and treat them as the Phase 2 execution plan.
+
+You are working in the existing `interface-ai-takehome` repository on branch `meridian-adaptation`. This is an adaptation of the completed Phase 1 system, not a rewrite.
+
+Build the MERIDIAN CORE Phase 2 project end-to-end, following the phases and acceptance criteria in the pack.
+
+Important operating rules:
+- inspect before editing;
+- preserve the existing core and Phase 1 guarantees;
+- prefer adapter/configuration/generalization over parallel implementations;
+- keep deterministic replay as the production path;
+- keep PolicyEngine/redaction/evidence/escalation on every execution path;
+- implement and test the seven required capabilities;
+- prioritize balance, transfer, hidden-token handling, review->post safety, supervisor gating, and exceptional-state handling;
+- add API, then chatbot, then dashboard only after the core is green;
+- run tests continuously;
+- commit small green phases with clear messages;
+- do not hide incomplete items or flaky behavior;
+- keep UI intentionally simple;
+- update README/write-up/demo assets at the end;
+- use `08_DEFINITION_OF_DONE.md` as the final hard gate.
+
+Work autonomously through the phases. If you encounter a genuinely ambiguous decision that could materially change architecture, safety, or scope, stop and present the options with your recommendation instead of guessing. For routine implementation decisions, choose the simplest defensible option and document it.
+
+Do not declare completion until the full definition of done is checked and you have produced a concise final report containing:
+- architecture changes;
+- files/modules changed;
+- tests and live flows run;
+- required capabilities and their status;
+- error-state coverage;
+- API/chatbot/dashboard run instructions;
+- remaining limitations;
+- exact demo path.

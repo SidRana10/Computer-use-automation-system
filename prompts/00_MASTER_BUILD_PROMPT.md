@@ -1,3 +1,5 @@
+> **Phase 1 historical.** This file drove the original Northstar build. Phase 2 (MERIDIAN CORE) is governed by `phase2_build_pack/`. Kept for provenance; not a current instruction.
+
 Build this project completely from the repository specification already present here.
 
 Start by reading, in full:

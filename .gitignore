@@ -16,6 +16,9 @@ dist/
 evidence/runs/
 artifacts/*.json
 !artifacts/.gitkeep
+# Phase 2: MERIDIAN capability artifacts are submission deliverables
+!artifacts/meridian/
+!artifacts/meridian/*.json
 demo_app_state.json
 
 # OS / editor
