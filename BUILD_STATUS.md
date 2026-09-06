@@ -253,6 +253,16 @@ API, chatbot, dashboard.
       only `cli.py` (+`serve` subcommand) and `pyproject.toml`
       (template package-data) touched outside the new `api/`/`chatbot/`/
       `dashboard/` packages).
-- [ ] P9 integration, docs (README/REPORT_PHASE2), evidence hardening, demo
-      polish — explicitly deferred per instruction, not started.
+- [x] P9 docs and demo prep: `README.md` restructured with a Phase-2 section
+      first (architecture, setup, env vars, `uicap serve` + all three UI
+      URLs, discovery/replay/API-invoke commands, a 3-scene live demo script,
+      known limitations, backup-evidence table); `REPORT_PHASE2.md` added
+      (the five required sections, ~2 pages). No product code changed;
+      routes/commands spot-checked (`uicap --help`/`serve --help`/`discover
+      --help`/`replay --help` parse; `TestClient` against the real
+      `create_app()` returns 200 for `/api/capabilities`, `/chatbot/`,
+      `/dashboard/`, and 400 for a caller-supplied `operator_id`, matching
+      what the docs claim) rather than rerunning the full suite for a docs
+      change. Full suite last confirmed green at 328 passed, 15 skipped
+      (unchanged by this milestone).
 
