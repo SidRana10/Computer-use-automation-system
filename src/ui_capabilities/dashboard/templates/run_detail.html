@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Run {{ run.run_id }}{% endblock %}
+{% block content %}
+<p><a href="/dashboard/runs">&larr; back to run history</a></p>
+<h1>Run <span class="mono">{{ run.run_id }}</span></h1>
+<p>
+  Capability: <a href="/dashboard/capabilities/{{ run.capability_id }}">{{ run.capability_name }}</a>
+  <span class="mono">{{ run.capability_id }} v{{ run.capability_version }}</span>
+</p>
+<p>
+  Status: <span class="badge status-{{ run.status }}">{{ run.status }}</span>
+  {% if run.code %}<span class="mono">[{{ run.code }}]</span>{% endif %}
+</p>
+<p>Started: {{ run.started_at }} &middot; Finished: {{ run.finished_at }} &middot; Duration: {{ run.duration_ms }} ms</p>
+
+<div class="card">
+<h3>Inputs (redacted per contract sensitivity)</h3>
+{% if run.inputs %}
+<table>
+<tr><th>Name</th><th>Value</th></tr>
+{% for name, value in run.inputs.items() %}
+<tr><td class="mono">{{ name }}</td><td class="mono">{{ value }}</td></tr>
+{% endfor %}
+</table>
+{% else %}
+<p>(no caller-supplied inputs)</p>
+{% endif %}
+</div>
+
+<div class="card">
+<h3>Structured result</h3>
+{% if run.result.status == "success" %}
+  <p>Outputs:</p>
+  {% if run.result.outputs %}
+  <table><tr><th>Name</th><th>Value</th></tr>
+  {% for k, v in run.result.outputs.items() %}<tr><td class="mono">{{ k }}</td><td class="mono">{{ v }}</td></tr>{% endfor %}
+  </table>
+  {% else %}<p>(no outputs)</p>{% endif %}
+  {% if run.result.recoveries %}<p>Recoveries: {{ run.result.recoveries }}</p>{% endif %}
+  {% if run.result.human_completions %}<p>Human completions: {{ run.result.human_completions }}</p>{% endif %}
+{% elif run.result.status == "business_outcome" %}
+  <p>{{ run.result.message }}</p>
+  {% if run.result.step_id %}<p>Step: <span class="mono">{{ run.result.step_id }}</span></p>{% endif %}
+  {% if run.result.outputs %}
+  <table><tr><th>Name</th><th>Value</th></tr>
+  {% for k, v in run.result.outputs.items() %}<tr><td class="mono">{{ k }}</td><td class="mono">{{ v }}</td></tr>{% endfor %}
+  </table>
+  {% endif %}
+{% elif run.result.status == "escalated" %}
+  <p>{{ run.result.message }}</p>
+  <p>Intervention: <span class="mono">{{ run.result.intervention_id }}</span> &middot; Resolution: {{ run.result.resolution }}</p>
+  {% if run.result.step_id %}<p>Step: <span class="mono">{{ run.result.step_id }}</span></p>{% endif %}
+  <p>Resolve via the operator console, then re-check this run.</p>
+{% elif run.result.status == "failure" %}
+  <p>Expected: {{ run.result.expected }}</p>
+  <p>Observed: {{ run.result.observed }}</p>
+  {% if run.result.step_id %}<p>Step: <span class="mono">{{ run.result.step_id }}</span></p>{% endif %}
+  <p>Recovery attempts: {{ run.result.recovery_attempts }}</p>
+{% endif %}
+</div>
+
+<div class="card">
+<h3>Step / policy events</h3>
+<div class="events">
+{% for e in run.events %}
+<div>{{ e.ts }} &mdash; <b>{{ e.event }}</b>
+{%- for key, value in e.items() if key not in ["ts", "run_id", "event"] %} {{ key }}={{ value }}{% endfor -%}
+</div>
+{% endfor %}
+{% if not run.events %}<p>(no run.jsonl for this run — tracing/logging is target-profile dependent)</p>{% endif %}
+</div>
+</div>
+
+<div class="card">
+<h3>Evidence</h3>
+<ul class="evidence-list">
+{% for f in run.evidence_files %}
+<li>
+  {% if f.endswith('.png') %}
+    <a href="/api/runs/{{ run.run_id }}/evidence/{{ f }}" class="mono">{{ f }}</a><br>
+    <img class="evidence" src="/api/runs/{{ run.run_id }}/evidence/{{ f }}" alt="{{ f }}">
+  {% else %}
+    <a href="/api/runs/{{ run.run_id }}/evidence/{{ f }}" class="mono">{{ f }}</a>
+  {% endif %}
+</li>
+{% endfor %}
+{% if not run.evidence_files %}<li>(no evidence files)</li>{% endif %}
+</ul>
+</div>
+{% endblock %}

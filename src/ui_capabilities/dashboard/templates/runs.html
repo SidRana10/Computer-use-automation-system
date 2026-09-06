@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Run History{% endblock %}
+{% block content %}
+<h1>Run History</h1>
+<p>Every invocation made through the capability API or chatbot (deterministic replay, no LLM). Historical CLI/script runs are not listed here — see <span class="mono">evidence/runs/</span> directly for those.</p>
+<table>
+<tr><th>Run</th><th>Capability</th><th>Status</th><th>Started</th><th>Duration</th></tr>
+{% for r in runs %}
+<tr>
+  <td><a href="/dashboard/runs/{{ r.run_id }}" class="mono">{{ r.run_id }}</a></td>
+  <td>{{ r.capability_name }}<br><span class="mono">{{ r.capability_id }}</span></td>
+  <td><span class="badge status-{{ r.status }}">{{ r.status }}</span>{% if r.code %}<br><span class="mono">{{ r.code }}</span>{% endif %}</td>
+  <td>{{ r.started_at }}</td>
+  <td>{{ r.duration_ms }} ms</td>
+</tr>
+{% endfor %}
+{% if not runs %}
+<tr><td colspan="5">No runs yet — invoke a capability via the chatbot or <span class="mono">POST /api/capabilities/&lt;id&gt;/invoke</span>.</td></tr>
+{% endif %}
+</table>
+{% endblock %}

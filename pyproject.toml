@@ -34,6 +34,12 @@ uicap = "ui_capabilities.cli:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+# Jinja templates for the P6-P8 chatbot/dashboard UIs — not picked up by
+# setuptools' default .py-only package discovery.
+"ui_capabilities.chatbot" = ["templates/*.html"]
+"ui_capabilities.dashboard" = ["templates/*.html"]
+
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Capability Catalog{% endblock %}
+{% block content %}
+<h1>Capability Catalog</h1>
+<p>MERIDIAN capabilities compiled from genuine discovery runs, replayed deterministically with no LLM in the loop.</p>
+<table>
+<tr><th>Capability</th><th>Version</th><th>Target</th><th>Risk</th><th>Inputs</th><th>Outputs</th></tr>
+{% for c in capabilities %}
+<tr>
+  <td><a href="/dashboard/capabilities/{{ c.capability_id }}">{{ c.name }}</a><br><span class="mono">{{ c.capability_id }}</span><br>{{ c.description }}</td>
+  <td>{{ c.capability_version }}</td>
+  <td>{{ c.target_display_name }}</td>
+  <td><span class="badge risk-{{ c.risk_level }}">{{ c.risk_level }}</span></td>
+  <td>{{ c.input_count }}</td>
+  <td>{{ c.output_count }}</td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}

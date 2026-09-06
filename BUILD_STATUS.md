@@ -214,8 +214,45 @@ API, chatbot, dashboard.
 - API, chatbot, dashboard explicitly NOT built yet (P6-P8, per instruction)
 
 ## M17–M19 — P6..P9
-- [ ] P6 capability API
-- [ ] P7 chatbot
-- [ ] P8 dashboard
-- [ ] P9 integration, docs, evidence, demo hardening
+- [x] P6 capability API (`src/ui_capabilities/api/`): `CapabilityCatalog` reads
+      the 7 committed MERIDIAN artifacts; `CapabilityService` validates,
+      injects server-side operator credentials, and calls `CapabilityRunner`
+      — the same `PlaywrightWebSurface` + `PolicyEngine` + `HandoffManager` +
+      `ReplayEngine` construction `uicap replay` already uses (`api/runner.py`
+      is the only module in api/chatbot/dashboard that imports a surface or
+      the replay engine, statically pinned by
+      `tests/unit/test_chatbot_no_playwright_path.py`). Endpoints:
+      `GET /api/capabilities`, `GET /api/capabilities/{id}`,
+      `POST /api/capabilities/{id}/invoke`, `GET /api/runs`,
+      `GET /api/runs/{id}`, `GET /api/runs/{id}/evidence/{path}`. Credential
+      inputs (`operator_id`/`password`/`branch`) and `human_approved` are
+      rejected from any request before the runner is ever touched; a bad
+      capability id or invalid typed args fail before any browser/evidence
+      side effect (`api/service.py`).
+- [x] P7 thin chatbot (`src/ui_capabilities/chatbot/`): deterministic
+      regex/keyword intent + slot extraction (`nlu.py`, no model call — a
+      documented, swappable simplification), multi-turn slot filling via an
+      in-memory per-session store, calls the identical `CapabilityService`
+      the HTTP routes use (never a second invocation path), explains
+      success/business_outcome/failure/escalated in plain language.
+- [x] P8 dashboard (`src/ui_capabilities/dashboard/`): read-only capability
+      catalog, run history, and run detail (redacted inputs, structured
+      result, step/policy events from `run.jsonl`, masked screenshots,
+      redacted DOM snapshots) server-rendered with Jinja2. No invoke form, no
+      browser-control endpoint — verified by
+      `tests/unit/test_dashboard_router.py::test_catalog_page_has_no_mutating_form`.
+- [x] live verification: one real `GET.../invoke` balance call and one real
+      chatbot balance request against the live MERIDIAN target both
+      succeeded end-to-end (run ids `api-645b4c28d7`, `api-4c95f56f66`,
+      `api-60d17ba0b6`), and the dashboard displayed the resulting run
+      history/detail, including its evidence screenshot, over HTTP.
+- [x] 54 new focused tests (catalog, service, routes, run-store path safety,
+      chatbot NLU, chatbot multi-turn router, static no-Playwright-import
+      checks, dashboard rendering) — 328 passed, 15 skipped full suite
+      (274 P1-P5 baseline + 54 new), zero core module changes (`git status`:
+      only `cli.py` (+`serve` subcommand) and `pyproject.toml`
+      (template package-data) touched outside the new `api/`/`chatbot/`/
+      `dashboard/` packages).
+- [ ] P9 integration, docs (README/REPORT_PHASE2), evidence hardening, demo
+      polish — explicitly deferred per instruction, not started.
 

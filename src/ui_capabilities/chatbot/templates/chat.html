@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>MERIDIAN Capability Chatbot</title>
+<style>
+ body { font-family: monospace; margin: 20px; background: #f5f5f0; }
+ #log { max-width: 760px; border: 1px solid #888; background: #fff; padding: 12px; height: 420px; overflow-y: auto; }
+ .msg { margin-bottom: 10px; white-space: pre-wrap; }
+ .me { color: #114; }
+ .bot { color: #060; }
+ .meta { color: #888; font-size: 0.85em; }
+ form { max-width: 760px; margin-top: 10px; display: flex; gap: 8px; }
+ input[type=text] { flex: 1; font-family: monospace; padding: 6px; }
+ button { font-family: monospace; padding: 6px 12px; }
+ a { color: #114; }
+</style>
+</head>
+<body>
+<h1>MERIDIAN Capability Chatbot</h1>
+<p class="meta">Talks only to the capability API — no direct browser control here.
+See the <a href="/dashboard">dashboard</a> for the capability catalog and run history.</p>
+<div id="log"></div>
+<form id="composer">
+  <input type="text" id="input" autocomplete="off" placeholder='e.g. "check the balance for member 100234"'>
+  <button type="submit">Send</button>
+</form>
+<script>
+let sessionId = null;
+const log = document.getElementById('log');
+const form = document.getElementById('composer');
+const input = document.getElementById('input');
+
+function append(who, text) {
+  const div = document.createElement('div');
+  div.className = 'msg ' + who;
+  div.textContent = (who === 'me' ? 'you: ' : 'bot: ') + text;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+
+form.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const text = input.value.trim();
+  if (!text) return;
+  append('me', text);
+  input.value = '';
+  try {
+    const response = await fetch('/chatbot/message', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session_id: sessionId, message: text }),
+    });
+    const data = await response.json();
+    sessionId = data.session_id;
+    append('bot', data.reply);
+    if (data.result) {
+      append('bot', 'run: ' + data.result.run_id + ' (status: ' + data.result.status + ')');
+    }
+  } catch (err) {
+    append('bot', 'request failed: ' + err);
+  }
+});
+</script>
+</body>
+</html>

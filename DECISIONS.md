@@ -493,3 +493,77 @@ Two genuine, minimal ($1, same-member, internal) live transfers were
 performed against the shared sandbox in the course of this investigation
 (`disc-c0bfce3b6c`, `disc-887e90fe6a`); both are real, already-settled
 transactions, not test doubles, and are documented here rather than hidden.
+
+## D036 — P6-P8: one CapabilityService, no second invocation path, credentials never a caller concern
+**Decision:** `api/service.py::CapabilityService` is the single place that
+turns "invoke capability X with these arguments" into a deterministic replay
+run. Both the HTTP routes (`api/routes.py`) and the chatbot
+(`chatbot/router.py`) call it directly, in-process — the chatbot does not
+make an HTTP call to its own server. `api/runner.py` is the only module
+anywhere under `api/`, `chatbot/`, or `dashboard/` allowed to import a
+surface or `ReplayEngine` (statically pinned by
+`tests/unit/test_chatbot_no_playwright_path.py`, via `ast`-parsed imports
+rather than a text search, since several docstrings *describe* not using
+Playwright). Every MERIDIAN artifact's contract declares `operator_id`,
+`password`, and `branch` as required inputs (each capability carries its own
+sign-on prefix per D017); the API/chatbot layer excludes exactly these three
+names from the public schema (`schemas.SERVER_SUPPLIED_INPUTS`) and injects
+them at invoke time from `MERIDIAN_TELLER_ID`/`MERIDIAN_TELLER_PASSWORD`/
+`MERIDIAN_BRANCH` (the same env vars the existing live integration tests
+already read) — a caller can never supply, override, or see them. A request
+naming any of those three, or `human_approved`, is rejected
+(`InvalidArgumentsError`, HTTP 400) before the catalog lookup's artifact is
+even bound to input, let alone before a browser launches. A contract-invalid
+business argument (bad pattern, missing required field) is instead resolved
+via `binder.validate_and_bind` called directly in the service — the exact
+check `ReplayEngine.replay` performs first — so it returns a structured
+`FailureResult(code=INVOCATION_INVALID)` with zero side effects (no evidence
+directory, no operator-console port bind, no browser), not merely "before
+the browser launches."
+**Reason:** "The caller must not need to know MERIDIAN UI details" (docs)
+extends naturally to "the caller must not need to know MERIDIAN has a
+sign-on step at all" — every one of the 7 capabilities embeds it, so hiding
+it is what makes the API's inputs match what a member-servicing task
+actually varies per call. Sharing one service object rather than routing the
+chatbot through its own HTTP client avoids a redundant network hop in a
+single-process demo while still guaranteeing, structurally, that there is
+exactly one invocation path — the thing "must not create a second Playwright
+execution path" actually requires.
+
+## D037 — P7 chatbot NLU is deterministic regex/keywords, not a model call
+**Decision:** `chatbot/nlu.py` maps a request to a capability id and typed
+slots with regex/keyword matching — no LLM call. Multi-turn slot-filling
+state is an in-memory per-session dict (`chatbot/session.py`), mirroring how
+the existing `InterventionStore` is already in-memory-only for a demo-scale
+system.
+**Reason:** P7's own instructions are explicit — "thin," "do not build a
+sophisticated agent framework," "use the simplest existing model/provider
+integration" — and CLAUDE.md ranks "genuine LLM discovery loop" below
+artifact/replay/handoff/safety quality already; chatbot NLU is further still
+from that priority list. A regex mapper is exhaustively unit-testable
+offline (`tests/unit/test_chatbot_nlu.py`), with zero API cost or network
+flakiness in the two demo-prioritized requests (balance, transfer) and
+representative coverage of the other four caller-facing capabilities.
+Swapping `detect_capability`/`extract_slots` for a structured-output call to
+the same Gemini/Anthropic adapters discovery already uses is a natural,
+scoped future improvement — the chatbot loop in `router.py` only depends on
+their function signatures, not on how they're implemented — and is
+documented rather than built, per the instruction to document
+nonessential enhancements and continue.
+
+## D038 — P8 dashboard is read-only; no invoke form
+**Decision:** `dashboard/` renders the capability catalog and run
+history/detail (inputs redacted per contract sensitivity, structured result,
+step/policy events, masked screenshots, redacted DOM snapshots) with no form
+anywhere on any page (pinned by
+`test_dashboard_router.py::test_catalog_page_has_no_mutating_form`).
+Invocation happens via the chatbot or `POST /api/capabilities/{id}/invoke`
+(discoverable at `/docs`), not a dashboard control.
+**Reason:** "The dashboard must not introduce browser-control or
+policy-bypass endpoints" is trivially, structurally true of a page that
+issues no POSTs at all — the safest way to satisfy it, not merely the
+easiest. Evidence files are served read-only through the same traversal-safe
+`RunStore.evidence_file_path` (rejects any resolved path outside the run's
+own directory; pinned in `test_run_store.py`); DOM snapshots are served as
+`text/plain` regardless of their `.html` extension so a redacted capture is
+never re-executed as a live page inside the dashboard's own browser context.

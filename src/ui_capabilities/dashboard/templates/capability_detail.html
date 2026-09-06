@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}{{ capability.name }}{% endblock %}
+{% block content %}
+<p><a href="/dashboard">&larr; back to catalog</a></p>
+<h1>{{ capability.name }}</h1>
+<p class="mono">{{ capability.capability_id }} v{{ capability.capability_version }}</p>
+<p>{{ capability.description }}</p>
+<p>
+  Target: {{ capability.target_display_name }} &middot;
+  Risk: <span class="badge risk-{{ capability.risk_level }}">{{ capability.risk_level }}</span>
+  {% if capability.escalate_on_codes %}
+  &middot; Escalates on: {{ capability.escalate_on_codes | join(", ") }}
+  {% endif %}
+</p>
+
+<div class="card">
+<h3>Inputs (caller-supplied)</h3>
+<p class="mono" style="color:#888">Operator sign-on (operator_id / password / branch) is supplied by the server environment and is never part of this contract.</p>
+<table>
+<tr><th>Name</th><th>Type</th><th>Required</th><th>Sensitive</th><th>Constraints</th><th>Description</th></tr>
+{% for i in capability.inputs %}
+<tr>
+  <td class="mono">{{ i.name }}</td>
+  <td>{{ i.type }}</td>
+  <td>{{ "yes" if i.required else "no" }}</td>
+  <td>{{ "yes" if i.sensitive else "no" }}</td>
+  <td class="mono">
+    {%- if i.pattern %}pattern: {{ i.pattern }}{% endif -%}
+    {%- if i.minimum is not none %} min: {{ i.minimum }}{% endif -%}
+    {%- if i.maximum is not none %} max: {{ i.maximum }}{% endif -%}
+  </td>
+  <td>{{ i.description }}</td>
+</tr>
+{% endfor %}
+</table>
+</div>
+
+<div class="card">
+<h3>Outputs</h3>
+<table>
+<tr><th>Name</th><th>Type</th><th>Description</th></tr>
+{% for o in capability.outputs %}
+<tr><td class="mono">{{ o.name }}</td><td>{{ o.type }}</td><td>{{ o.description }}</td></tr>
+{% endfor %}
+{% if not capability.outputs %}
+<tr><td colspan="3">(no published outputs)</td></tr>
+{% endif %}
+</table>
+</div>
+
+<p class="mono">Invoke via <code>POST /api/capabilities/{{ capability.capability_id }}/invoke</code> (see <a href="/docs">API docs</a>) or through the <a href="/chatbot">chatbot</a>.</p>
+{% endblock %}

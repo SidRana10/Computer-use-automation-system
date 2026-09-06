@@ -304,6 +304,13 @@ def build_parser() -> argparse.ArgumentParser:
     rep.add_argument("--demo-interstitial", action="store_true", help="arm the known idle interstitial (recoverable demo)")
     rep.add_argument("--demo-slow", action="store_true", help="arm the transient slow-load state (recoverable demo)")
     rep.add_argument("--demo-session-expired", action="store_true", help="arm the session-expired state (hard failure demo)")
+
+    serve = sub.add_parser(
+        "serve",
+        help="run the capability API + thin chatbot + dashboard (in-process FastAPI app over deterministic replay)",
+    )
+    serve.add_argument("--host", default="127.0.0.1")
+    serve.add_argument("--port", type=int, default=8003)
     return parser
 
 
@@ -319,6 +326,12 @@ def main() -> None:
         raise SystemExit(asyncio.run(_discover(args)))
     if args.command == "replay":
         raise SystemExit(asyncio.run(_replay(args)))
+    if args.command == "serve":
+        import uvicorn
+
+        sys.path.insert(0, str(Path.cwd()))
+        uvicorn.run("ui_capabilities.api.app:app", host=args.host, port=args.port, log_level="info")
+        return
 
 
 if __name__ == "__main__":
