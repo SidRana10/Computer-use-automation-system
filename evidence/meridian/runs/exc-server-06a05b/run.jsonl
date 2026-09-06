@@ -1,0 +1,15 @@
+{"ts": "2026-09-06T00:05:57.096629+00:00", "run_id": "exc-server-06a05b", "event": "replay_started", "capability_id": "test.meridian_exceptional_state_probe", "capability_version": "1.0.0", "inputs": ["branch", "member_number", "operator_id", "[REDACTED]"]}
+{"ts": "2026-09-06T00:05:57.762284+00:00", "run_id": "exc-server-06a05b", "event": "policy_checked", "step_id": "s1_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-06T00:05:57.769220+00:00", "run_id": "exc-server-06a05b", "event": "target_resolved", "step_id": "s1_fill", "strategy": "stable_attribute"}
+{"ts": "2026-09-06T00:05:57.769340+00:00", "run_id": "exc-server-06a05b", "event": "step_completed", "step_id": "s1_fill", "attempts": 0}
+{"ts": "2026-09-06T00:05:57.769451+00:00", "run_id": "exc-server-06a05b", "event": "policy_checked", "step_id": "s2_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-06T00:05:57.788330+00:00", "run_id": "exc-server-06a05b", "event": "target_resolved", "step_id": "s2_fill", "strategy": "stable_attribute"}
+{"ts": "2026-09-06T00:05:57.788442+00:00", "run_id": "exc-server-06a05b", "event": "step_completed", "step_id": "s2_fill", "attempts": 0}
+{"ts": "2026-09-06T00:05:57.788498+00:00", "run_id": "exc-server-06a05b", "event": "policy_checked", "step_id": "s3_select", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-06T00:05:57.790677+00:00", "run_id": "exc-server-06a05b", "event": "target_resolved", "step_id": "s3_select", "strategy": "stable_attribute"}
+{"ts": "2026-09-06T00:05:57.790763+00:00", "run_id": "exc-server-06a05b", "event": "step_completed", "step_id": "s3_select", "attempts": 0}
+{"ts": "2026-09-06T00:05:57.790822+00:00", "run_id": "exc-server-06a05b", "event": "policy_checked", "step_id": "s4_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-06T00:05:57.985410+00:00", "run_id": "exc-server-06a05b", "event": "target_resolved", "step_id": "s4_click", "strategy": "role_name"}
+{"ts": "2026-09-06T00:05:57.985992+00:00", "run_id": "exc-server-06a05b", "event": "step_completed", "step_id": "s4_click", "attempts": 0}
+{"ts": "2026-09-06T00:05:57.986294+00:00", "run_id": "exc-server-06a05b", "event": "policy_checked", "step_id": "s5_navigate", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-06T00:06:07.428514+00:00", "run_id": "exc-server-06a05b", "event": "hard_failure", "step_id": "s5_navigate", "code": "APPLICATION_ERROR", "expected": "step to complete without a declared fatal condition", "observed": "MERIDIAN returned an application error; the run stopped and preserved evidence.", "recovery_attempts": 0}

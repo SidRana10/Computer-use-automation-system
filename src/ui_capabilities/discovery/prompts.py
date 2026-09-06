@@ -25,6 +25,7 @@ You are operating in a regulated-style environment. Follow these rules strictly:
 8. If you are blocked, uncertain about a consequential action, or cannot safely identify the next control, request human intervention instead of guessing.
 9. When the goal is visibly complete, return DONE with a concise success summary and a success condition grounded in the visible UI. Do not continue interacting after completion.
 10. Return only the structured next-action payload required by the tool/schema. Keep `rationale_summary` short and operational; do not provide hidden chain-of-thought.
+11. If a form carries a hidden security/transaction token, it appears in INTERACTIVE ELEMENTS with kind "hidden" (never as a visible field) — explicitly extract its current value with extract_mode='value' and internal=true immediately before submitting, so the flow is shown to check for it. Never mark a genuine result (a balance, a confirmation number) internal.
 
 The application code, not you, is responsible for policy enforcement, actual browser execution, retries, logging, and artifact compilation.
 """

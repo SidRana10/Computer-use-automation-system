@@ -1,0 +1,45 @@
+[
+  {
+    "intervention_id": "int-76aa80c7",
+    "run_id": "disc-c0bfce3b6c",
+    "mode": "discovery",
+    "capability_id": "meridian.funds_transfer",
+    "goal_summary": "Sign on to MERIDIAN CORE as the supplied operator. Use Member Inquiry to search by member number for the given member number and select that member. Start a Funds Transfer using the given from-share, to-share, amount, and memo, and click Continue to reach the review screen. On the review screen, before submitting, look at INTERACTIVE ELEMENTS for an element with kind 'hidden' (the security/transaction token) and extract its value using extract_mode=value and internal=true (it must never be a public output). Then click Post Transfer to submit. After the transfer is posted you MUST reach the TRANSACTION COMPLETE confirmation page and look at INTERACTIVE ELEMENTS for a 'cell' element whose name is 'Confirmation' (the posted transaction's confirmation number). Extract its value using extract_mode=value, internal=false, output_name=confirmation_number, output_type=string \u2014 this is a genuine result the caller needs and must become a public output, never internal. Only after that extraction has succeeded should you declare the goal DONE, using a suggested_success_condition grounded in stable page text such as TRANSACTION COMPLETE (never the confirmation number or any other value you just extracted).",
+    "step_id": "step_14",
+    "reason_code": "risky_action",
+    "reason_message": "irreversible action requires a human operator",
+    "control_owner": "PAUSED",
+    "screenshot_path": "evidence/meridian/runs/disc-c0bfce3b6c/screenshots/intervention_step_14.png",
+    "current_url": "https://web-sample.interface-hiring.com/members/[REDACTED]/transfer/review",
+    "created_at": "2026-09-06T00:49:38.243082Z",
+    "status": "resumed",
+    "operator_id": "scripted-operator",
+    "operator_note": "scripted operator approved 'Post Transfer'",
+    "human_events": [
+      {
+        "event": "click",
+        "tag": "input",
+        "text": "Post Transfer",
+        "aria_label": null,
+        "name": null,
+        "value_changed": null,
+        "value": null,
+        "url": null,
+        "timestamp": "2026-09-06T00:49:38.372Z"
+      },
+      {
+        "event": "navigation",
+        "tag": null,
+        "text": null,
+        "aria_label": null,
+        "name": null,
+        "value_changed": null,
+        "value": null,
+        "url": "/members/[REDACTED]/transfer/post",
+        "timestamp": "2026-09-06T00:49:38.624Z"
+      }
+    ],
+    "before_screenshot": "evidence/meridian/runs/disc-c0bfce3b6c/screenshots/intervention_step_14.png",
+    "after_screenshot": "evidence/meridian/runs/disc-c0bfce3b6c/screenshots/resume_int-76aa80c7.png"
+  }
+]

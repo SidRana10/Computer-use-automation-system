@@ -1,0 +1,55 @@
+{"ts": "2026-09-05T23:55:51.588737+00:00", "run_id": "rep-2b1dd06224", "event": "replay_started", "capability_id": "meridian.place_hold", "capability_version": "1.0.0", "inputs": ["branch", "member_number", "notes", "operator_id", "[REDACTED]", "reason_code", "share"]}
+{"ts": "2026-09-05T23:55:52.701734+00:00", "run_id": "rep-2b1dd06224", "event": "policy_checked", "step_id": "s1_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T23:55:52.720940+00:00", "run_id": "rep-2b1dd06224", "event": "target_resolved", "step_id": "s1_fill", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T23:55:52.721077+00:00", "run_id": "rep-2b1dd06224", "event": "step_completed", "step_id": "s1_fill", "attempts": 0}
+{"ts": "2026-09-05T23:55:52.721143+00:00", "run_id": "rep-2b1dd06224", "event": "policy_checked", "step_id": "s2_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T23:55:52.741983+00:00", "run_id": "rep-2b1dd06224", "event": "target_resolved", "step_id": "s2_fill", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T23:55:52.742136+00:00", "run_id": "rep-2b1dd06224", "event": "step_completed", "step_id": "s2_fill", "attempts": 0}
+{"ts": "2026-09-05T23:55:52.742227+00:00", "run_id": "rep-2b1dd06224", "event": "policy_checked", "step_id": "s3_select", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T23:55:52.745394+00:00", "run_id": "rep-2b1dd06224", "event": "target_resolved", "step_id": "s3_select", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T23:55:52.745479+00:00", "run_id": "rep-2b1dd06224", "event": "step_completed", "step_id": "s3_select", "attempts": 0}
+{"ts": "2026-09-05T23:55:52.745536+00:00", "run_id": "rep-2b1dd06224", "event": "policy_checked", "step_id": "s4_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T23:55:52.939997+00:00", "run_id": "rep-2b1dd06224", "event": "target_resolved", "step_id": "s4_click", "strategy": "role_name"}
+{"ts": "2026-09-05T23:55:52.951162+00:00", "run_id": "rep-2b1dd06224", "event": "step_completed", "step_id": "s4_click", "attempts": 0}
+{"ts": "2026-09-05T23:55:52.951353+00:00", "run_id": "rep-2b1dd06224", "event": "policy_checked", "step_id": "s5_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T23:55:53.048720+00:00", "run_id": "rep-2b1dd06224", "event": "target_resolved", "step_id": "s5_click", "strategy": "role_name"}
+{"ts": "2026-09-05T23:55:53.060258+00:00", "run_id": "rep-2b1dd06224", "event": "step_completed", "step_id": "s5_click", "attempts": 0}
+{"ts": "2026-09-05T23:55:53.060455+00:00", "run_id": "rep-2b1dd06224", "event": "policy_checked", "step_id": "s6_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T23:55:53.066020+00:00", "run_id": "rep-2b1dd06224", "event": "target_resolved", "step_id": "s6_fill", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T23:55:53.066166+00:00", "run_id": "rep-2b1dd06224", "event": "step_completed", "step_id": "s6_fill", "attempts": 0}
+{"ts": "2026-09-05T23:55:53.066261+00:00", "run_id": "rep-2b1dd06224", "event": "policy_checked", "step_id": "s7_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T23:55:53.189083+00:00", "run_id": "rep-2b1dd06224", "event": "target_resolved", "step_id": "s7_click", "strategy": "role_name"}
+{"ts": "2026-09-05T23:55:53.189627+00:00", "run_id": "rep-2b1dd06224", "event": "step_completed", "step_id": "s7_click", "attempts": 0}
+{"ts": "2026-09-05T23:55:53.189801+00:00", "run_id": "rep-2b1dd06224", "event": "policy_checked", "step_id": "s8_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T23:55:53.309619+00:00", "run_id": "rep-2b1dd06224", "event": "target_resolved", "step_id": "s8_click", "strategy": "role_name"}
+{"ts": "2026-09-05T23:55:53.323273+00:00", "run_id": "rep-2b1dd06224", "event": "step_completed", "step_id": "s8_click", "attempts": 0}
+{"ts": "2026-09-05T23:55:53.323552+00:00", "run_id": "rep-2b1dd06224", "event": "policy_checked", "step_id": "s9_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T23:55:53.429399+00:00", "run_id": "rep-2b1dd06224", "event": "target_resolved", "step_id": "s9_click", "strategy": "role_name"}
+{"ts": "2026-09-05T23:55:53.444462+00:00", "run_id": "rep-2b1dd06224", "event": "step_completed", "step_id": "s9_click", "attempts": 0}
+{"ts": "2026-09-05T23:55:53.444712+00:00", "run_id": "rep-2b1dd06224", "event": "policy_checked", "step_id": "s10_select", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T23:55:53.450434+00:00", "run_id": "rep-2b1dd06224", "event": "target_resolved", "step_id": "s10_select", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T23:55:53.450611+00:00", "run_id": "rep-2b1dd06224", "event": "step_completed", "step_id": "s10_select", "attempts": 0}
+{"ts": "2026-09-05T23:55:53.450774+00:00", "run_id": "rep-2b1dd06224", "event": "policy_checked", "step_id": "s11_select", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T23:55:53.453875+00:00", "run_id": "rep-2b1dd06224", "event": "target_resolved", "step_id": "s11_select", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T23:55:53.453985+00:00", "run_id": "rep-2b1dd06224", "event": "step_completed", "step_id": "s11_select", "attempts": 0}
+{"ts": "2026-09-05T23:55:53.454070+00:00", "run_id": "rep-2b1dd06224", "event": "policy_checked", "step_id": "s12_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T23:55:53.457317+00:00", "run_id": "rep-2b1dd06224", "event": "target_resolved", "step_id": "s12_fill", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T23:55:53.457445+00:00", "run_id": "rep-2b1dd06224", "event": "step_completed", "step_id": "s12_fill", "attempts": 0}
+{"ts": "2026-09-05T23:55:53.457525+00:00", "run_id": "rep-2b1dd06224", "event": "policy_checked", "step_id": "s13_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T23:55:53.559162+00:00", "run_id": "rep-2b1dd06224", "event": "target_resolved", "step_id": "s13_click", "strategy": "role_name"}
+{"ts": "2026-09-05T23:55:59.092895+00:00", "run_id": "rep-2b1dd06224", "event": "policy_escalation", "step_id": "s13_click", "code": "SUPERVISOR_REQUIRED", "classification": "hard_failure"}
+{"ts": "2026-09-05T23:55:59.138555+00:00", "run_id": "rep-2b1dd06224", "event": "intervention_created", "intervention_id": "int-a712876a", "step_id": "s13_click", "reason_code": "SUPERVISOR_REQUIRED", "reason": "MERIDIAN requires a supervisor profile for this function; the signed-on operator is not authorized and automation will not attempt to bypass it.", "control_owner": "PAUSED", "operator_url": ""}
+{"ts": "2026-09-05T23:55:59.240819+00:00", "run_id": "rep-2b1dd06224", "event": "control_owner_changed", "to": "HUMAN", "intervention_id": "int-a712876a", "operator_id": "scripted-supervisor"}
+{"ts": "2026-09-05T23:55:59.922256+00:00", "run_id": "rep-2b1dd06224", "event": "control_owner_changed", "to": "PAUSED", "intervention_id": "int-a712876a", "human_events": 13}
+{"ts": "2026-09-05T23:55:59.924055+00:00", "run_id": "rep-2b1dd06224", "event": "control_owner_changed", "to": "AUTOMATION", "intervention_id": "int-a712876a"}
+{"ts": "2026-09-05T23:55:59.924133+00:00", "run_id": "rep-2b1dd06224", "event": "human_completed_step", "step_id": "s13_click", "intervention_id": "int-a712876a", "events": 13}
+{"ts": "2026-09-05T23:55:59.924207+00:00", "run_id": "rep-2b1dd06224", "event": "policy_checked", "step_id": "s14_extract", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T23:55:59.933903+00:00", "run_id": "rep-2b1dd06224", "event": "target_resolved", "step_id": "s14_extract", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T23:55:59.934125+00:00", "run_id": "rep-2b1dd06224", "event": "step_completed", "step_id": "s14_extract", "attempts": 0}
+{"ts": "2026-09-05T23:55:59.934218+00:00", "run_id": "rep-2b1dd06224", "event": "policy_checked", "step_id": "s15_click", "allowed": false, "requires_human": true, "code": "HUMAN_APPROVAL_REQUIRED"}
+{"ts": "2026-09-05T23:55:59.962507+00:00", "run_id": "rep-2b1dd06224", "event": "intervention_created", "intervention_id": "int-acf02b4f", "step_id": "s15_click", "reason_code": "HUMAN_APPROVAL_REQUIRED", "reason": "Step 's15_click' is irreversible; policy requires a human operator to perform it.", "control_owner": "PAUSED", "operator_url": ""}
+{"ts": "2026-09-05T23:56:00.126040+00:00", "run_id": "rep-2b1dd06224", "event": "control_owner_changed", "to": "HUMAN", "intervention_id": "int-acf02b4f", "operator_id": "scripted-operator"}
+{"ts": "2026-09-05T23:56:00.280808+00:00", "run_id": "rep-2b1dd06224", "event": "control_owner_changed", "to": "PAUSED", "intervention_id": "int-acf02b4f", "human_events": 2}
+{"ts": "2026-09-05T23:56:00.282510+00:00", "run_id": "rep-2b1dd06224", "event": "control_owner_changed", "to": "AUTOMATION", "intervention_id": "int-acf02b4f"}
+{"ts": "2026-09-05T23:56:00.282595+00:00", "run_id": "rep-2b1dd06224", "event": "human_completed_step", "step_id": "s15_click", "intervention_id": "int-acf02b4f", "events": 2}
+{"ts": "2026-09-05T23:56:00.283257+00:00", "run_id": "rep-2b1dd06224", "event": "replay_succeeded", "outputs": [], "recoveries": 0}

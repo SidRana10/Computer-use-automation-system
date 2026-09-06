@@ -1,0 +1,45 @@
+[
+  {
+    "intervention_id": "int-ed90356a",
+    "run_id": "disc-1c8826ceba",
+    "mode": "discovery",
+    "capability_id": "meridian.place_hold",
+    "goal_summary": "Sign on to MERIDIAN CORE as the supplied operator. Use Member Inquiry to search by member number for the given member number and select that member. Go to Place Account Hold and select the given share and reason code, fill the notes, then click Continue to reach the confirm screen. On the confirm screen click Apply Hold to submit. Declare the goal DONE once the hold is confirmed, using a suggested_success_condition grounded in stable page text (never a value you just entered).",
+    "step_id": "step_14",
+    "reason_code": "risky_action",
+    "reason_message": "irreversible action requires a human operator",
+    "control_owner": "PAUSED",
+    "screenshot_path": "evidence/runs/disc-1c8826ceba/screenshots/intervention_step_14.png",
+    "current_url": "https://web-sample.interface-hiring.com/members/[REDACTED]/hold/review",
+    "created_at": "2026-09-05T23:45:55.576532Z",
+    "status": "resumed",
+    "operator_id": "scripted-operator",
+    "operator_note": "scripted operator approved 'Apply Hold'",
+    "human_events": [
+      {
+        "event": "click",
+        "tag": "input",
+        "text": "Apply Hold",
+        "aria_label": null,
+        "name": null,
+        "value_changed": null,
+        "value": null,
+        "url": null,
+        "timestamp": "2026-09-05T23:45:55.631Z"
+      },
+      {
+        "event": "navigation",
+        "tag": null,
+        "text": null,
+        "aria_label": null,
+        "name": null,
+        "value_changed": null,
+        "value": null,
+        "url": "/members/[REDACTED]/hold/post",
+        "timestamp": "2026-09-05T23:45:55.727Z"
+      }
+    ],
+    "before_screenshot": "evidence/runs/disc-1c8826ceba/screenshots/intervention_step_14.png",
+    "after_screenshot": "evidence/runs/disc-1c8826ceba/screenshots/resume_int-ed90356a.png"
+  }
+]

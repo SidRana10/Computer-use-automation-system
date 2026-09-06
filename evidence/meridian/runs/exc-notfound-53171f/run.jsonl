@@ -1,0 +1,15 @@
+{"ts": "2026-09-06T00:04:53.536517+00:00", "run_id": "exc-notfound-53171f", "event": "replay_started", "capability_id": "test.meridian_exceptional_state_probe", "capability_version": "1.0.0", "inputs": ["branch", "member_number", "operator_id", "[REDACTED]"]}
+{"ts": "2026-09-06T00:04:54.831349+00:00", "run_id": "exc-notfound-53171f", "event": "policy_checked", "step_id": "s1_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-06T00:04:54.847041+00:00", "run_id": "exc-notfound-53171f", "event": "target_resolved", "step_id": "s1_fill", "strategy": "stable_attribute"}
+{"ts": "2026-09-06T00:04:54.847185+00:00", "run_id": "exc-notfound-53171f", "event": "step_completed", "step_id": "s1_fill", "attempts": 0}
+{"ts": "2026-09-06T00:04:54.847248+00:00", "run_id": "exc-notfound-53171f", "event": "policy_checked", "step_id": "s2_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-06T00:04:54.866033+00:00", "run_id": "exc-notfound-53171f", "event": "target_resolved", "step_id": "s2_fill", "strategy": "stable_attribute"}
+{"ts": "2026-09-06T00:04:54.866169+00:00", "run_id": "exc-notfound-53171f", "event": "step_completed", "step_id": "s2_fill", "attempts": 0}
+{"ts": "2026-09-06T00:04:54.866238+00:00", "run_id": "exc-notfound-53171f", "event": "policy_checked", "step_id": "s3_select", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-06T00:04:54.869336+00:00", "run_id": "exc-notfound-53171f", "event": "target_resolved", "step_id": "s3_select", "strategy": "stable_attribute"}
+{"ts": "2026-09-06T00:04:54.869420+00:00", "run_id": "exc-notfound-53171f", "event": "step_completed", "step_id": "s3_select", "attempts": 0}
+{"ts": "2026-09-06T00:04:54.869475+00:00", "run_id": "exc-notfound-53171f", "event": "policy_checked", "step_id": "s4_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-06T00:04:55.062958+00:00", "run_id": "exc-notfound-53171f", "event": "target_resolved", "step_id": "s4_click", "strategy": "role_name"}
+{"ts": "2026-09-06T00:04:55.063272+00:00", "run_id": "exc-notfound-53171f", "event": "step_completed", "step_id": "s4_click", "attempts": 0}
+{"ts": "2026-09-06T00:04:55.063506+00:00", "run_id": "exc-notfound-53171f", "event": "policy_checked", "step_id": "s5_navigate", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-06T00:05:01.541941+00:00", "run_id": "exc-notfound-53171f", "event": "business_outcome", "step_id": "s5_navigate", "code": "MEMBER_NOT_FOUND"}

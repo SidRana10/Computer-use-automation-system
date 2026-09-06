@@ -1,0 +1,45 @@
+[
+  {
+    "intervention_id": "int-bd7f90e5",
+    "run_id": "disc-09032250da",
+    "mode": "discovery",
+    "capability_id": "meridian.funds_transfer",
+    "goal_summary": "Sign on to MERIDIAN CORE as the supplied operator. Use Member Inquiry to search by member number for the given member number and select that member. Start a Funds Transfer using the given from-share, to-share, amount, and memo, and click Continue to reach the review screen. On the review screen, before submitting, look at INTERACTIVE ELEMENTS for an element with kind 'hidden' (the security/transaction token) and extract its value using extract_mode=value and internal=true (it must never be a public output). Then click Post Transfer to submit. Declare the goal DONE once a confirmation is shown, recording the confirmation detail as a structured output if one is shown, using a suggested_success_condition grounded in stable page text (never a value you just extracted).",
+    "step_id": "step_14",
+    "reason_code": "risky_action",
+    "reason_message": "irreversible action requires a human operator",
+    "control_owner": "PAUSED",
+    "screenshot_path": "evidence/runs/disc-09032250da/screenshots/intervention_step_14.png",
+    "current_url": "https://web-sample.interface-hiring.com/members/[REDACTED]/transfer/review",
+    "created_at": "2026-09-05T22:51:41.127250Z",
+    "status": "resumed",
+    "operator_id": "scripted-operator",
+    "operator_note": "scripted operator approved 'Post Transfer'",
+    "human_events": [
+      {
+        "event": "click",
+        "tag": "input",
+        "text": "Post Transfer",
+        "aria_label": null,
+        "name": null,
+        "value_changed": null,
+        "value": null,
+        "url": null,
+        "timestamp": "2026-09-05T22:51:41.210Z"
+      },
+      {
+        "event": "navigation",
+        "tag": null,
+        "text": null,
+        "aria_label": null,
+        "name": null,
+        "value_changed": null,
+        "value": null,
+        "url": "/members/[REDACTED]/transfer/post",
+        "timestamp": "2026-09-05T22:51:41.463Z"
+      }
+    ],
+    "before_screenshot": "evidence/runs/disc-09032250da/screenshots/intervention_step_14.png",
+    "after_screenshot": "evidence/runs/disc-09032250da/screenshots/resume_int-bd7f90e5.png"
+  }
+]

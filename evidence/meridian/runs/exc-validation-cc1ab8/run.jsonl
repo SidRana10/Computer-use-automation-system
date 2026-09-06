@@ -1,0 +1,15 @@
+{"ts": "2026-09-06T00:06:07.447397+00:00", "run_id": "exc-validation-cc1ab8", "event": "replay_started", "capability_id": "test.meridian_exceptional_state_probe", "capability_version": "1.0.0", "inputs": ["branch", "member_number", "operator_id", "[REDACTED]"]}
+{"ts": "2026-09-06T00:06:08.096215+00:00", "run_id": "exc-validation-cc1ab8", "event": "policy_checked", "step_id": "s1_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-06T00:06:08.103725+00:00", "run_id": "exc-validation-cc1ab8", "event": "target_resolved", "step_id": "s1_fill", "strategy": "stable_attribute"}
+{"ts": "2026-09-06T00:06:08.103902+00:00", "run_id": "exc-validation-cc1ab8", "event": "step_completed", "step_id": "s1_fill", "attempts": 0}
+{"ts": "2026-09-06T00:06:08.103977+00:00", "run_id": "exc-validation-cc1ab8", "event": "policy_checked", "step_id": "s2_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-06T00:06:08.124492+00:00", "run_id": "exc-validation-cc1ab8", "event": "target_resolved", "step_id": "s2_fill", "strategy": "stable_attribute"}
+{"ts": "2026-09-06T00:06:08.124642+00:00", "run_id": "exc-validation-cc1ab8", "event": "step_completed", "step_id": "s2_fill", "attempts": 0}
+{"ts": "2026-09-06T00:06:08.124723+00:00", "run_id": "exc-validation-cc1ab8", "event": "policy_checked", "step_id": "s3_select", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-06T00:06:08.127203+00:00", "run_id": "exc-validation-cc1ab8", "event": "target_resolved", "step_id": "s3_select", "strategy": "stable_attribute"}
+{"ts": "2026-09-06T00:06:08.127298+00:00", "run_id": "exc-validation-cc1ab8", "event": "step_completed", "step_id": "s3_select", "attempts": 0}
+{"ts": "2026-09-06T00:06:08.127353+00:00", "run_id": "exc-validation-cc1ab8", "event": "policy_checked", "step_id": "s4_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-06T00:06:08.320589+00:00", "run_id": "exc-validation-cc1ab8", "event": "target_resolved", "step_id": "s4_click", "strategy": "role_name"}
+{"ts": "2026-09-06T00:06:08.320983+00:00", "run_id": "exc-validation-cc1ab8", "event": "step_completed", "step_id": "s4_click", "attempts": 0}
+{"ts": "2026-09-06T00:06:08.321262+00:00", "run_id": "exc-validation-cc1ab8", "event": "policy_checked", "step_id": "s5_navigate", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-06T00:06:16.457328+00:00", "run_id": "exc-validation-cc1ab8", "event": "business_outcome", "step_id": "s5_navigate", "code": "VALIDATION_REJECTED"}

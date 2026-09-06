@@ -24,7 +24,6 @@ from ..models.artifact import (
     Provenance,
     StepSpec,
     TargetAppSpec,
-    ValueType,
 )
 from ..models.conditions import ConditionKind, ConditionSpec
 from ..models.errors import CompileError, RiskLevel, risk_exceeds
@@ -83,11 +82,10 @@ class ArtifactCompiler:
             if recorded.after is not None:
                 route_patterns.add(self._parameterize_path(recorded.after.path, bindings))
             if isinstance(recorded.action, ExtractAction) and not step.internal:
-                output_type: ValueType = recorded.action.output_type
                 outputs.append(
                     OutputSpec(
                         name=recorded.action.output_name,
-                        type=output_type,
+                        type=step.output_type,
                         description=f"Extracted from step {step.id}",
                         sensitive=True,  # financial-style values: sensitive by default
                         source_step_id=step.id,
@@ -201,10 +199,21 @@ class ArtifactCompiler:
 
     @staticmethod
     def _contains_runtime_value(text: str | None, runtime_values: list[str]) -> bool:
-        if not text:
+        """True if `text` and any registered runtime value overlap in either
+        direction: `text` embeds a runtime value (e.g. a checkpoint heading
+        that happens to quote a balance), or a runtime value embeds `text`
+        (e.g. a member's name, itself a short fragment of the much larger
+        extracted table JSON, proposed verbatim as a success condition).
+        Table/JSON extraction (`extract_mode='table'`) made the second
+        direction real: the earlier one-directional check treated the huge
+        blob as the needle, never as the haystack, so a condition sourced
+        from inside it slipped through uncaught."""
+        if not text or len(text) < 3:
             return False
         normalized = text.replace("$", "").replace(",", "")
-        return any(v in text or v in normalized for v in runtime_values)
+        return any(
+            v in text or v in normalized or text in v or normalized in v for v in runtime_values
+        )
 
     # ------------------------------------------------------------- selection
 
@@ -317,14 +326,22 @@ class ArtifactCompiler:
             )
 
         if isinstance(action, ExtractAction):
+            # `extract_mode="table"` always reads through the trusted
+            # `_TABLE_ROWS_JS` serializer, which always produces JSON rows —
+            # a structural fact about the extraction mechanism, not something
+            # the model's choice of output_type should be able to override.
+            # A model that names it "string" would otherwise leave a caller
+            # holding an opaque JSON-in-a-string instead of parsed rows.
+            output_type = "json" if action.extract_mode == "table" else action.output_type
             return StepSpec(
                 id=step_id,
                 name=f"Extract {action.output_name}",
                 action="extract",
                 target=target,
                 output_name=action.output_name,
-                output_type=action.output_type,
+                output_type=output_type,
                 extract_mode=action.extract_mode,
+                internal=action.internal,
                 checkpoint_after=[],
             )
 

@@ -16,6 +16,7 @@ _ELEMENT_INFO_JS = """
 (el) => {
   const tag = el.tagName.toLowerCase();
   let labelText = null;
+  let labelFromLblCell = false;
   if (el.id) {
     const lab = document.querySelector('label[for="' + el.id + '"]');
     if (lab) labelText = lab.innerText.trim();
@@ -23,15 +24,27 @@ _ELEMENT_INFO_JS = """
   if (!labelText && el.closest('label')) labelText = el.closest('label').innerText.trim();
   // Legacy table layouts carry the field label in the preceding cell rather
   // than in a <label> element; fall back to it when nothing else names the
-  // control. Bounded in length so a data cell can never become a label.
+  // control. Bounded in length so a data cell can never become a label. When
+  // `el` is itself a plain value <td> (not a form control), `el.closest('td')`
+  // returns `el` itself, so this also names a read-only result cell — e.g. the
+  // "Confirmation:" value on a posted-transaction receipt — the same
+  // structural pattern already relied on for screenshot masking.
   if (!labelText) {
     const cell = el.closest('td');
     const prev = cell && cell.previousElementSibling;
     if (prev && prev.tagName === 'TD' && !prev.querySelector('input,select,textarea,a,button')) {
       const t = (prev.innerText || '').trim().replace(/\\s+/g, ' ').replace(/:$/, '');
-      if (t && t.length <= 40) labelText = t;
+      if (t && t.length <= 40) {
+        labelText = t;
+        labelFromLblCell = prev.classList.contains('lbl');
+      }
     }
   }
+  // A legacy bordered <table> is the only durable identity a variable-length
+  // data table (a share list, a search-results set) offers: it carries no id
+  // or class, but the `border` attribute is a stable structural marker
+  // already used to scope screenshot masking to this exact element.
+  const border = tag === 'table' ? el.getAttribute('border') : null;
   let options = [];
   let optionValues = [];
   if (tag === 'select') {
@@ -54,14 +67,37 @@ _ELEMENT_INFO_JS = """
     placeholder: el.getAttribute('placeholder'),
     text: text || null,
     label: labelText,
+    label_from_lbl_cell: labelFromLblCell,
     options: options,
     option_values: optionValues,
-    visible: !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length)
+    border: border,
+    // A rendered element must have layout; a hidden form field never does
+    // (offsetWidth/offsetHeight/getClientRects are all zero by definition),
+    // yet a legacy write flow can carry a security/transaction token in
+    // exactly such a field with no other way to observe it. It is listed
+    // explicitly rather than folded into the ordinary visibility check, so a
+    // capability can still only ever *fill* or *click* what a person could
+    // actually see and act on.
+    visible: !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length) ||
+      (tag === 'input' && el.type === 'hidden')
   };
 }
 """
 
-_INVENTORY_SELECTOR = "a[href], button, input, select, textarea, [role='button'], td[id], th[id]"
+# `table[border="N"]` is scoped to bordered data tables only, so ordinary
+# layout tables (border="0" on this target) never clutter the inventory.
+# `td.lbl + td` is the same read-only label/value row pattern already relied
+# on for screenshot masking (e.g. "Member:", "Confirmation:") — a plain
+# result cell with no id/name/label of its own, addressable only by its
+# preceding label cell's class and text. `:not(:has(...))` keeps this to pure
+# display cells: a value cell that itself wraps a form control is already
+# reachable through that control's own selector below, and would otherwise
+# show up twice.
+_INVENTORY_SELECTOR = (
+    "a[href], button, input, select, textarea, [role='button'], td[id], th[id], "
+    'table[border]:not([border="0"]), '
+    "td.lbl + td:not(:has(input, select, textarea, a, button))"
+)
 
 MAX_ELEMENTS = 40
 MAX_TEXT_SUMMARY = 900
@@ -82,9 +118,13 @@ def _element_kind(info: dict) -> str:
             return "checkbox"
         if info.get("type") == "radio":
             return "radio"
+        if info.get("type") == "hidden":
+            return "hidden"
         return "textbox"
     if tag in ("td", "th"):
         return "cell"
+    if tag == "table":
+        return "table"
     return tag
 
 
@@ -113,6 +153,19 @@ def candidate_strategies(kind: str, info: dict) -> list[LocatorStrategy]:
         out.append(LocatorStrategy(kind=LocatorKind.STABLE_ATTRIBUTE, attribute="name", value=info["name"]))
     if info.get("id"):
         out.append(LocatorStrategy(kind=LocatorKind.STABLE_ATTRIBUTE, attribute="id", value=info["id"]))
+    if kind == "table" and info.get("border") is not None:
+        # Last-resort structural identity (docs/03 CSS-last priority): a
+        # variable-length legacy data table carries no id/name/label at all.
+        out.append(LocatorStrategy(kind=LocatorKind.CSS, value=f'table[border="{info["border"]}"]'))
+    if kind == "cell" and info.get("label_from_lbl_cell") and info.get("label"):
+        # Last-resort structural identity for a read-only result cell (docs/03
+        # CSS-last priority): the preceding LABEL strategy targets a real
+        # <label> element and will not resolve here, so a value cell like
+        # MERIDIAN's "Confirmation:" row needs its own anchor. Reuses the
+        # exact selector shape already verified live for screenshot masking
+        # (`td.lbl:text-is("X:") + td`) rather than inventing a new one.
+        escaped = str(info["label"]).replace("\\", "\\\\").replace('"', '\\"')
+        out.append(LocatorStrategy(kind=LocatorKind.CSS, value=f'td.lbl:text-is("{escaped}:") + td'))
     return out
 
 

@@ -395,6 +395,21 @@
       "caller_message": "MERIDIAN rejected the transaction as entered."
     },
     {
+      "code": "OPEN_SHARE_VALIDATION_FAILED",
+      "classification": "business_outcome",
+      "when": [
+        {
+          "kind": "text_present",
+          "target": null,
+          "value": "The request could not be validated:",
+          "timeout_ms": 400
+        }
+      ],
+      "recovery": [],
+      "max_attempts": 0,
+      "caller_message": "MERIDIAN rejected the new-share request during validation (for example a deposit below the product's required minimum)."
+    },
+    {
       "code": "MAINTENANCE_WINDOW",
       "classification": "recoverable",
       "when": [

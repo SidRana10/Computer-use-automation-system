@@ -18,7 +18,7 @@ from ..models.targets import LocatorStrategy, TargetDescriptor
 
 class ObservedElement(BaseModel):
     ref: str  # ephemeral, valid only for the observation that produced it
-    kind: str  # link | button | textbox | combobox | cell | checkbox | ...
+    kind: str  # link | button | textbox | combobox | cell | checkbox | table | hidden | ...
     tag: str
     accessible_name: str | None = None
     label: str | None = None

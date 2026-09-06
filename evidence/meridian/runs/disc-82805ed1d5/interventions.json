@@ -1,0 +1,45 @@
+[
+  {
+    "intervention_id": "int-55ba20e1",
+    "run_id": "disc-82805ed1d5",
+    "mode": "discovery",
+    "capability_id": "meridian.open_share",
+    "goal_summary": "Sign on to MERIDIAN CORE as the supplied operator. Use Member Inquiry to search by member number for the given member number and select that member. Open a new share using the given share type and initial deposit: select the share type, fill the initial deposit, then click Continue to reach the confirm screen. Do not extract any hidden fields or tokens for this task. Immediately click Open Share on the confirm screen to submit. Declare the goal DONE as soon as the new share is shown, using a suggested_success_condition grounded in stable page text such as a heading (never a value you just extracted).",
+    "step_id": "step_12",
+    "reason_code": "risky_action",
+    "reason_message": "risky action requires a human operator",
+    "control_owner": "PAUSED",
+    "screenshot_path": "evidence/runs/disc-82805ed1d5/screenshots/intervention_step_12.png",
+    "current_url": "https://web-sample.interface-hiring.com/members/[REDACTED]/open-share/review",
+    "created_at": "2026-09-05T23:27:01.815027Z",
+    "status": "resumed",
+    "operator_id": "scripted-operator",
+    "operator_note": "scripted operator approved 'Open Share'",
+    "human_events": [
+      {
+        "event": "click",
+        "tag": "input",
+        "text": "Open Share",
+        "aria_label": null,
+        "name": null,
+        "value_changed": null,
+        "value": null,
+        "url": null,
+        "timestamp": "2026-09-05T23:27:01.971Z"
+      },
+      {
+        "event": "navigation",
+        "tag": null,
+        "text": null,
+        "aria_label": null,
+        "name": null,
+        "value_changed": null,
+        "value": null,
+        "url": "/members/[REDACTED]/open-share/post",
+        "timestamp": "2026-09-05T23:27:02.230Z"
+      }
+    ],
+    "before_screenshot": "evidence/runs/disc-82805ed1d5/screenshots/intervention_step_12.png",
+    "after_screenshot": "evidence/runs/disc-82805ed1d5/screenshots/resume_int-55ba20e1.png"
+  }
+]

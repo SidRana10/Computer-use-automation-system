@@ -40,7 +40,13 @@ TOOL_DESCRIPTIONS = {
     "click": "Click one interactive element, addressed by its `ref` from INTERACTIVE ELEMENTS.",
     "fill": "Fill a text field. Use value_source.input_name for invocation inputs so the executor binds the real value.",
     "select": "Choose an option in a select control.",
-    "extract": "Read the visible text of one element as a named typed output.",
+    "extract": (
+        "Read a value from one element as a named typed output. Use extract_mode='value' to read a form "
+        "control's current value (e.g. a hidden security/transaction token) and extract_mode='table' to read "
+        "a whole table as structured rows. Set internal=true when the value is only needed to complete the "
+        "current flow (e.g. confirming a hidden token is present before a write) and must never be returned "
+        "to the caller or persisted; leave internal=false for a genuine result the caller needs."
+    ),
     "wait": "Wait briefly for the UI to settle (bounded by policy).",
     "done": "Declare the goal visibly complete, with a success condition grounded in the current UI.",
     "request_human": "Ask for a human operator when blocked, uncertain, or facing a risky action.",

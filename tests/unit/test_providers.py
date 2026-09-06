@@ -93,7 +93,10 @@ def test_gemini_schema_simplifier_produces_supported_subset():
 
 
 class _FakeGeminiClient:
-    """Stands in for genai.Client; returns canned function-call responses."""
+    """Stands in for genai.Client; returns canned function-call responses.
+
+    Entries in `responses` are either a response object or an Exception
+    instance to raise (used to simulate a transient 429 before success)."""
 
     def __init__(self, responses):
         self._responses = list(responses)
@@ -102,7 +105,10 @@ class _FakeGeminiClient:
 
     async def _generate(self, *, model, contents, config):
         self.calls += 1
-        return self._responses.pop(0)
+        item = self._responses.pop(0)
+        if isinstance(item, Exception):
+            raise item
+        return item
 
 
 def _response(name: str, args: dict):
@@ -122,6 +128,7 @@ def _gemini_adapter(fake_client):
 
     adapter._tools = build_gemini_tools()
     adapter.name = "gemini:test"
+    adapter._last_call_at = None
     return adapter
 
 
@@ -151,7 +158,10 @@ async def test_gemini_adapter_parses_valid_function_call():
     assert client.calls == 1
 
 
-async def test_gemini_adapter_retries_once_then_accepts():
+async def test_gemini_adapter_retries_once_then_accepts(monkeypatch):
+    import ui_capabilities.discovery.gemini_client as gc
+
+    monkeypatch.setattr(gc, "_MIN_CALL_INTERVAL_S", 0.0)  # two real calls; no need to pace in a test
     client = _FakeGeminiClient(
         [
             _response("click", {}),  # invalid: no target
@@ -164,12 +174,142 @@ async def test_gemini_adapter_retries_once_then_accepts():
     assert client.calls == 2
 
 
-async def test_gemini_adapter_rejects_persistently_invalid_output():
+async def test_gemini_adapter_rejects_persistently_invalid_output(monkeypatch):
+    import ui_capabilities.discovery.gemini_client as gc
+
+    monkeypatch.setattr(gc, "_MIN_CALL_INTERVAL_S", 0.0)
     client = _FakeGeminiClient([_response("click", {}), _response("run_shell", {"cmd": "ls"})])
     adapter = _gemini_adapter(client)
     with pytest.raises(ValueError, match="valid structured action"):
         await adapter.next_action(_observation(), _context())
     assert client.calls == 2  # bounded: exactly one retry, never free-form execution
+
+
+# --------------------------------------- free-tier rate-limit backoff (429)
+
+
+def _rate_limit_error(retry_delay_s: str = "1") -> "ClientError":
+    from google.genai.errors import ClientError
+
+    return ClientError(429, {"error": {"details": [{"retryDelay": f"{retry_delay_s}s"}]}})
+
+
+def _server_error() -> "ServerError":
+    from google.genai.errors import ServerError
+
+    return ServerError(503, {"error": {"message": "This model is currently experiencing high demand."}})
+
+
+async def test_gemini_adapter_survives_a_transient_server_error(monkeypatch):
+    """A 503 'experiencing high demand' response was hit live on two
+    different fresh models back to back; it must not crash the run either."""
+    import ui_capabilities.discovery.gemini_client as gc
+
+    slept: list[float] = []
+
+    async def _fake_sleep(s):
+        slept.append(s)
+
+    monkeypatch.setattr(gc.asyncio, "sleep", _fake_sleep)
+    monkeypatch.setattr(gc, "_MIN_CALL_INTERVAL_S", 0.0)
+    client = _FakeGeminiClient([_server_error(), _response("click", {"element_ref": "e1"})])
+    adapter = _gemini_adapter(client)
+    action = await adapter.next_action(_observation(), _context())
+    assert isinstance(action, ClickAction)
+    assert client.calls == 2
+    assert slept == [gc._SERVER_ERROR_RETRY_DELAY_S]
+
+
+async def test_gemini_adapter_does_not_retry_non_503_server_errors():
+    from google.genai.errors import ServerError
+
+    client = _FakeGeminiClient([ServerError(500, {"error": {"message": "internal"}})])
+    adapter = _gemini_adapter(client)
+    with pytest.raises(ServerError):
+        await adapter.next_action(_observation(), _context())
+    assert client.calls == 1
+
+
+def test_retry_delay_seconds_parses_the_api_suggestion():
+    from ui_capabilities.discovery.gemini_client import _retry_delay_seconds
+
+    assert _retry_delay_seconds(_rate_limit_error("17")) == 18.0
+
+
+def test_retry_delay_seconds_falls_back_when_unparseable():
+    from ui_capabilities.discovery.gemini_client import ClientError, _retry_delay_seconds
+
+    assert _retry_delay_seconds(ClientError(429, {"error": {}})) > 0
+
+
+async def test_gemini_adapter_survives_a_transient_rate_limit(monkeypatch):
+    """A 429 mid-run must not crash a genuine multi-turn discovery session —
+    the free tier's 5-requests/minute cap is real and was hit live."""
+    import ui_capabilities.discovery.gemini_client as gc
+
+    slept: list[float] = []
+
+    async def _fake_sleep(s):
+        slept.append(s)
+
+    monkeypatch.setattr(gc.asyncio, "sleep", _fake_sleep)
+    monkeypatch.setattr(gc, "_MIN_CALL_INTERVAL_S", 0.0)  # isolate retry backoff from pacing
+    client = _FakeGeminiClient([_rate_limit_error("2"), _response("click", {"element_ref": "e1"})])
+    adapter = _gemini_adapter(client)
+    action = await adapter.next_action(_observation(), _context())
+    assert isinstance(action, ClickAction)
+    assert client.calls == 2
+    assert slept == [3.0]
+
+
+async def test_gemini_adapter_gives_up_after_bounded_retries(monkeypatch):
+    import ui_capabilities.discovery.gemini_client as gc
+
+    async def _fake_sleep(s):
+        return None
+
+    monkeypatch.setattr(gc.asyncio, "sleep", _fake_sleep)
+    monkeypatch.setattr(gc, "_MIN_CALL_INTERVAL_S", 0.0)
+    client = _FakeGeminiClient([_rate_limit_error("0") for _ in range(gc._MAX_RATE_LIMIT_RETRIES + 1)])
+    adapter = _gemini_adapter(client)
+    with pytest.raises(gc.ClientError):
+        await adapter.next_action(_observation(), _context())
+    assert client.calls == gc._MAX_RATE_LIMIT_RETRIES + 1
+
+
+async def test_gemini_adapter_paces_consecutive_calls(monkeypatch):
+    """Proactive floor: observed live, a burst of calls under ~1s apart
+    immediately tripped the free tier's 5/minute cap. Pacing calls ~13s apart
+    avoids ever discovering the limit reactively in the common case."""
+    import ui_capabilities.discovery.gemini_client as gc
+
+    slept: list[float] = []
+
+    async def _fake_sleep(s):
+        slept.append(s)
+
+    monkeypatch.setattr(gc.asyncio, "sleep", _fake_sleep)
+    client = _FakeGeminiClient(
+        [
+            _response("click", {}),  # invalid: forces a second real call
+            _response("click", {"element_ref": "e1"}),
+        ]
+    )
+    adapter = _gemini_adapter(client)
+    await adapter.next_action(_observation(), _context())
+    assert client.calls == 2
+    # first call: no prior call, no pacing sleep; second call: paced
+    assert slept == [pytest.approx(gc._MIN_CALL_INTERVAL_S, abs=0.1)]
+
+
+async def test_gemini_adapter_does_not_retry_non_rate_limit_errors():
+    from google.genai.errors import ClientError
+
+    client = _FakeGeminiClient([ClientError(400, {"error": {"message": "bad request"}})])
+    adapter = _gemini_adapter(client)
+    with pytest.raises(ClientError):
+        await adapter.next_action(_observation(), _context())
+    assert client.calls == 1
 
 
 # ------------------------------------------ genuine evidence: no fake fallback

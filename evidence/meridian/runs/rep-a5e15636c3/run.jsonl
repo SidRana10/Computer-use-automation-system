@@ -1,0 +1,29 @@
+{"ts": "2026-09-05T22:32:48.242306+00:00", "run_id": "rep-a5e15636c3", "event": "replay_started", "capability_id": "meridian.get_member_balances", "capability_version": "1.0.0", "inputs": ["branch", "member_number", "operator_id", "[REDACTED]"]}
+{"ts": "2026-09-05T22:32:49.413797+00:00", "run_id": "rep-a5e15636c3", "event": "policy_checked", "step_id": "s1_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T22:32:49.430895+00:00", "run_id": "rep-a5e15636c3", "event": "target_resolved", "step_id": "s1_fill", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T22:32:49.431021+00:00", "run_id": "rep-a5e15636c3", "event": "step_completed", "step_id": "s1_fill", "attempts": 0}
+{"ts": "2026-09-05T22:32:49.431089+00:00", "run_id": "rep-a5e15636c3", "event": "policy_checked", "step_id": "s2_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T22:32:49.452692+00:00", "run_id": "rep-a5e15636c3", "event": "target_resolved", "step_id": "s2_fill", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T22:32:49.452811+00:00", "run_id": "rep-a5e15636c3", "event": "step_completed", "step_id": "s2_fill", "attempts": 0}
+{"ts": "2026-09-05T22:32:49.452877+00:00", "run_id": "rep-a5e15636c3", "event": "policy_checked", "step_id": "s3_select", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T22:32:49.456115+00:00", "run_id": "rep-a5e15636c3", "event": "target_resolved", "step_id": "s3_select", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T22:32:49.456200+00:00", "run_id": "rep-a5e15636c3", "event": "step_completed", "step_id": "s3_select", "attempts": 0}
+{"ts": "2026-09-05T22:32:49.456254+00:00", "run_id": "rep-a5e15636c3", "event": "policy_checked", "step_id": "s4_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T22:32:49.649822+00:00", "run_id": "rep-a5e15636c3", "event": "target_resolved", "step_id": "s4_click", "strategy": "role_name"}
+{"ts": "2026-09-05T22:32:49.660226+00:00", "run_id": "rep-a5e15636c3", "event": "step_completed", "step_id": "s4_click", "attempts": 0}
+{"ts": "2026-09-05T22:32:49.660401+00:00", "run_id": "rep-a5e15636c3", "event": "policy_checked", "step_id": "s5_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T22:32:49.767773+00:00", "run_id": "rep-a5e15636c3", "event": "target_resolved", "step_id": "s5_click", "strategy": "role_name"}
+{"ts": "2026-09-05T22:32:49.780226+00:00", "run_id": "rep-a5e15636c3", "event": "step_completed", "step_id": "s5_click", "attempts": 0}
+{"ts": "2026-09-05T22:32:49.780416+00:00", "run_id": "rep-a5e15636c3", "event": "policy_checked", "step_id": "s6_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T22:32:49.786166+00:00", "run_id": "rep-a5e15636c3", "event": "target_resolved", "step_id": "s6_fill", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T22:32:49.786324+00:00", "run_id": "rep-a5e15636c3", "event": "step_completed", "step_id": "s6_fill", "attempts": 0}
+{"ts": "2026-09-05T22:32:49.786414+00:00", "run_id": "rep-a5e15636c3", "event": "policy_checked", "step_id": "s7_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T22:32:49.906632+00:00", "run_id": "rep-a5e15636c3", "event": "target_resolved", "step_id": "s7_click", "strategy": "role_name"}
+{"ts": "2026-09-05T22:32:49.907027+00:00", "run_id": "rep-a5e15636c3", "event": "step_completed", "step_id": "s7_click", "attempts": 0}
+{"ts": "2026-09-05T22:32:49.907174+00:00", "run_id": "rep-a5e15636c3", "event": "policy_checked", "step_id": "s8_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T22:32:50.029151+00:00", "run_id": "rep-a5e15636c3", "event": "target_resolved", "step_id": "s8_click", "strategy": "role_name"}
+{"ts": "2026-09-05T22:32:50.044783+00:00", "run_id": "rep-a5e15636c3", "event": "step_completed", "step_id": "s8_click", "attempts": 0}
+{"ts": "2026-09-05T22:32:50.045086+00:00", "run_id": "rep-a5e15636c3", "event": "policy_checked", "step_id": "s9_extract", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T22:32:50.058448+00:00", "run_id": "rep-a5e15636c3", "event": "target_resolved", "step_id": "s9_extract", "strategy": "css"}
+{"ts": "2026-09-05T22:32:50.058621+00:00", "run_id": "rep-a5e15636c3", "event": "step_completed", "step_id": "s9_extract", "attempts": 0}
+{"ts": "2026-09-05T22:32:50.059657+00:00", "run_id": "rep-a5e15636c3", "event": "replay_succeeded", "outputs": ["shares"], "recoveries": 0}

@@ -1,0 +1,56 @@
+[
+  {
+    "intervention_id": "int-c83eaa3d",
+    "run_id": "disc-fd24e17788",
+    "mode": "discovery",
+    "capability_id": "meridian.update_member_info",
+    "goal_summary": "Sign on to MERIDIAN CORE as the supplied operator. Use Member Inquiry to search by member number for the given member number and select that member. Go to Update Member Information and set the e-mail, phone, and mailing address to the given values, then click Save Changes to submit. Declare the goal DONE once the update is confirmed, using a suggested_success_condition grounded in stable page text (never a value you just entered).",
+    "step_id": "step_13",
+    "reason_code": "risky_action",
+    "reason_message": "risky action requires a human operator",
+    "control_owner": "PAUSED",
+    "screenshot_path": "evidence/runs/disc-fd24e17788/screenshots/intervention_step_13.png",
+    "current_url": "https://web-sample.interface-hiring.com/members/[REDACTED]/update",
+    "created_at": "2026-09-05T23:36:21.297875Z",
+    "status": "resumed",
+    "operator_id": "scripted-operator",
+    "operator_note": "scripted operator approved 'Save Changes'",
+    "human_events": [
+      {
+        "event": "change",
+        "tag": "input",
+        "text": null,
+        "aria_label": null,
+        "name": "address",
+        "value_changed": true,
+        "value": "[REDACTED]",
+        "url": null,
+        "timestamp": "2026-09-05T23:36:21.344Z"
+      },
+      {
+        "event": "click",
+        "tag": "input",
+        "text": "Save Changes",
+        "aria_label": null,
+        "name": null,
+        "value_changed": null,
+        "value": null,
+        "url": null,
+        "timestamp": "2026-09-05T23:36:21.346Z"
+      },
+      {
+        "event": "navigation",
+        "tag": null,
+        "text": null,
+        "aria_label": null,
+        "name": null,
+        "value_changed": null,
+        "value": null,
+        "url": "/members/[REDACTED]/update",
+        "timestamp": "2026-09-05T23:36:21.440Z"
+      }
+    ],
+    "before_screenshot": "evidence/runs/disc-fd24e17788/screenshots/intervention_step_13.png",
+    "after_screenshot": "evidence/runs/disc-fd24e17788/screenshots/resume_int-c83eaa3d.png"
+  }
+]

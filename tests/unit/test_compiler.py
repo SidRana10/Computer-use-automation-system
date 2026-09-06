@@ -174,3 +174,70 @@ def test_recorded_run_serialization_excludes_bindings():
     run = make_run()
     assert "M-10001" not in str(run.model_dump().get("input_bindings", ""))
     assert "input_bindings" not in run.model_dump_json()
+
+
+def test_compile_forces_json_output_type_for_table_extracts():
+    """A genuine Gemini run compiling meridian.member_inquiry proposed
+    extract_mode='table' with output_type='string' — the model's choice, not
+    a structural fact. `_TABLE_ROWS_JS` always serializes rows to JSON
+    regardless of what the model names the output type, so a caller given
+    output_type='string' would receive an opaque JSON-in-a-string instead of
+    parsed rows. The compiler must override the type deterministically."""
+    run = make_run()
+    table_step = RecordedStep(
+        index=5,
+        before=snap("/members/M-10001/accounts", "Accounts", "f3"),
+        action=ExtractAction(
+            element_ref="e1",
+            output_name="results_table",
+            output_type="string",  # deliberately wrong, as the live model proposed
+            extract_mode="table",
+            rationale_summary="read results",
+        ),
+        element=element("table", None, [LocatorStrategy(kind=LocatorKind.CSS, value='table[border="1"]')]),
+        policy=ALLOWED,
+        result=ActionResult(ok=True, extracted_text='[{"a": "1"}]'),
+        after=snap("/members/M-10001/accounts", "Accounts", "f3"),
+        started_at=NOW,
+    )
+    run.steps.append(table_step)
+    artifact = compiler().compile(run)
+    table_output = next(o for o in artifact.contract.outputs if o.name == "results_table")
+    assert table_output.type == "json"
+    table_compiled_step = next(s for s in artifact.steps if s.output_name == "results_table")
+    assert table_compiled_step.output_type == "json"
+
+
+def test_compile_passes_internal_flag_through_and_excludes_it_from_outputs():
+    """The schema has always supported StepSpec.internal (test_extract_modes.py
+    pins that), but nothing set it from a recorded run until this: an
+    ExtractAction(internal=True) — e.g. reading a hidden transaction token to
+    confirm it is present before a write — must compile to a step the
+    contract never publishes as an output, distinct from an ordinary extract
+    on the same run."""
+    run = make_run()
+    token_step = RecordedStep(
+        index=5,
+        before=snap("/members/M-10001/accounts", "Accounts", "f3"),
+        action=ExtractAction(
+            element_ref="e1",
+            output_name="transaction_token",
+            output_type="string",
+            extract_mode="value",
+            internal=True,
+            rationale_summary="confirm token present",
+        ),
+        element=element("textbox", None, [LocatorStrategy(kind=LocatorKind.STABLE_ATTRIBUTE, attribute="name", value="_token")]),
+        policy=ALLOWED,
+        result=ActionResult(ok=True, extracted_text="d847f6d9-2c0"),
+        after=snap("/members/M-10001/accounts", "Accounts", "f3"),
+        started_at=NOW,
+    )
+    run.steps.append(token_step)
+    artifact = compiler().compile(run)
+    internal_step = next(s for s in artifact.steps if s.output_name == "transaction_token")
+    assert internal_step.internal is True
+    assert all(o.name != "transaction_token" for o in artifact.contract.outputs)
+    # the public extract on the same run is unaffected
+    assert any(o.name == "savings_balance" for o in artifact.contract.outputs)
+    assert "d847f6d9-2c0" not in artifact.model_dump_json()

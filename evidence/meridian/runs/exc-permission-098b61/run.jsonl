@@ -1,0 +1,15 @@
+{"ts": "2026-09-06T00:05:01.652995+00:00", "run_id": "exc-permission-098b61", "event": "replay_started", "capability_id": "test.meridian_exceptional_state_probe", "capability_version": "1.0.0", "inputs": ["branch", "member_number", "operator_id", "[REDACTED]"]}
+{"ts": "2026-09-06T00:05:02.352421+00:00", "run_id": "exc-permission-098b61", "event": "policy_checked", "step_id": "s1_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-06T00:05:02.359861+00:00", "run_id": "exc-permission-098b61", "event": "target_resolved", "step_id": "s1_fill", "strategy": "stable_attribute"}
+{"ts": "2026-09-06T00:05:02.360051+00:00", "run_id": "exc-permission-098b61", "event": "step_completed", "step_id": "s1_fill", "attempts": 0}
+{"ts": "2026-09-06T00:05:02.360126+00:00", "run_id": "exc-permission-098b61", "event": "policy_checked", "step_id": "s2_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-06T00:05:02.380535+00:00", "run_id": "exc-permission-098b61", "event": "target_resolved", "step_id": "s2_fill", "strategy": "stable_attribute"}
+{"ts": "2026-09-06T00:05:02.380667+00:00", "run_id": "exc-permission-098b61", "event": "step_completed", "step_id": "s2_fill", "attempts": 0}
+{"ts": "2026-09-06T00:05:02.380726+00:00", "run_id": "exc-permission-098b61", "event": "policy_checked", "step_id": "s3_select", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-06T00:05:02.383031+00:00", "run_id": "exc-permission-098b61", "event": "target_resolved", "step_id": "s3_select", "strategy": "stable_attribute"}
+{"ts": "2026-09-06T00:05:02.383135+00:00", "run_id": "exc-permission-098b61", "event": "step_completed", "step_id": "s3_select", "attempts": 0}
+{"ts": "2026-09-06T00:05:02.383201+00:00", "run_id": "exc-permission-098b61", "event": "policy_checked", "step_id": "s4_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-06T00:05:02.585751+00:00", "run_id": "exc-permission-098b61", "event": "target_resolved", "step_id": "s4_click", "strategy": "role_name"}
+{"ts": "2026-09-06T00:05:02.586427+00:00", "run_id": "exc-permission-098b61", "event": "step_completed", "step_id": "s4_click", "attempts": 0}
+{"ts": "2026-09-06T00:05:02.586692+00:00", "run_id": "exc-permission-098b61", "event": "policy_checked", "step_id": "s5_navigate", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-06T00:05:08.318030+00:00", "run_id": "exc-permission-098b61", "event": "hard_failure", "step_id": "s5_navigate", "code": "SUPERVISOR_REQUIRED", "expected": "step to complete without a declared fatal condition", "observed": "MERIDIAN requires a supervisor profile for this function; the signed-on operator is not authorized and automation will not attempt to bypass it.", "recovery_attempts": 0}

@@ -1,0 +1,32 @@
+{"ts": "2026-09-05T21:55:38.197445+00:00", "run_id": "rep-0802f12da7", "event": "replay_started", "capability_id": "meridian.member_inquiry", "capability_version": "1.0.0", "inputs": ["branch", "operator_id", "[REDACTED]", "search_mode", "search_value"]}
+{"ts": "2026-09-05T21:55:39.361217+00:00", "run_id": "rep-0802f12da7", "event": "policy_checked", "step_id": "s1_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T21:55:39.378729+00:00", "run_id": "rep-0802f12da7", "event": "target_resolved", "step_id": "s1_fill", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T21:55:39.378939+00:00", "run_id": "rep-0802f12da7", "event": "step_completed", "step_id": "s1_fill", "attempts": 0}
+{"ts": "2026-09-05T21:55:39.379025+00:00", "run_id": "rep-0802f12da7", "event": "policy_checked", "step_id": "s2_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T21:55:39.399329+00:00", "run_id": "rep-0802f12da7", "event": "target_resolved", "step_id": "s2_fill", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T21:55:39.399460+00:00", "run_id": "rep-0802f12da7", "event": "step_completed", "step_id": "s2_fill", "attempts": 0}
+{"ts": "2026-09-05T21:55:39.399529+00:00", "run_id": "rep-0802f12da7", "event": "policy_checked", "step_id": "s3_select", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T21:55:39.403009+00:00", "run_id": "rep-0802f12da7", "event": "target_resolved", "step_id": "s3_select", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T21:55:39.403099+00:00", "run_id": "rep-0802f12da7", "event": "step_completed", "step_id": "s3_select", "attempts": 0}
+{"ts": "2026-09-05T21:55:39.403158+00:00", "run_id": "rep-0802f12da7", "event": "policy_checked", "step_id": "s4_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T21:55:39.601919+00:00", "run_id": "rep-0802f12da7", "event": "target_resolved", "step_id": "s4_click", "strategy": "role_name"}
+{"ts": "2026-09-05T21:55:39.612381+00:00", "run_id": "rep-0802f12da7", "event": "step_completed", "step_id": "s4_click", "attempts": 0}
+{"ts": "2026-09-05T21:55:39.612633+00:00", "run_id": "rep-0802f12da7", "event": "policy_checked", "step_id": "s5_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T21:55:39.718465+00:00", "run_id": "rep-0802f12da7", "event": "target_resolved", "step_id": "s5_click", "strategy": "role_name"}
+{"ts": "2026-09-05T21:55:39.730445+00:00", "run_id": "rep-0802f12da7", "event": "step_completed", "step_id": "s5_click", "attempts": 0}
+{"ts": "2026-09-05T21:55:39.730803+00:00", "run_id": "rep-0802f12da7", "event": "policy_checked", "step_id": "s6_select", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T21:55:39.736144+00:00", "run_id": "rep-0802f12da7", "event": "target_resolved", "step_id": "s6_select", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T21:55:39.736303+00:00", "run_id": "rep-0802f12da7", "event": "step_completed", "step_id": "s6_select", "attempts": 0}
+{"ts": "2026-09-05T21:55:39.736398+00:00", "run_id": "rep-0802f12da7", "event": "policy_checked", "step_id": "s7_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T21:55:39.740083+00:00", "run_id": "rep-0802f12da7", "event": "target_resolved", "step_id": "s7_fill", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T21:55:39.740233+00:00", "run_id": "rep-0802f12da7", "event": "step_completed", "step_id": "s7_fill", "attempts": 0}
+{"ts": "2026-09-05T21:55:39.740317+00:00", "run_id": "rep-0802f12da7", "event": "policy_checked", "step_id": "s8_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T21:55:39.846565+00:00", "run_id": "rep-0802f12da7", "event": "target_resolved", "step_id": "s8_click", "strategy": "role_name"}
+{"ts": "2026-09-05T21:55:39.847058+00:00", "run_id": "rep-0802f12da7", "event": "step_completed", "step_id": "s8_click", "attempts": 0}
+{"ts": "2026-09-05T21:55:39.847220+00:00", "run_id": "rep-0802f12da7", "event": "policy_checked", "step_id": "s9_extract", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T21:55:39.869996+00:00", "run_id": "rep-0802f12da7", "event": "target_resolved", "step_id": "s9_extract", "strategy": "css"}
+{"ts": "2026-09-05T21:55:39.870238+00:00", "run_id": "rep-0802f12da7", "event": "step_completed", "step_id": "s9_extract", "attempts": 0}
+{"ts": "2026-09-05T21:55:39.870336+00:00", "run_id": "rep-0802f12da7", "event": "policy_checked", "step_id": "s10_extract", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T21:55:39.873390+00:00", "run_id": "rep-0802f12da7", "event": "target_resolved", "step_id": "s10_extract", "strategy": "css"}
+{"ts": "2026-09-05T21:55:39.873528+00:00", "run_id": "rep-0802f12da7", "event": "step_completed", "step_id": "s10_extract", "attempts": 0}
+{"ts": "2026-09-05T21:55:39.874407+00:00", "run_id": "rep-0802f12da7", "event": "replay_succeeded", "outputs": ["member_results", "member_results_table"], "recoveries": 0}

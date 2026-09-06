@@ -1,0 +1,27 @@
+{"ts": "2026-09-05T21:56:15.152002+00:00", "run_id": "rep-ebba49ff75", "event": "replay_started", "capability_id": "meridian.member_inquiry", "capability_version": "1.0.0", "inputs": ["branch", "operator_id", "[REDACTED]", "search_mode", "search_value"]}
+{"ts": "2026-09-05T21:56:15.839860+00:00", "run_id": "rep-ebba49ff75", "event": "policy_checked", "step_id": "s1_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T21:56:15.848667+00:00", "run_id": "rep-ebba49ff75", "event": "target_resolved", "step_id": "s1_fill", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T21:56:15.848819+00:00", "run_id": "rep-ebba49ff75", "event": "step_completed", "step_id": "s1_fill", "attempts": 0}
+{"ts": "2026-09-05T21:56:15.848893+00:00", "run_id": "rep-ebba49ff75", "event": "policy_checked", "step_id": "s2_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T21:56:15.868573+00:00", "run_id": "rep-ebba49ff75", "event": "target_resolved", "step_id": "s2_fill", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T21:56:15.868728+00:00", "run_id": "rep-ebba49ff75", "event": "step_completed", "step_id": "s2_fill", "attempts": 0}
+{"ts": "2026-09-05T21:56:15.868800+00:00", "run_id": "rep-ebba49ff75", "event": "policy_checked", "step_id": "s3_select", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T21:56:15.872058+00:00", "run_id": "rep-ebba49ff75", "event": "target_resolved", "step_id": "s3_select", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T21:56:15.872171+00:00", "run_id": "rep-ebba49ff75", "event": "step_completed", "step_id": "s3_select", "attempts": 0}
+{"ts": "2026-09-05T21:56:15.872235+00:00", "run_id": "rep-ebba49ff75", "event": "policy_checked", "step_id": "s4_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T21:56:16.066069+00:00", "run_id": "rep-ebba49ff75", "event": "target_resolved", "step_id": "s4_click", "strategy": "role_name"}
+{"ts": "2026-09-05T21:56:16.078258+00:00", "run_id": "rep-ebba49ff75", "event": "step_completed", "step_id": "s4_click", "attempts": 0}
+{"ts": "2026-09-05T21:56:16.078514+00:00", "run_id": "rep-ebba49ff75", "event": "policy_checked", "step_id": "s5_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T21:56:16.179225+00:00", "run_id": "rep-ebba49ff75", "event": "target_resolved", "step_id": "s5_click", "strategy": "role_name"}
+{"ts": "2026-09-05T21:56:16.191597+00:00", "run_id": "rep-ebba49ff75", "event": "step_completed", "step_id": "s5_click", "attempts": 0}
+{"ts": "2026-09-05T21:56:16.191824+00:00", "run_id": "rep-ebba49ff75", "event": "policy_checked", "step_id": "s6_select", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T21:56:16.197393+00:00", "run_id": "rep-ebba49ff75", "event": "target_resolved", "step_id": "s6_select", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T21:56:16.197575+00:00", "run_id": "rep-ebba49ff75", "event": "step_completed", "step_id": "s6_select", "attempts": 0}
+{"ts": "2026-09-05T21:56:16.197721+00:00", "run_id": "rep-ebba49ff75", "event": "policy_checked", "step_id": "s7_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T21:56:16.201495+00:00", "run_id": "rep-ebba49ff75", "event": "target_resolved", "step_id": "s7_fill", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T21:56:16.201648+00:00", "run_id": "rep-ebba49ff75", "event": "step_completed", "step_id": "s7_fill", "attempts": 0}
+{"ts": "2026-09-05T21:56:16.201732+00:00", "run_id": "rep-ebba49ff75", "event": "policy_checked", "step_id": "s8_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T21:56:16.322515+00:00", "run_id": "rep-ebba49ff75", "event": "target_resolved", "step_id": "s8_click", "strategy": "role_name"}
+{"ts": "2026-09-05T21:56:16.322810+00:00", "run_id": "rep-ebba49ff75", "event": "step_completed", "step_id": "s8_click", "attempts": 0}
+{"ts": "2026-09-05T21:56:16.322970+00:00", "run_id": "rep-ebba49ff75", "event": "policy_checked", "step_id": "s9_extract", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T21:56:23.100904+00:00", "run_id": "rep-ebba49ff75", "event": "business_outcome", "step_id": "s9_extract", "code": "NO_SEARCH_RESULTS"}

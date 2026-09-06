@@ -1,0 +1,45 @@
+[
+  {
+    "intervention_id": "int-177af5bf",
+    "run_id": "disc-887e90fe6a",
+    "mode": "discovery",
+    "capability_id": "meridian.funds_transfer",
+    "goal_summary": "Sign on to MERIDIAN CORE as the supplied operator. Use Member Inquiry to search by member number for the given member number and select that member. Start a Funds Transfer using the given from-share, to-share, amount, and memo, and click Continue to reach the review screen. On the review screen, before submitting, look at INTERACTIVE ELEMENTS for an element with kind 'hidden' (the security/transaction token) and extract its value using extract_mode=value and internal=true (it must never be a public output). Then click Post Transfer to submit. This dispatches a real, irreversible transfer \u2014 it must be posted exactly once. After the transfer is posted, reach the TRANSACTION COMPLETE confirmation page. Look at INTERACTIVE ELEMENTS for the single 'cell' element whose name is 'Confirmation' and extract its value EXACTLY ONCE using extract_mode=value, internal=false, output_name=confirmation_number, output_type=string. Do not extract it a second time. Do not click, fill, select, navigate, or take any other action after that one extraction succeeds. Your very next tool call after that single successful extraction MUST be done, with a suggested_success_condition grounded in stable page text such as TRANSACTION COMPLETE (never the confirmation number or any other value you just extracted).",
+    "step_id": "step_14",
+    "reason_code": "risky_action",
+    "reason_message": "irreversible action requires a human operator",
+    "control_owner": "PAUSED",
+    "screenshot_path": "evidence/meridian/runs/disc-887e90fe6a/screenshots/intervention_step_14.png",
+    "current_url": "https://web-sample.interface-hiring.com/members/[REDACTED]/transfer/review",
+    "created_at": "2026-09-06T01:00:37.492677Z",
+    "status": "resumed",
+    "operator_id": "scripted-operator",
+    "operator_note": "scripted operator approved 'Post Transfer'",
+    "human_events": [
+      {
+        "event": "click",
+        "tag": "input",
+        "text": "Post Transfer",
+        "aria_label": null,
+        "name": null,
+        "value_changed": null,
+        "value": null,
+        "url": null,
+        "timestamp": "2026-09-06T01:00:37.665Z"
+      },
+      {
+        "event": "navigation",
+        "tag": null,
+        "text": null,
+        "aria_label": null,
+        "name": null,
+        "value_changed": null,
+        "value": null,
+        "url": "/members/[REDACTED]/transfer/post",
+        "timestamp": "2026-09-06T01:00:37.931Z"
+      }
+    ],
+    "before_screenshot": "evidence/meridian/runs/disc-887e90fe6a/screenshots/intervention_step_14.png",
+    "after_screenshot": "evidence/meridian/runs/disc-887e90fe6a/screenshots/resume_int-177af5bf.png"
+  }
+]

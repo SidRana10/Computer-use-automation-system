@@ -166,12 +166,55 @@ Explicitly NOT in P1 (deferred or dropped on evidence): parameterized locators
 (G1), StepOutputRef (G2), session manager, frame support (G9), run index (G6b),
 API, chatbot, dashboard.
 
-## M13–M19 — P2..P9
-- [ ] P2 member inquiry + balances
-- [ ] P3 funds transfer
-- [ ] P4 open share / update member / place hold
-- [ ] P5 exceptional-state matrix
-- [ ] P6 runner + capability API
+## M13–M16 — P2-P5 (implemented, awaiting review)
+- [x] P2 member inquiry (search by number and by last name, single/multi/no
+      match) + get_member_balances (variable share table, two members with
+      structurally different share counts: 31 vs 8)
+- [x] P3 funds transfer (hidden-token internal extraction, review→post gate,
+      irreversible no-repeat, insufficient-funds business outcome, one real
+      live transfer proving the flow)
+- [ ] P3 gap: `meridian.funds_transfer` still does not expose
+      `confirmation_number` as a typed output. Investigated in depth (see
+      DECISIONS.md D035): a fifth core generalization (`observation.py` now
+      enumerates MERIDIAN's label/value result cells, e.g. "Confirmation:",
+      the same pattern D019/D020 already used for masking) makes the value
+      genuinely observable and extractable, verified live. Two further
+      genuine discovery runs and two minimal ($1) real live transfers were
+      spent confirming this; the second compiled a seemingly-valid artifact,
+      but replay verification caught a real defect before it was kept
+      canonical: `DiscoveryAgent._to_executable` doesn't forward
+      `extract_mode`, so discovery silently always extracts in "text" mode
+      regardless of what it records, masking that the goal wording asked for
+      the wrong mode ("value", correct only for the hidden `_token` form
+      field, not a plain result cell) for this new case. Canonical artifact
+      reverted to its original state rather than kept half-working. Fix is
+      understood and scoped (agent.py forward the mode; correct the goal
+      text to `extract_mode="text"`) and needs one clean discovery run with
+      no further live transfer required to test the observation fix itself.
+- [x] P4 open share (risky, real live post), update member info (risky, real
+      live post + invalid-email business outcome), place hold (irreversible,
+      teller→supervisor escalation demonstrated end-to-end in the same
+      session, real live hold applied)
+- [x] P5 exceptional-state matrix: all six `?inject=` states classified
+      correctly against the live target (validation/notfound/permission/
+      timeout/maintenance/server), plus natural bad login, insufficient
+      funds, invalid email, teller-attempts-hold, and unrecognized-value
+      fail-closed — 9 live integration tests, all passing
+- [x] four core generalizations, each driven by a genuine live discovery
+      failure, not speculative: table-element observation (D028), hidden
+      form-field observation (D032), compiler-forced JSON type for table
+      extracts (D031), bidirectional runtime-value containment check (D030);
+      plus Gemini free-tier rate-limit/transient-error backoff (D029) and two
+      new MERIDIAN error rules/policy classifications (D033, D034) found live
+- [x] all 7 required capability artifacts exist, genuinely discovery-generated
+      (Gemini, several models — see DECISIONS.md D029), replay LLM-free
+- 274 offline tests passing (226 P1 baseline + 43 P2-P5 + 5 new for the
+  label/value result-cell observation fix, D035); 9 additional live
+  exceptional-state tests pass with MERIDIAN_LIVE=1
+- API, chatbot, dashboard explicitly NOT built yet (P6-P8, per instruction)
+
+## M17–M19 — P6..P9
+- [ ] P6 capability API
 - [ ] P7 chatbot
 - [ ] P8 dashboard
 - [ ] P9 integration, docs, evidence, demo hardening

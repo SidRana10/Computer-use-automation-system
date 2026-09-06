@@ -1,0 +1,15 @@
+{"ts": "2026-09-06T00:05:50.057135+00:00", "run_id": "exc-timeout-0691a3", "event": "replay_started", "capability_id": "test.meridian_exceptional_state_probe", "capability_version": "1.0.0", "inputs": ["branch", "member_number", "operator_id", "[REDACTED]"]}
+{"ts": "2026-09-06T00:05:50.712642+00:00", "run_id": "exc-timeout-0691a3", "event": "policy_checked", "step_id": "s1_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-06T00:05:50.719517+00:00", "run_id": "exc-timeout-0691a3", "event": "target_resolved", "step_id": "s1_fill", "strategy": "stable_attribute"}
+{"ts": "2026-09-06T00:05:50.719793+00:00", "run_id": "exc-timeout-0691a3", "event": "step_completed", "step_id": "s1_fill", "attempts": 0}
+{"ts": "2026-09-06T00:05:50.719896+00:00", "run_id": "exc-timeout-0691a3", "event": "policy_checked", "step_id": "s2_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-06T00:05:50.739882+00:00", "run_id": "exc-timeout-0691a3", "event": "target_resolved", "step_id": "s2_fill", "strategy": "stable_attribute"}
+{"ts": "2026-09-06T00:05:50.740015+00:00", "run_id": "exc-timeout-0691a3", "event": "step_completed", "step_id": "s2_fill", "attempts": 0}
+{"ts": "2026-09-06T00:05:50.740085+00:00", "run_id": "exc-timeout-0691a3", "event": "policy_checked", "step_id": "s3_select", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-06T00:05:50.742444+00:00", "run_id": "exc-timeout-0691a3", "event": "target_resolved", "step_id": "s3_select", "strategy": "stable_attribute"}
+{"ts": "2026-09-06T00:05:50.742563+00:00", "run_id": "exc-timeout-0691a3", "event": "step_completed", "step_id": "s3_select", "attempts": 0}
+{"ts": "2026-09-06T00:05:50.742626+00:00", "run_id": "exc-timeout-0691a3", "event": "policy_checked", "step_id": "s4_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-06T00:05:50.935019+00:00", "run_id": "exc-timeout-0691a3", "event": "target_resolved", "step_id": "s4_click", "strategy": "role_name"}
+{"ts": "2026-09-06T00:05:50.935465+00:00", "run_id": "exc-timeout-0691a3", "event": "step_completed", "step_id": "s4_click", "attempts": 0}
+{"ts": "2026-09-06T00:05:50.935723+00:00", "run_id": "exc-timeout-0691a3", "event": "policy_checked", "step_id": "s5_navigate", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-06T00:05:57.078283+00:00", "run_id": "exc-timeout-0691a3", "event": "hard_failure", "step_id": "s5_navigate", "code": "SESSION_EXPIRED", "expected": "step to complete without a declared fatal condition", "observed": "The MERIDIAN session ended; re-authentication is required, so this run stops rather than resuming a flow whose state is unknown.", "recovery_attempts": 0}

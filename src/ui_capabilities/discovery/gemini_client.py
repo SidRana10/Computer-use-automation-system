@@ -10,10 +10,14 @@ is deliberately no code/JS/shell tool.
 
 from __future__ import annotations
 
+import asyncio
+import re
+
 from pathlib import Path
 
 from google import genai
 from google.genai import types
+from google.genai.errors import ClientError, ServerError
 
 from ..models.actions import DiscoveryAction
 from ..policy.redaction import Redactor
@@ -23,6 +27,30 @@ from .model_adapter import TurnContext
 from .prompts import SYSTEM_PROMPT, build_turn_prompt
 
 DEFAULT_GEMINI_MODEL = "gemini-3-flash-preview"
+
+# Bounded backoff for transient provider failures: the free-tier per-minute
+# rate limit (429, observed: 5 requests/minute/model) and a transient
+# "experiencing high demand" 503, both observed live. A multi-turn discovery
+# run makes one call per step, so an unhandled transient failure mid-run would
+# otherwise crash a genuine discovery session outright. Retries only these two
+# specific, known-transient conditions; every other error still propagates
+# immediately.
+_MAX_RATE_LIMIT_RETRIES = 4
+_DEFAULT_RETRY_DELAY_S = 20.0
+_SERVER_ERROR_RETRY_DELAY_S = 15.0
+_RETRY_DELAY_RE = re.compile(r"'retryDelay':\s*'(\d+(?:\.\d+)?)s'")
+
+# Proactive pacing floor: observed live at 5 requests/minute/model, so an
+# average spacing of 12s stays exactly at the limit — 13s leaves margin.
+# Cheaper than discovering the cap reactively every run: a burst of calls
+# that clears in under a second (page loads are sometimes that fast) would
+# otherwise immediately trip a 429 and fall into the escalating backoff below.
+_MIN_CALL_INTERVAL_S = 13.0
+
+
+def _retry_delay_seconds(exc: ClientError) -> float:
+    match = _RETRY_DELAY_RE.search(str(exc))
+    return float(match.group(1)) + 1.0 if match else _DEFAULT_RETRY_DELAY_S
 
 
 def simplify_schema_for_gemini(schema: dict) -> dict:
@@ -84,6 +112,7 @@ class GeminiModelAdapter:
         self._redactor = redactor
         self._tools = build_gemini_tools()
         self.name = f"gemini:{model}"  # flows into artifact provenance
+        self._last_call_at: float | None = None
 
     async def next_action(self, observation: Observation, context: TurnContext) -> DiscoveryAction:
         prompt = build_turn_prompt(
@@ -122,11 +151,7 @@ class GeminiModelAdapter:
 
         last_error: str | None = None
         for _attempt in range(2):
-            response = await self._client.aio.models.generate_content(
-                model=self._model,
-                contents=contents,
-                config=config,
-            )
+            response = await self._generate_with_backoff(contents, config)
             calls = response.function_calls or []
             if not calls:
                 raise ValueError("model failed to produce a structured action: no function call in response")
@@ -155,3 +180,33 @@ class GeminiModelAdapter:
                 ),
             ]
         raise ValueError(f"model failed to produce a valid structured action: {last_error}")
+
+    async def _generate_with_backoff(self, contents: list[types.Content], config: types.GenerateContentConfig):
+        for attempt in range(_MAX_RATE_LIMIT_RETRIES + 1):
+            await self._wait_for_pacing_floor()
+            try:
+                response = await self._client.aio.models.generate_content(
+                    model=self._model,
+                    contents=contents,
+                    config=config,
+                )
+                self._last_call_at = asyncio.get_event_loop().time()
+                return response
+            except ClientError as exc:
+                self._last_call_at = asyncio.get_event_loop().time()
+                if exc.code != 429 or attempt == _MAX_RATE_LIMIT_RETRIES:
+                    raise
+                await asyncio.sleep(_retry_delay_seconds(exc))
+            except ServerError as exc:
+                self._last_call_at = asyncio.get_event_loop().time()
+                if exc.code != 503 or attempt == _MAX_RATE_LIMIT_RETRIES:
+                    raise
+                await asyncio.sleep(_SERVER_ERROR_RETRY_DELAY_S)
+
+    async def _wait_for_pacing_floor(self) -> None:
+        if self._last_call_at is None:
+            return
+        elapsed = asyncio.get_event_loop().time() - self._last_call_at
+        remaining = _MIN_CALL_INTERVAL_S - elapsed
+        if remaining > 0:
+            await asyncio.sleep(remaining)

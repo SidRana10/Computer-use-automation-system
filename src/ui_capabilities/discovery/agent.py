@@ -353,6 +353,14 @@ class DiscoveryAgent:
 
     @staticmethod
     def _embeds_runtime_value(text: str, bindings: dict[str, str], extracted_outputs: dict[str, str]) -> bool:
+        """Checked in both directions: `text` may embed a runtime value (a
+        condition quoting a balance), or a runtime value may embed `text` (a
+        member name proposed as a condition, itself a short fragment of a
+        much larger extracted table/JSON value) — the second direction is
+        what a table-extraction output makes possible, since the "value" is
+        no longer a short scalar the old one-directional check assumed."""
+        if len(text) < 3:
+            return False
         normalized_text = text.replace("$", "").replace(",", "")
         for value in list(bindings.values()) + list(extracted_outputs.values()):
             if not value:
@@ -360,7 +368,7 @@ class DiscoveryAgent:
             normalized_value = value.replace("$", "").replace(",", "").strip()
             if len(normalized_value) < 3:
                 continue
-            if value in text or normalized_value in normalized_text:
+            if value in text or normalized_value in normalized_text or text in value or normalized_text in normalized_value:
                 return True
         return False
 

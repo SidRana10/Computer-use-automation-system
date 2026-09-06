@@ -1,0 +1,1097 @@
+{
+  "schema_version": "1.0",
+  "capability_id": "meridian.funds_transfer",
+  "capability_version": "1.0.0",
+  "name": "Meridian Funds Transfer",
+  "description": "Sign on to MERIDIAN CORE as the supplied operator. Use Member Inquiry to search by member number for the given member number and select that member. Start a Funds Transfer using the given from-share, to-share, amount, and memo, and click Continue to reach the review screen. On the review screen, before submitting, look at INTERACTIVE ELEMENTS for an element with kind 'hidden' (the security/transaction token) and extract its value using extract_mode=value and internal=true (it must never be a public output). Then click Post Transfer to submit. Declare the goal DONE once a confirmation is shown, recording the confirmation detail as a structured output if one is shown, using a suggested_success_condition grounded in stable page text (never a value you just extracted).",
+  "approval_state": "draft",
+  "risk_level": "irreversible",
+  "target": {
+    "app_id": "meridian_core",
+    "vendor_family": "cornerstone_meridian",
+    "surface_kind": "web",
+    "entry_point": "https://web-sample.interface-hiring.com",
+    "compatible_variants": [],
+    "app_fingerprint": {
+      "app_title": "Sign On - Meridian Core",
+      "build_marker": "4.2.1"
+    }
+  },
+  "contract": {
+    "inputs": [
+      {
+        "name": "amount",
+        "type": "decimal",
+        "required": true,
+        "description": "Funds transfer amount in dollars",
+        "sensitive": true,
+        "credential": false,
+        "pattern": null,
+        "minimum": 0.01,
+        "maximum": null
+      },
+      {
+        "name": "branch",
+        "type": "string",
+        "required": true,
+        "description": "Branch code selected at sign-on, e.g. MAIN-001",
+        "sensitive": false,
+        "credential": false,
+        "pattern": null,
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "name": "from_share",
+        "type": "string",
+        "required": true,
+        "description": "Source share identifier for a funds transfer, e.g. <member number>-MMKT-<n>",
+        "sensitive": true,
+        "credential": false,
+        "pattern": null,
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "name": "member_number",
+        "type": "string",
+        "required": true,
+        "description": "Six-digit MERIDIAN member number",
+        "sensitive": true,
+        "credential": false,
+        "pattern": "\\d{6}",
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "name": "memo",
+        "type": "string",
+        "required": false,
+        "description": "Optional free-text memo for a funds transfer",
+        "sensitive": true,
+        "credential": false,
+        "pattern": null,
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "name": "operator_id",
+        "type": "string",
+        "required": true,
+        "description": "MERIDIAN operator sign-on ID (supplied by the environment, never by a caller)",
+        "sensitive": true,
+        "credential": true,
+        "pattern": null,
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "name": "password",
+        "type": "string",
+        "required": true,
+        "description": "MERIDIAN operator password (supplied by the environment, never by a caller)",
+        "sensitive": true,
+        "credential": true,
+        "pattern": null,
+        "minimum": null,
+        "maximum": null
+      },
+      {
+        "name": "to_share",
+        "type": "string",
+        "required": true,
+        "description": "Destination share identifier for a funds transfer",
+        "sensitive": true,
+        "credential": false,
+        "pattern": null,
+        "minimum": null,
+        "maximum": null
+      }
+    ],
+    "outputs": []
+  },
+  "preconditions": [],
+  "steps": [
+    {
+      "id": "s1_fill",
+      "name": "Fill Operator ID",
+      "action": "fill",
+      "target": {
+        "description": "textbox 'Operator ID'",
+        "strategies": [
+          {
+            "kind": "role_name",
+            "role": "textbox",
+            "name": "Operator ID",
+            "value": null,
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          },
+          {
+            "kind": "label",
+            "role": null,
+            "name": null,
+            "value": "Operator ID",
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          },
+          {
+            "kind": "stable_attribute",
+            "role": null,
+            "name": null,
+            "value": "operator",
+            "attribute": "name",
+            "exact": true,
+            "confidence": null
+          }
+        ]
+      },
+      "value": {
+        "kind": "input",
+        "name": "operator_id"
+      },
+      "url_template": null,
+      "output_name": null,
+      "output_type": null,
+      "extract_mode": null,
+      "internal": false,
+      "timeout_ms": null,
+      "risk": "reversible",
+      "checkpoint_after": [],
+      "on_error": null
+    },
+    {
+      "id": "s2_fill",
+      "name": "Fill Password",
+      "action": "fill",
+      "target": {
+        "description": "textbox 'Password'",
+        "strategies": [
+          {
+            "kind": "role_name",
+            "role": "textbox",
+            "name": "Password",
+            "value": null,
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          },
+          {
+            "kind": "label",
+            "role": null,
+            "name": null,
+            "value": "Password",
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          },
+          {
+            "kind": "stable_attribute",
+            "role": null,
+            "name": null,
+            "value": "password",
+            "attribute": "name",
+            "exact": true,
+            "confidence": null
+          }
+        ]
+      },
+      "value": {
+        "kind": "input",
+        "name": "password"
+      },
+      "url_template": null,
+      "output_name": null,
+      "output_type": null,
+      "extract_mode": null,
+      "internal": false,
+      "timeout_ms": null,
+      "risk": "reversible",
+      "checkpoint_after": [],
+      "on_error": null
+    },
+    {
+      "id": "s3_click",
+      "name": "Click Sign On",
+      "action": "click",
+      "target": {
+        "description": "button 'Sign On'",
+        "strategies": [
+          {
+            "kind": "role_name",
+            "role": "button",
+            "name": "Sign On",
+            "value": null,
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          },
+          {
+            "kind": "text",
+            "role": null,
+            "name": null,
+            "value": "Sign On",
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          }
+        ]
+      },
+      "value": null,
+      "url_template": null,
+      "output_name": null,
+      "output_type": null,
+      "extract_mode": null,
+      "internal": false,
+      "timeout_ms": null,
+      "risk": "safe",
+      "checkpoint_after": [
+        {
+          "kind": "url_matches",
+          "target": null,
+          "value": "/menu",
+          "timeout_ms": null
+        },
+        {
+          "kind": "text_present",
+          "target": null,
+          "value": "MAIN MENU",
+          "timeout_ms": null
+        }
+      ],
+      "on_error": null
+    },
+    {
+      "id": "s4_click",
+      "name": "Click Member Inquiry / Selection",
+      "action": "click",
+      "target": {
+        "description": "link 'Member Inquiry / Selection'",
+        "strategies": [
+          {
+            "kind": "role_name",
+            "role": "link",
+            "name": "Member Inquiry / Selection",
+            "value": null,
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          },
+          {
+            "kind": "label",
+            "role": null,
+            "name": null,
+            "value": "1.",
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          },
+          {
+            "kind": "text",
+            "role": null,
+            "name": null,
+            "value": "Member Inquiry / Selection",
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          }
+        ]
+      },
+      "value": null,
+      "url_template": null,
+      "output_name": null,
+      "output_type": null,
+      "extract_mode": null,
+      "internal": false,
+      "timeout_ms": null,
+      "risk": "safe",
+      "checkpoint_after": [
+        {
+          "kind": "url_matches",
+          "target": null,
+          "value": "/members",
+          "timeout_ms": null
+        },
+        {
+          "kind": "text_present",
+          "target": null,
+          "value": "MEMBER INQUIRY / SELECTION",
+          "timeout_ms": null
+        }
+      ],
+      "on_error": null
+    },
+    {
+      "id": "s5_fill",
+      "name": "Fill Value",
+      "action": "fill",
+      "target": {
+        "description": "textbox 'Value'",
+        "strategies": [
+          {
+            "kind": "role_name",
+            "role": "textbox",
+            "name": "Value",
+            "value": null,
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          },
+          {
+            "kind": "label",
+            "role": null,
+            "name": null,
+            "value": "Value",
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          },
+          {
+            "kind": "stable_attribute",
+            "role": null,
+            "name": null,
+            "value": "q",
+            "attribute": "name",
+            "exact": true,
+            "confidence": null
+          }
+        ]
+      },
+      "value": {
+        "kind": "input",
+        "name": "member_number"
+      },
+      "url_template": null,
+      "output_name": null,
+      "output_type": null,
+      "extract_mode": null,
+      "internal": false,
+      "timeout_ms": null,
+      "risk": "reversible",
+      "checkpoint_after": [],
+      "on_error": null
+    },
+    {
+      "id": "s6_click",
+      "name": "Click Search",
+      "action": "click",
+      "target": {
+        "description": "button 'Search'",
+        "strategies": [
+          {
+            "kind": "role_name",
+            "role": "button",
+            "name": "Search",
+            "value": null,
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          },
+          {
+            "kind": "label",
+            "role": null,
+            "name": null,
+            "value": "Value",
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          },
+          {
+            "kind": "text",
+            "role": null,
+            "name": null,
+            "value": "Search",
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          }
+        ]
+      },
+      "value": null,
+      "url_template": null,
+      "output_name": null,
+      "output_type": null,
+      "extract_mode": null,
+      "internal": false,
+      "timeout_ms": null,
+      "risk": "safe",
+      "checkpoint_after": [],
+      "on_error": null
+    },
+    {
+      "id": "s7_click",
+      "name": "Click Select",
+      "action": "click",
+      "target": {
+        "description": "link 'Select'",
+        "strategies": [
+          {
+            "kind": "role_name",
+            "role": "link",
+            "name": "Select",
+            "value": null,
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          },
+          {
+            "kind": "label",
+            "role": null,
+            "name": null,
+            "value": "12",
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          },
+          {
+            "kind": "text",
+            "role": null,
+            "name": null,
+            "value": "Select",
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          }
+        ]
+      },
+      "value": null,
+      "url_template": null,
+      "output_name": null,
+      "output_type": null,
+      "extract_mode": null,
+      "internal": false,
+      "timeout_ms": null,
+      "risk": "safe",
+      "checkpoint_after": [
+        {
+          "kind": "url_matches",
+          "target": null,
+          "value": "/members/*",
+          "timeout_ms": null
+        },
+        {
+          "kind": "text_present",
+          "target": null,
+          "value": "MEMBER RECORD",
+          "timeout_ms": null
+        }
+      ],
+      "on_error": null
+    },
+    {
+      "id": "s8_click",
+      "name": "Click Funds Transfer",
+      "action": "click",
+      "target": {
+        "description": "link 'Funds Transfer'",
+        "strategies": [
+          {
+            "kind": "role_name",
+            "role": "link",
+            "name": "Funds Transfer",
+            "value": null,
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          },
+          {
+            "kind": "text",
+            "role": null,
+            "name": null,
+            "value": "Funds Transfer",
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          }
+        ]
+      },
+      "value": null,
+      "url_template": null,
+      "output_name": null,
+      "output_type": null,
+      "extract_mode": null,
+      "internal": false,
+      "timeout_ms": null,
+      "risk": "safe",
+      "checkpoint_after": [
+        {
+          "kind": "url_matches",
+          "target": null,
+          "value": "/members/*/transfer",
+          "timeout_ms": null
+        },
+        {
+          "kind": "text_present",
+          "target": null,
+          "value": "FUNDS TRANSFER",
+          "timeout_ms": null
+        }
+      ],
+      "on_error": null
+    },
+    {
+      "id": "s9_select",
+      "name": "Select From Share",
+      "action": "select",
+      "target": {
+        "description": "combobox 'From Share'",
+        "strategies": [
+          {
+            "kind": "role_name",
+            "role": "combobox",
+            "name": "From Share",
+            "value": null,
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          },
+          {
+            "kind": "label",
+            "role": null,
+            "name": null,
+            "value": "From Share",
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          },
+          {
+            "kind": "stable_attribute",
+            "role": null,
+            "name": null,
+            "value": "from",
+            "attribute": "name",
+            "exact": true,
+            "confidence": null
+          }
+        ]
+      },
+      "value": {
+        "kind": "input",
+        "name": "from_share"
+      },
+      "url_template": null,
+      "output_name": null,
+      "output_type": null,
+      "extract_mode": null,
+      "internal": false,
+      "timeout_ms": null,
+      "risk": "reversible",
+      "checkpoint_after": [],
+      "on_error": null
+    },
+    {
+      "id": "s10_select",
+      "name": "Select To Share",
+      "action": "select",
+      "target": {
+        "description": "combobox 'To Share'",
+        "strategies": [
+          {
+            "kind": "role_name",
+            "role": "combobox",
+            "name": "To Share",
+            "value": null,
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          },
+          {
+            "kind": "label",
+            "role": null,
+            "name": null,
+            "value": "To Share",
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          },
+          {
+            "kind": "stable_attribute",
+            "role": null,
+            "name": null,
+            "value": "to",
+            "attribute": "name",
+            "exact": true,
+            "confidence": null
+          }
+        ]
+      },
+      "value": {
+        "kind": "input",
+        "name": "to_share"
+      },
+      "url_template": null,
+      "output_name": null,
+      "output_type": null,
+      "extract_mode": null,
+      "internal": false,
+      "timeout_ms": null,
+      "risk": "reversible",
+      "checkpoint_after": [],
+      "on_error": null
+    },
+    {
+      "id": "s11_fill",
+      "name": "Fill Amount",
+      "action": "fill",
+      "target": {
+        "description": "textbox 'Amount'",
+        "strategies": [
+          {
+            "kind": "role_name",
+            "role": "textbox",
+            "name": "Amount",
+            "value": null,
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          },
+          {
+            "kind": "label",
+            "role": null,
+            "name": null,
+            "value": "Amount",
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          },
+          {
+            "kind": "stable_attribute",
+            "role": null,
+            "name": null,
+            "value": "amount",
+            "attribute": "name",
+            "exact": true,
+            "confidence": null
+          }
+        ]
+      },
+      "value": {
+        "kind": "input",
+        "name": "amount"
+      },
+      "url_template": null,
+      "output_name": null,
+      "output_type": null,
+      "extract_mode": null,
+      "internal": false,
+      "timeout_ms": null,
+      "risk": "reversible",
+      "checkpoint_after": [],
+      "on_error": null
+    },
+    {
+      "id": "s12_fill",
+      "name": "Fill Memo",
+      "action": "fill",
+      "target": {
+        "description": "textbox 'Memo'",
+        "strategies": [
+          {
+            "kind": "role_name",
+            "role": "textbox",
+            "name": "Memo",
+            "value": null,
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          },
+          {
+            "kind": "label",
+            "role": null,
+            "name": null,
+            "value": "Memo",
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          },
+          {
+            "kind": "stable_attribute",
+            "role": null,
+            "name": null,
+            "value": "memo",
+            "attribute": "name",
+            "exact": true,
+            "confidence": null
+          }
+        ]
+      },
+      "value": {
+        "kind": "input",
+        "name": "memo"
+      },
+      "url_template": null,
+      "output_name": null,
+      "output_type": null,
+      "extract_mode": null,
+      "internal": false,
+      "timeout_ms": null,
+      "risk": "reversible",
+      "checkpoint_after": [],
+      "on_error": null
+    },
+    {
+      "id": "s13_click",
+      "name": "Click Continue",
+      "action": "click",
+      "target": {
+        "description": "button 'Continue'",
+        "strategies": [
+          {
+            "kind": "role_name",
+            "role": "button",
+            "name": "Continue",
+            "value": null,
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          },
+          {
+            "kind": "text",
+            "role": null,
+            "name": null,
+            "value": "Continue",
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          }
+        ]
+      },
+      "value": null,
+      "url_template": null,
+      "output_name": null,
+      "output_type": null,
+      "extract_mode": null,
+      "internal": false,
+      "timeout_ms": null,
+      "risk": "safe",
+      "checkpoint_after": [
+        {
+          "kind": "url_matches",
+          "target": null,
+          "value": "/members/*/transfer/review",
+          "timeout_ms": null
+        },
+        {
+          "kind": "text_present",
+          "target": null,
+          "value": "CONFIRM FUNDS TRANSFER",
+          "timeout_ms": null
+        }
+      ],
+      "on_error": null
+    },
+    {
+      "id": "s14_extract",
+      "name": "Extract token",
+      "action": "extract",
+      "target": {
+        "description": "hidden '_token'",
+        "strategies": [
+          {
+            "kind": "stable_attribute",
+            "role": null,
+            "name": null,
+            "value": "_token",
+            "attribute": "name",
+            "exact": true,
+            "confidence": null
+          }
+        ]
+      },
+      "value": null,
+      "url_template": null,
+      "output_name": "token",
+      "output_type": "string",
+      "extract_mode": "value",
+      "internal": true,
+      "timeout_ms": null,
+      "risk": "safe",
+      "checkpoint_after": [],
+      "on_error": null
+    },
+    {
+      "id": "s15_click",
+      "name": "Click Post Transfer",
+      "action": "click",
+      "target": {
+        "description": "button 'Post Transfer'",
+        "strategies": [
+          {
+            "kind": "role_name",
+            "role": "button",
+            "name": "Post Transfer",
+            "value": null,
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          },
+          {
+            "kind": "text",
+            "role": null,
+            "name": null,
+            "value": "Post Transfer",
+            "attribute": null,
+            "exact": true,
+            "confidence": null
+          }
+        ]
+      },
+      "value": null,
+      "url_template": null,
+      "output_name": null,
+      "output_type": null,
+      "extract_mode": null,
+      "internal": false,
+      "timeout_ms": null,
+      "risk": "irreversible",
+      "checkpoint_after": [
+        {
+          "kind": "url_matches",
+          "target": null,
+          "value": "/members/*/transfer/post",
+          "timeout_ms": null
+        },
+        {
+          "kind": "text_present",
+          "target": null,
+          "value": "TRANSFER POSTED",
+          "timeout_ms": null
+        }
+      ],
+      "on_error": null
+    }
+  ],
+  "success_conditions": [
+    {
+      "kind": "url_matches",
+      "target": null,
+      "value": "/members/*/transfer/post",
+      "timeout_ms": null
+    },
+    {
+      "kind": "text_present",
+      "target": null,
+      "value": "TRANSACTION COMPLETE",
+      "timeout_ms": null
+    }
+  ],
+  "error_rules": [
+    {
+      "code": "BAD_LOGIN",
+      "classification": "business_outcome",
+      "when": [
+        {
+          "kind": "text_present",
+          "target": null,
+          "value": "Invalid operator ID or password.",
+          "timeout_ms": 400
+        }
+      ],
+      "recovery": [],
+      "max_attempts": 0,
+      "caller_message": "The supplied operator credentials were rejected by MERIDIAN."
+    },
+    {
+      "code": "SUPERVISOR_REQUIRED",
+      "classification": "hard_failure",
+      "when": [
+        {
+          "kind": "text_present",
+          "target": null,
+          "value": "is not authorized to perform this function",
+          "timeout_ms": 400
+        }
+      ],
+      "recovery": [],
+      "max_attempts": 0,
+      "caller_message": "MERIDIAN requires a supervisor profile for this function; the signed-on operator is not authorized and automation will not attempt to bypass it."
+    },
+    {
+      "code": "SESSION_EXPIRED",
+      "classification": "hard_failure",
+      "when": [
+        {
+          "kind": "text_present",
+          "target": null,
+          "value": "your session ended due to inactivity",
+          "timeout_ms": 400
+        }
+      ],
+      "recovery": [],
+      "max_attempts": 0,
+      "caller_message": "The MERIDIAN session ended; re-authentication is required, so this run stops rather than resuming a flow whose state is unknown."
+    },
+    {
+      "code": "MEMBER_NOT_FOUND",
+      "classification": "business_outcome",
+      "when": [
+        {
+          "kind": "text_present",
+          "target": null,
+          "value": "The requested member record could not be located on this host.",
+          "timeout_ms": 400
+        }
+      ],
+      "recovery": [],
+      "max_attempts": 0,
+      "caller_message": "No MERIDIAN member record exists for that member number."
+    },
+    {
+      "code": "NO_SEARCH_RESULTS",
+      "classification": "business_outcome",
+      "when": [
+        {
+          "kind": "text_present",
+          "target": null,
+          "value": "No member records matched your search.",
+          "timeout_ms": 400
+        }
+      ],
+      "recovery": [],
+      "max_attempts": 0,
+      "caller_message": "The member inquiry returned no matching records."
+    },
+    {
+      "code": "TRANSACTION_REJECTED",
+      "classification": "business_outcome",
+      "when": [
+        {
+          "kind": "text_present",
+          "target": null,
+          "value": "The transaction could not be validated:",
+          "timeout_ms": 400
+        }
+      ],
+      "recovery": [],
+      "max_attempts": 0,
+      "caller_message": "MERIDIAN rejected the transaction during validation (for example insufficient available balance in the source share)."
+    },
+    {
+      "code": "FIELD_VALIDATION_FAILED",
+      "classification": "business_outcome",
+      "when": [
+        {
+          "kind": "text_present",
+          "target": null,
+          "value": "Please correct the following:",
+          "timeout_ms": 400
+        }
+      ],
+      "recovery": [],
+      "max_attempts": 0,
+      "caller_message": "One or more submitted field values were rejected by MERIDIAN validation."
+    },
+    {
+      "code": "VALIDATION_REJECTED",
+      "classification": "business_outcome",
+      "when": [
+        {
+          "kind": "text_present",
+          "target": null,
+          "value": "The transaction could not be completed as entered.",
+          "timeout_ms": 400
+        }
+      ],
+      "recovery": [],
+      "max_attempts": 0,
+      "caller_message": "MERIDIAN rejected the transaction as entered."
+    },
+    {
+      "code": "OPEN_SHARE_VALIDATION_FAILED",
+      "classification": "business_outcome",
+      "when": [
+        {
+          "kind": "text_present",
+          "target": null,
+          "value": "The request could not be validated:",
+          "timeout_ms": 400
+        }
+      ],
+      "recovery": [],
+      "max_attempts": 0,
+      "caller_message": "MERIDIAN rejected the new-share request during validation (for example a deposit below the product's required minimum)."
+    },
+    {
+      "code": "MAINTENANCE_WINDOW",
+      "classification": "recoverable",
+      "when": [
+        {
+          "kind": "text_present",
+          "target": null,
+          "value": "The host is temporarily unavailable",
+          "timeout_ms": 400
+        }
+      ],
+      "recovery": [
+        {
+          "kind": "wait",
+          "target": null,
+          "wait_ms": 1500
+        },
+        {
+          "kind": "reload",
+          "target": null,
+          "wait_ms": null
+        }
+      ],
+      "max_attempts": 2,
+      "caller_message": "MERIDIAN reported a maintenance window; waited and retried within budget."
+    },
+    {
+      "code": "APPLICATION_ERROR",
+      "classification": "hard_failure",
+      "when": [
+        {
+          "kind": "text_present",
+          "target": null,
+          "value": "An unexpected error occurred while processing your request.",
+          "timeout_ms": 400
+        }
+      ],
+      "recovery": [],
+      "max_attempts": 0,
+      "caller_message": "MERIDIAN returned an application error; the run stopped and preserved evidence."
+    }
+  ],
+  "policy": {
+    "allowed_domains": [
+      "web-sample.interface-hiring.com"
+    ],
+    "allowed_route_patterns": [
+      "/",
+      "/members",
+      "/members/*",
+      "/members/*/transfer",
+      "/members/*/transfer/post",
+      "/members/*/transfer/review",
+      "/menu",
+      "/session/**",
+      "/signon"
+    ],
+    "allowed_actions": [
+      "assert",
+      "click",
+      "extract",
+      "fill",
+      "select",
+      "wait_for"
+    ],
+    "max_unattended_risk": "reversible",
+    "require_human_for": [
+      "risky",
+      "irreversible"
+    ],
+    "escalate_on_codes": []
+  },
+  "provenance": {
+    "discovery_run_id": "disc-09032250da",
+    "discovered_at": "2026-09-05T22:51:55.696452Z",
+    "discovery_model": "gemini:gemini-3.5-flash-lite",
+    "source_app_fingerprint": {
+      "app_title": "Sign On - Meridian Core",
+      "build_marker": "4.2.1"
+    }
+  }
+}

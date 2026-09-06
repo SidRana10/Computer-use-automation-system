@@ -1,0 +1,209 @@
+[
+  {
+    "intervention_id": "int-acf02b4f",
+    "run_id": "rep-2b1dd06224",
+    "mode": "replay",
+    "capability_id": "meridian.place_hold",
+    "goal_summary": "Sign on to MERIDIAN CORE as the supplied operator. Use Member Inquiry to search by member number for the given member number and select that member. Go to Place Account Hold and select the given share and reason code, fill the notes, then click Continue to reach the confirm screen. On the confirm screen click Apply Hold to submit. Declare the goal DONE once the hold is confirmed, using a suggested_success_condition grounded in stable page text (never a value you just entered).",
+    "step_id": "s15_click",
+    "reason_code": "HUMAN_APPROVAL_REQUIRED",
+    "reason_message": "Step 's15_click' is irreversible; policy requires a human operator to perform it.",
+    "control_owner": "AUTOMATION",
+    "screenshot_path": "evidence/runs/rep-2b1dd06224/screenshots/intervention_s15_click.png",
+    "current_url": "https://web-sample.interface-hiring.com/members/[REDACTED]/hold/review",
+    "created_at": "2026-09-05T23:55:59.962159Z",
+    "status": "resolved",
+    "operator_id": "scripted-operator",
+    "operator_note": "scripted operator approved 'Apply Hold'",
+    "human_events": [
+      {
+        "event": "click",
+        "tag": "input",
+        "text": "Apply Hold",
+        "aria_label": null,
+        "name": null,
+        "value_changed": null,
+        "value": null,
+        "url": null,
+        "timestamp": "2026-09-05T23:56:00.136Z"
+      },
+      {
+        "event": "navigation",
+        "tag": null,
+        "text": null,
+        "aria_label": null,
+        "name": null,
+        "value_changed": null,
+        "value": null,
+        "url": "/members/[REDACTED]/hold/post",
+        "timestamp": "2026-09-05T23:56:00.232Z"
+      }
+    ],
+    "before_screenshot": "evidence/runs/rep-2b1dd06224/screenshots/intervention_s15_click.png",
+    "after_screenshot": "evidence/runs/rep-2b1dd06224/screenshots/resume_int-acf02b4f.png"
+  },
+  {
+    "intervention_id": "int-a712876a",
+    "run_id": "rep-2b1dd06224",
+    "mode": "replay",
+    "capability_id": "meridian.place_hold",
+    "goal_summary": "Sign on to MERIDIAN CORE as the supplied operator. Use Member Inquiry to search by member number for the given member number and select that member. Go to Place Account Hold and select the given share and reason code, fill the notes, then click Continue to reach the confirm screen. On the confirm screen click Apply Hold to submit. Declare the goal DONE once the hold is confirmed, using a suggested_success_condition grounded in stable page text (never a value you just entered).",
+    "step_id": "s13_click",
+    "reason_code": "SUPERVISOR_REQUIRED",
+    "reason_message": "MERIDIAN requires a supervisor profile for this function; the signed-on operator is not authorized and automation will not attempt to bypass it.",
+    "control_owner": "AUTOMATION",
+    "screenshot_path": "evidence/runs/rep-2b1dd06224/screenshots/intervention_s13_click.png",
+    "current_url": "https://web-sample.interface-hiring.com/members/[REDACTED]/hold/review",
+    "created_at": "2026-09-05T23:55:59.138235Z",
+    "status": "resolved",
+    "operator_id": "scripted-supervisor",
+    "operator_note": "supervisor re-entered the hold request",
+    "human_events": [
+      {
+        "event": "click",
+        "tag": "a",
+        "text": "Sign Off",
+        "aria_label": null,
+        "name": null,
+        "value_changed": null,
+        "value": null,
+        "url": null,
+        "timestamp": "2026-09-05T23:55:59.253Z"
+      },
+      {
+        "event": "navigation",
+        "tag": null,
+        "text": null,
+        "aria_label": null,
+        "name": null,
+        "value_changed": null,
+        "value": null,
+        "url": "/signon",
+        "timestamp": "2026-09-05T23:55:59.434Z"
+      },
+      {
+        "event": "change",
+        "tag": "input",
+        "text": null,
+        "aria_label": null,
+        "name": "operator",
+        "value_changed": true,
+        "value": "[REDACTED]",
+        "url": null,
+        "timestamp": "2026-09-05T23:55:59.454Z"
+      },
+      {
+        "event": "change",
+        "tag": "select",
+        "text": null,
+        "aria_label": null,
+        "name": "branch",
+        "value_changed": true,
+        "value": "[REDACTED]",
+        "url": null,
+        "timestamp": "2026-09-05T23:55:59.461Z"
+      },
+      {
+        "event": "change",
+        "tag": "input",
+        "text": null,
+        "aria_label": null,
+        "name": "[REDACTED]",
+        "value_changed": true,
+        "value": "[REDACTED]",
+        "url": null,
+        "timestamp": "2026-09-05T23:55:59.477Z"
+      },
+      {
+        "event": "click",
+        "tag": "input",
+        "text": "Sign On",
+        "aria_label": null,
+        "name": null,
+        "value_changed": null,
+        "value": null,
+        "url": null,
+        "timestamp": "2026-09-05T23:55:59.477Z"
+      },
+      {
+        "event": "navigation",
+        "tag": null,
+        "text": null,
+        "aria_label": null,
+        "name": null,
+        "value_changed": null,
+        "value": null,
+        "url": "/menu",
+        "timestamp": "2026-09-05T23:55:59.652Z"
+      },
+      {
+        "event": "navigation",
+        "tag": null,
+        "text": null,
+        "aria_label": null,
+        "name": null,
+        "value_changed": null,
+        "value": null,
+        "url": "/members/[REDACTED]/hold",
+        "timestamp": "2026-09-05T23:55:59.741Z"
+      },
+      {
+        "event": "change",
+        "tag": "select",
+        "text": null,
+        "aria_label": null,
+        "name": "share",
+        "value_changed": true,
+        "value": "[REDACTED]",
+        "url": null,
+        "timestamp": "2026-09-05T23:55:59.759Z"
+      },
+      {
+        "event": "change",
+        "tag": "select",
+        "text": null,
+        "aria_label": null,
+        "name": "reason",
+        "value_changed": true,
+        "value": "[REDACTED]",
+        "url": null,
+        "timestamp": "2026-09-05T23:55:59.761Z"
+      },
+      {
+        "event": "change",
+        "tag": "input",
+        "text": null,
+        "aria_label": null,
+        "name": "notes",
+        "value_changed": true,
+        "value": "[REDACTED]",
+        "url": null,
+        "timestamp": "2026-09-05T23:55:59.778Z"
+      },
+      {
+        "event": "click",
+        "tag": "input",
+        "text": "Continue",
+        "aria_label": null,
+        "name": null,
+        "value_changed": null,
+        "value": null,
+        "url": null,
+        "timestamp": "2026-09-05T23:55:59.778Z"
+      },
+      {
+        "event": "navigation",
+        "tag": null,
+        "text": null,
+        "aria_label": null,
+        "name": null,
+        "value_changed": null,
+        "value": null,
+        "url": "/members/[REDACTED]/hold/review",
+        "timestamp": "2026-09-05T23:55:59.870Z"
+      }
+    ],
+    "before_screenshot": "evidence/runs/rep-2b1dd06224/screenshots/intervention_s13_click.png",
+    "after_screenshot": "evidence/runs/rep-2b1dd06224/screenshots/resume_int-a712876a.png"
+  }
+]

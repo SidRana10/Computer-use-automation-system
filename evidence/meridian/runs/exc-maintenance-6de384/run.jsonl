@@ -1,0 +1,17 @@
+{"ts": "2026-09-06T00:05:08.337073+00:00", "run_id": "exc-maintenance-6de384", "event": "replay_started", "capability_id": "test.meridian_exceptional_state_probe", "capability_version": "1.0.0", "inputs": ["branch", "member_number", "operator_id", "[REDACTED]"]}
+{"ts": "2026-09-06T00:05:08.986084+00:00", "run_id": "exc-maintenance-6de384", "event": "policy_checked", "step_id": "s1_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-06T00:05:08.993202+00:00", "run_id": "exc-maintenance-6de384", "event": "target_resolved", "step_id": "s1_fill", "strategy": "stable_attribute"}
+{"ts": "2026-09-06T00:05:08.993347+00:00", "run_id": "exc-maintenance-6de384", "event": "step_completed", "step_id": "s1_fill", "attempts": 0}
+{"ts": "2026-09-06T00:05:08.993556+00:00", "run_id": "exc-maintenance-6de384", "event": "policy_checked", "step_id": "s2_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-06T00:05:09.012856+00:00", "run_id": "exc-maintenance-6de384", "event": "target_resolved", "step_id": "s2_fill", "strategy": "stable_attribute"}
+{"ts": "2026-09-06T00:05:09.012996+00:00", "run_id": "exc-maintenance-6de384", "event": "step_completed", "step_id": "s2_fill", "attempts": 0}
+{"ts": "2026-09-06T00:05:09.013070+00:00", "run_id": "exc-maintenance-6de384", "event": "policy_checked", "step_id": "s3_select", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-06T00:05:09.015544+00:00", "run_id": "exc-maintenance-6de384", "event": "target_resolved", "step_id": "s3_select", "strategy": "stable_attribute"}
+{"ts": "2026-09-06T00:05:09.015638+00:00", "run_id": "exc-maintenance-6de384", "event": "step_completed", "step_id": "s3_select", "attempts": 0}
+{"ts": "2026-09-06T00:05:09.015696+00:00", "run_id": "exc-maintenance-6de384", "event": "policy_checked", "step_id": "s4_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-06T00:05:09.214729+00:00", "run_id": "exc-maintenance-6de384", "event": "target_resolved", "step_id": "s4_click", "strategy": "role_name"}
+{"ts": "2026-09-06T00:05:09.215318+00:00", "run_id": "exc-maintenance-6de384", "event": "step_completed", "step_id": "s4_click", "attempts": 0}
+{"ts": "2026-09-06T00:05:09.215606+00:00", "run_id": "exc-maintenance-6de384", "event": "policy_checked", "step_id": "s5_navigate", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-06T00:05:19.775915+00:00", "run_id": "exc-maintenance-6de384", "event": "recovery_attempted", "step_id": "s5_navigate", "code": "MAINTENANCE_WINDOW", "attempt": 1, "notes": ["waited 1500ms", "reload -> ok"], "denied": null}
+{"ts": "2026-09-06T00:05:35.638504+00:00", "run_id": "exc-maintenance-6de384", "event": "recovery_attempted", "step_id": "s5_navigate", "code": "MAINTENANCE_WINDOW", "attempt": 2, "notes": ["waited 1500ms", "reload -> ok"], "denied": null}
+{"ts": "2026-09-06T00:05:50.036992+00:00", "run_id": "exc-maintenance-6de384", "event": "hard_failure", "step_id": "s5_navigate", "code": "RETRY_EXHAUSTED", "expected": "recovery MAINTENANCE_WINDOW to restore the expected state within 2 attempts", "observed": "still failing after 2 attempts", "recovery_attempts": 2}

@@ -103,6 +103,16 @@ def meridian_error_rules() -> list[ErrorRule]:
             caller_message="MERIDIAN rejected the transaction as entered.",
         ),
         ErrorRule(
+            code="OPEN_SHARE_VALIDATION_FAILED",
+            classification=ErrorClassification.BUSINESS_OUTCOME,
+            # Distinct wording from TRANSACTION_REJECTED ("request", not
+            # "transaction") — verified live: a Certificate opened below its
+            # $500 minimum deposit renders this exact heading/text.
+            when=when_text("The request could not be validated:"),
+            caller_message="MERIDIAN rejected the new-share request during validation "
+            "(for example a deposit below the product's required minimum).",
+        ),
+        ErrorRule(
             code="MAINTENANCE_WINDOW",
             classification=ErrorClassification.RECOVERABLE,
             when=when_text("The host is temporarily unavailable"),
@@ -141,8 +151,14 @@ def meridian_policy(target_base_url: str = DEFAULT_ENTRY_POINT) -> PolicyConfig:
         require_human_for=[RiskLevel.RISKY, RiskLevel.IRREVERSIBLE],
         # Control captions observed on the live target. Classification is by
         # visible identity, decided by policy code rather than by a model.
+        # Verified live (P2 recon): the transfer/hold confirm screens both
+        # render an "IRREVERSIBLE ACTION" banner and their captions are listed
+        # here; the open-share confirm screen renders no such banner and its
+        # caption ("Open Share") matches neither pattern — a real product
+        # distinction (a new share can be closed later; a posted transfer or
+        # an applied hold cannot), so it is classified risky, not irreversible.
         irreversible_control_patterns=["apply hold", "post transfer"],
-        risky_control_patterns=["save changes"],
+        risky_control_patterns=["save changes", "open share"],
     )
 
 
@@ -172,6 +188,94 @@ MERIDIAN_INPUT_SPECS: dict[str, InputSpec] = {
         sensitive=True,
         pattern=r"\d{6}",
         description="Six-digit MERIDIAN member number",
+    ),
+    "search_mode": InputSpec(
+        name="search_mode",
+        type="string",
+        pattern=r"number|name",
+        description="Member inquiry search field: 'number' (member number) or 'name' (last name)",
+    ),
+    "search_value": InputSpec(
+        name="search_value",
+        type="string",
+        sensitive=True,
+        description="Value to search by: a member number or a last name",
+    ),
+    "from_share": InputSpec(
+        name="from_share",
+        type="string",
+        sensitive=True,
+        description="Source share identifier for a funds transfer, e.g. <member number>-MMKT-<n>",
+    ),
+    "to_share": InputSpec(
+        name="to_share",
+        type="string",
+        sensitive=True,
+        description="Destination share identifier for a funds transfer",
+    ),
+    "amount": InputSpec(
+        name="amount",
+        type="decimal",
+        sensitive=True,
+        minimum=0.01,
+        description="Funds transfer amount in dollars",
+    ),
+    "memo": InputSpec(
+        name="memo",
+        type="string",
+        required=False,
+        sensitive=True,
+        description="Optional free-text memo for a funds transfer",
+    ),
+    "share_type": InputSpec(
+        name="share_type",
+        type="string",
+        pattern=r"S0001|S0070|MMKT|CERT",
+        description="New share product type code",
+    ),
+    "initial_deposit": InputSpec(
+        name="initial_deposit",
+        type="decimal",
+        sensitive=True,
+        minimum=0.01,
+        description="Initial deposit in dollars for a newly opened share",
+    ),
+    "email": InputSpec(
+        name="email",
+        type="string",
+        sensitive=True,
+        description="Member e-mail address",
+    ),
+    "phone": InputSpec(
+        name="phone",
+        type="string",
+        sensitive=True,
+        description="Member phone number",
+    ),
+    "address": InputSpec(
+        name="address",
+        type="string",
+        sensitive=True,
+        description="Member mailing address",
+    ),
+    "share": InputSpec(
+        name="share",
+        type="string",
+        sensitive=True,
+        description="Share identifier to place a hold on",
+    ),
+    "reason_code": InputSpec(
+        name="reason_code",
+        type="string",
+        pattern=r"FRAUD|LEGAL|DECEASED",
+        description="Account hold reason code",
+    ),
+    "notes": InputSpec(
+        name="notes",
+        type="string",
+        required=False,
+        sensitive=True,
+        description="Optional free-text notes for an account hold",
     ),
 }
 

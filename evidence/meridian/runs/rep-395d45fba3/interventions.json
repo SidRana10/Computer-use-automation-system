@@ -1,0 +1,56 @@
+[
+  {
+    "intervention_id": "int-eb36fc36",
+    "run_id": "rep-395d45fba3",
+    "mode": "replay",
+    "capability_id": "meridian.update_member_info",
+    "goal_summary": "Sign on to MERIDIAN CORE as the supplied operator. Use Member Inquiry to search by member number for the given member number and select that member. Go to Update Member Information and set the e-mail, phone, and mailing address to the given values, then click Save Changes to submit. Declare the goal DONE once the update is confirmed, using a suggested_success_condition grounded in stable page text (never a value you just entered).",
+    "step_id": "s14_click",
+    "reason_code": "HUMAN_APPROVAL_REQUIRED",
+    "reason_message": "Step 's14_click' is risky; policy requires a human operator to perform it.",
+    "control_owner": "AUTOMATION",
+    "screenshot_path": "evidence/runs/rep-395d45fba3/screenshots/intervention_s14_click.png",
+    "current_url": "https://web-sample.interface-hiring.com/members/[REDACTED]/update",
+    "created_at": "2026-09-05T23:40:17.005757Z",
+    "status": "resolved",
+    "operator_id": "scripted-operator",
+    "operator_note": "scripted operator approved 'Save Changes'",
+    "human_events": [
+      {
+        "event": "change",
+        "tag": "input",
+        "text": null,
+        "aria_label": null,
+        "name": "address",
+        "value_changed": true,
+        "value": "[REDACTED]",
+        "url": null,
+        "timestamp": "2026-09-05T23:40:17.195Z"
+      },
+      {
+        "event": "click",
+        "tag": "input",
+        "text": "Save Changes",
+        "aria_label": null,
+        "name": null,
+        "value_changed": null,
+        "value": null,
+        "url": null,
+        "timestamp": "2026-09-05T23:40:17.197Z"
+      },
+      {
+        "event": "navigation",
+        "tag": null,
+        "text": null,
+        "aria_label": null,
+        "name": null,
+        "value_changed": null,
+        "value": null,
+        "url": "/members/[REDACTED]/update",
+        "timestamp": "2026-09-05T23:40:17.285Z"
+      }
+    ],
+    "before_screenshot": "evidence/runs/rep-395d45fba3/screenshots/intervention_s14_click.png",
+    "after_screenshot": "evidence/runs/rep-395d45fba3/screenshots/resume_int-eb36fc36.png"
+  }
+]

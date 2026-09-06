@@ -72,6 +72,13 @@ class ExtractAction(BaseModel):
     # value (needed for hidden fields such as a per-transaction token), or a
     # whole table as structured rows (needed when a list is variable-length).
     extract_mode: Literal["text", "value", "table"] = "text"
+    # True when this value is read only to complete the current flow (e.g.
+    # confirming a hidden security/transaction token is present before a
+    # write) and must never become a capability output or be persisted. False
+    # for a genuine result the caller needs (a balance, a confirmation
+    # number). The compiler enforces this: an internal extract can never
+    # source a declared output.
+    internal: bool = False
     rationale_summary: str = ""
 
 

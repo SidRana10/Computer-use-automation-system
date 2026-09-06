@@ -50,6 +50,26 @@ def test_unformatted_extracted_value_variant_is_also_caught():
     assert all("2540" not in (c.value or "") for c in artifact.success_conditions)
 
 
+def test_condition_sourced_from_inside_a_table_extract_is_also_caught():
+    """The reverse direction of the same class of leak, found live in a
+    genuine MERIDIAN run compiling meridian.member_inquiry: the extracted
+    value was a JSON table (extract_mode='table'), not a short scalar, and
+    the model's suggested condition was a short fragment quoted FROM inside
+    that blob (a member's name from one row) rather than a condition that
+    quotes the whole value. The old check only tested "runtime value found
+    inside condition text"; a huge blob is never found inside a much shorter
+    condition, so this leaked into the artifact undetected until this case."""
+    run = make_run()
+    run.steps[-1].result.extracted_text = (
+        '[{"Member No.": "100234", "Name": "Lovelace, Ada", "Shares": "31"}]'
+    )
+    run.suggested_success_condition = SuggestedCondition(kind="text_present", value="Lovelace, Ada")
+    artifact = compiler().compile(run)
+    assert all("Lovelace" not in (c.value or "") for c in artifact.success_conditions)
+    assert artifact.success_conditions  # a structural condition still survives
+    assert "Lovelace" not in artifact.model_dump_json()
+
+
 def test_locator_strategy_embedding_runtime_value_is_dropped():
     run = make_run()
     run.steps[0].element.candidate_strategies = [
@@ -120,6 +140,22 @@ async def test_verify_done_rejects_condition_embedding_extracted_value(tmp_path)
     )
     ok2, _ = await agent._verify_done(done2, {"member_id": "M-10001"}, {"savings_balance": "$2540.75"})
     assert not ok2
+
+
+async def test_verify_done_rejects_condition_sourced_from_inside_a_table_extract(tmp_path):
+    """Reverse direction: the extracted output is a JSON table (a much
+    larger blob), and the condition is a short fragment quoted from inside
+    it — found live compiling meridian.member_inquiry (see the compiler-side
+    regression test above)."""
+    agent = _agent(tmp_path, page_text="MEMBER INQUIRY / SELECTION Lovelace, Ada")
+    blob = '[{"Member No.": "100234", "Name": "Lovelace, Ada", "Shares": "31"}]'
+    done = DoneAction(
+        success_summary="results shown",
+        suggested_success_condition=SuggestedCondition(kind="text_present", value="Lovelace, Ada"),
+    )
+    ok, detail = await agent._verify_done(done, {"search_value": "100234"}, {"member_results_table": blob})
+    assert not ok
+    assert "extracted values" in detail
 
 
 async def test_verify_done_accepts_stable_ui_condition(tmp_path):

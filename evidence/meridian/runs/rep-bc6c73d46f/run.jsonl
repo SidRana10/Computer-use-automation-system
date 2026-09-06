@@ -1,0 +1,44 @@
+{"ts": "2026-09-05T23:05:48.391130+00:00", "run_id": "rep-bc6c73d46f", "event": "replay_started", "capability_id": "meridian.funds_transfer", "capability_version": "1.0.0", "inputs": ["amount", "branch", "from_share", "member_number", "memo", "operator_id", "[REDACTED]", "to_share"]}
+{"ts": "2026-09-05T23:05:49.757445+00:00", "run_id": "rep-bc6c73d46f", "event": "policy_checked", "step_id": "s1_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T23:05:49.776632+00:00", "run_id": "rep-bc6c73d46f", "event": "target_resolved", "step_id": "s1_fill", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T23:05:49.776806+00:00", "run_id": "rep-bc6c73d46f", "event": "step_completed", "step_id": "s1_fill", "attempts": 0}
+{"ts": "2026-09-05T23:05:49.776879+00:00", "run_id": "rep-bc6c73d46f", "event": "policy_checked", "step_id": "s2_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T23:05:49.801661+00:00", "run_id": "rep-bc6c73d46f", "event": "target_resolved", "step_id": "s2_fill", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T23:05:49.801824+00:00", "run_id": "rep-bc6c73d46f", "event": "step_completed", "step_id": "s2_fill", "attempts": 0}
+{"ts": "2026-09-05T23:05:49.801890+00:00", "run_id": "rep-bc6c73d46f", "event": "policy_checked", "step_id": "s3_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T23:05:50.009871+00:00", "run_id": "rep-bc6c73d46f", "event": "target_resolved", "step_id": "s3_click", "strategy": "role_name"}
+{"ts": "2026-09-05T23:05:50.022142+00:00", "run_id": "rep-bc6c73d46f", "event": "step_completed", "step_id": "s3_click", "attempts": 0}
+{"ts": "2026-09-05T23:05:50.022424+00:00", "run_id": "rep-bc6c73d46f", "event": "policy_checked", "step_id": "s4_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T23:05:50.127292+00:00", "run_id": "rep-bc6c73d46f", "event": "target_resolved", "step_id": "s4_click", "strategy": "role_name"}
+{"ts": "2026-09-05T23:05:50.140612+00:00", "run_id": "rep-bc6c73d46f", "event": "step_completed", "step_id": "s4_click", "attempts": 0}
+{"ts": "2026-09-05T23:05:50.140867+00:00", "run_id": "rep-bc6c73d46f", "event": "policy_checked", "step_id": "s5_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T23:05:50.146779+00:00", "run_id": "rep-bc6c73d46f", "event": "target_resolved", "step_id": "s5_fill", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T23:05:50.147049+00:00", "run_id": "rep-bc6c73d46f", "event": "step_completed", "step_id": "s5_fill", "attempts": 0}
+{"ts": "2026-09-05T23:05:50.147179+00:00", "run_id": "rep-bc6c73d46f", "event": "policy_checked", "step_id": "s6_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T23:05:50.267901+00:00", "run_id": "rep-bc6c73d46f", "event": "target_resolved", "step_id": "s6_click", "strategy": "role_name"}
+{"ts": "2026-09-05T23:05:50.268336+00:00", "run_id": "rep-bc6c73d46f", "event": "step_completed", "step_id": "s6_click", "attempts": 0}
+{"ts": "2026-09-05T23:05:50.268578+00:00", "run_id": "rep-bc6c73d46f", "event": "policy_checked", "step_id": "s7_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T23:05:50.392985+00:00", "run_id": "rep-bc6c73d46f", "event": "target_resolved", "step_id": "s7_click", "strategy": "role_name"}
+{"ts": "2026-09-05T23:05:50.401730+00:00", "run_id": "rep-bc6c73d46f", "event": "step_completed", "step_id": "s7_click", "attempts": 0}
+{"ts": "2026-09-05T23:05:50.401959+00:00", "run_id": "rep-bc6c73d46f", "event": "policy_checked", "step_id": "s8_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T23:05:50.503237+00:00", "run_id": "rep-bc6c73d46f", "event": "target_resolved", "step_id": "s8_click", "strategy": "role_name"}
+{"ts": "2026-09-05T23:05:50.513088+00:00", "run_id": "rep-bc6c73d46f", "event": "step_completed", "step_id": "s8_click", "attempts": 0}
+{"ts": "2026-09-05T23:05:50.513367+00:00", "run_id": "rep-bc6c73d46f", "event": "policy_checked", "step_id": "s9_select", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T23:05:50.519866+00:00", "run_id": "rep-bc6c73d46f", "event": "target_resolved", "step_id": "s9_select", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T23:05:50.520142+00:00", "run_id": "rep-bc6c73d46f", "event": "step_completed", "step_id": "s9_select", "attempts": 0}
+{"ts": "2026-09-05T23:05:50.520262+00:00", "run_id": "rep-bc6c73d46f", "event": "policy_checked", "step_id": "s10_select", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T23:05:50.524356+00:00", "run_id": "rep-bc6c73d46f", "event": "target_resolved", "step_id": "s10_select", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T23:05:50.524754+00:00", "run_id": "rep-bc6c73d46f", "event": "step_completed", "step_id": "s10_select", "attempts": 0}
+{"ts": "2026-09-05T23:05:50.524889+00:00", "run_id": "rep-bc6c73d46f", "event": "policy_checked", "step_id": "s11_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T23:05:50.528339+00:00", "run_id": "rep-bc6c73d46f", "event": "target_resolved", "step_id": "s11_fill", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T23:05:50.528531+00:00", "run_id": "rep-bc6c73d46f", "event": "step_completed", "step_id": "s11_fill", "attempts": 0}
+{"ts": "2026-09-05T23:05:50.528613+00:00", "run_id": "rep-bc6c73d46f", "event": "policy_checked", "step_id": "s12_fill", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T23:05:50.532866+00:00", "run_id": "rep-bc6c73d46f", "event": "target_resolved", "step_id": "s12_fill", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T23:05:50.533080+00:00", "run_id": "rep-bc6c73d46f", "event": "step_completed", "step_id": "s12_fill", "attempts": 0}
+{"ts": "2026-09-05T23:05:50.533151+00:00", "run_id": "rep-bc6c73d46f", "event": "policy_checked", "step_id": "s13_click", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T23:05:50.650412+00:00", "run_id": "rep-bc6c73d46f", "event": "target_resolved", "step_id": "s13_click", "strategy": "role_name"}
+{"ts": "2026-09-05T23:05:50.660862+00:00", "run_id": "rep-bc6c73d46f", "event": "step_completed", "step_id": "s13_click", "attempts": 0}
+{"ts": "2026-09-05T23:05:50.661166+00:00", "run_id": "rep-bc6c73d46f", "event": "policy_checked", "step_id": "s14_extract", "allowed": true, "requires_human": false, "code": "ALLOWED"}
+{"ts": "2026-09-05T23:05:50.671933+00:00", "run_id": "rep-bc6c73d46f", "event": "target_resolved", "step_id": "s14_extract", "strategy": "stable_attribute"}
+{"ts": "2026-09-05T23:05:50.672415+00:00", "run_id": "rep-bc6c73d46f", "event": "step_completed", "step_id": "s14_extract", "attempts": 0}
+{"ts": "2026-09-05T23:05:50.672540+00:00", "run_id": "rep-bc6c73d46f", "event": "policy_checked", "step_id": "s15_click", "allowed": false, "requires_human": true, "code": "HUMAN_APPROVAL_REQUIRED"}
