@@ -72,6 +72,39 @@ def test_incomplete_transfer_request_asks_for_missing_fields_then_completes(tmp_
     assert bound_inputs["amount"] == "1"
 
 
+def test_free_text_address_fills_last_outstanding_slot(tmp_path, monkeypatch):
+    """`address` matches none of nlu.py's extraction patterns, so once it is
+    the only slot left outstanding the bot must accept the next raw message
+    as its value instead of re-asking forever (P0 fix: chatbot update-member
+    slot filling could previously loop indefinitely)."""
+    monkeypatch.setenv("MERIDIAN_TELLER_ID", "teller1")
+    monkeypatch.setenv("MERIDIAN_TELLER_PASSWORD", "s3cret")
+    client, runner = _client(tmp_path)
+
+    first = client.post(
+        "/chatbot/message",
+        json={"message": "update member 100234 email to a@b.com phone 555-1234"},
+    )
+    body = first.json()
+    assert body["result"] is None
+    assert "address" in body["reply"].lower()
+    session_id = body["session_id"]
+    assert runner.calls == []
+
+    second = client.post(
+        "/chatbot/message",
+        json={"session_id": session_id, "message": "42 Elm Street, Springfield"},
+    )
+    body2 = second.json()
+    assert body2["result"] is not None
+    assert body2["result"]["status"] == "success"
+    assert len(runner.calls) == 1
+    _, bound_inputs = runner.calls[0]
+    assert bound_inputs["address"] == "42 Elm Street, Springfield"
+    assert bound_inputs["email"] == "a@b.com"
+    assert bound_inputs["phone"] == "555-1234"
+
+
 def test_cancel_resets_previously_collected_slots(tmp_path):
     client, runner = _client(tmp_path)
     first = client.post("/chatbot/message", json={"message": "Transfer money for member 100234"})

@@ -102,10 +102,25 @@ def build_chatbot_router(service: CapabilityService) -> APIRouter:
             sessions.reset(session_id)
             return ChatReply(session_id=session_id, reply="That capability isn't available right now.")
 
+        required = required_business_inputs(artifact)
+
+        # If exactly one required slot was outstanding when this turn began,
+        # this message is the answer to that specific question — accept it
+        # verbatim when ordinary pattern extraction finds nothing, rather
+        # than asking the same question forever (e.g. a free-text mailing
+        # address matches none of nlu.py's regexes).
+        awaiting_single_slot: str | None = None
+        if session.pending_capability_id is not None:
+            missing_before = [name for name in required if name not in session.collected]
+            if len(missing_before) == 1:
+                awaiting_single_slot = missing_before[0]
+
         extracted = extract_slots(capability_id, text)
         session.collected.update({name: value for name, value in extracted.items() if value})
 
-        required = required_business_inputs(artifact)
+        if awaiting_single_slot is not None and awaiting_single_slot not in session.collected:
+            session.collected[awaiting_single_slot] = text
+
         missing = [name for name in required if name not in session.collected]
         if missing:
             session.pending_capability_id = capability_id

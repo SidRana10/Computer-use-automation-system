@@ -72,11 +72,17 @@ browser.
 One genuine discovery run per capability, then unlimited deterministic
 replays with zero LLM calls in that path — architecturally true (no model
 client is even reachable from the replay/surfaces/policy/handoff packages)
-and operationally proven (seven capabilities, each replay-verified against a
-different invocation than its discovery run). Each step binds inputs, checks
-policy, resolves a locator strategy chain, executes, then verifies a
-declared checkpoint — a click only "worked" if the expected state actually
-appeared.
+and operationally exercised for all seven against an invocation different
+from each capability's own discovery run. The three read capabilities
+(sign-on, member inquiry, balances) complete unattended end to end. The four
+risky/irreversible capabilities (funds transfer, open share, update member
+info, place hold) correctly execute every automated step up to their
+policy-gated human-approval click and stop there for an unattended replay —
+the intended behavior, not a shortfall — and go on to complete when that
+approval is granted, as place hold and update member info are both shown
+doing in committed evidence. Each step binds inputs, checks policy, resolves
+a locator strategy chain, executes, then verifies a declared checkpoint — a
+click only "worked" if the expected state actually appeared.
 
 The hidden session/transaction token is read internally where the flow
 requires it and never persisted. Funds transfer and hold both follow a
@@ -140,7 +146,11 @@ the durable record instead.
   ceiling under concurrent load.
 - **`meridian.member_inquiry`'s table extraction can duplicate its header
   row** as an extra first data row on some renders. Data integrity is
-  unaffected; not fixed here.
+  unaffected; not fixed here. Separately, its contract declares two output
+  fields (`member_results`, `member_results_table`) that carry equivalent
+  data — the canonical discovery run issued the same extract twice before
+  calling `done`, and the compiler recorded both rather than collapsing
+  them. Also not fixed here, to avoid rediscovering this capability.
 
 These were accepted in favor of finishing the required end-to-end system —
 seven genuinely discovery-generated capabilities, a caller-facing API, a

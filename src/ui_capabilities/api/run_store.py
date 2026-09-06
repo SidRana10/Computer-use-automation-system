@@ -23,6 +23,8 @@ from typing import Any
 
 from ..models.artifact import CapabilityArtifact
 from ..models.results import RunResult
+from ..policy.redaction import Redactor
+from ..targets.registry import profile_for_app_id
 from .schemas import RunDetail, RunSummary
 
 
@@ -77,10 +79,32 @@ class RunStore:
             "finished_at": finished_at.isoformat(),
             "duration_ms": int((finished_at - started_at).total_seconds() * 1000),
             "inputs": display_inputs,
-            "result": json.loads(result.model_dump_json()),
+            "result": self._redacted_result(result, artifact),
         }
         run_dir.mkdir(parents=True, exist_ok=True)
         (run_dir / "result.json").write_text(json.dumps(record, indent=2, ensure_ascii=False) + "\n")
+
+    @staticmethod
+    def _redacted_result(result: RunResult, artifact: CapabilityArtifact) -> dict[str, Any]:
+        """The durable run-history copy, redacted with the same central
+        `Redactor` and target-profile patterns already used for logs, DOM
+        snapshots, and screenshots (`targets/<profile>.py`
+        `redaction_text_patterns`) — not a second, unrelated sanitizer.
+
+        The live API/chatbot response to the caller is unaffected: this only
+        governs what gets written to `result.json` for the dashboard/evidence
+        trail. A capability's structured outputs (e.g. balances) can carry
+        target-rendered sensitive values a caller legitimately asked for but
+        that must not accumulate in durable storage, matching the same
+        currency/contact-detail patterns already scrubbed from redacted DOM
+        snapshots for this target.
+        """
+        payload = json.loads(result.model_dump_json())
+        profile = profile_for_app_id(artifact.target.app_id)
+        if profile is None or not profile.redaction_text_patterns:
+            return payload
+        redactor = Redactor(text_patterns=profile.redaction_text_patterns)
+        return redactor.redact(payload)
 
     def list_runs(self) -> list[RunSummary]:
         runs_dir = self._runs_dir()

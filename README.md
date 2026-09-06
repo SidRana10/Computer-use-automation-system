@@ -255,14 +255,24 @@ hold step, `policy_escalation` fires with `code: SUPERVISOR_REQUIRED`
 (`meridian.place_hold`'s artifact-level `escalate_on_codes`, D034) —
 `meridian.place_hold`'s own discovery run was performed *as* a supervisor
 precisely so this restricted state is never bypassed. Control transfers to
-`HUMAN`, the supervisor completes the gated step in the same live browser
-session, control returns to `AUTOMATION`, the engine re-verifies, and a
-*second* intervention fires for the still-irreversible "apply hold" click
+`HUMAN`, the gated step is completed in the same live browser session,
+control returns to `AUTOMATION`, the engine re-verifies, and a *second*
+intervention fires for the still-irreversible "apply hold" click
 (`HUMAN_APPROVAL_REQUIRED`) before `replay_succeeded`. Two independent gates,
 both real. (This run's evidence directory does not show up in the dashboard —
 the dashboard only indexes API/chatbot-invoked runs with a `result.json`,
 per `RunStore`; CLI/script runs like this one are read directly from
 `evidence/meridian/runs/`.)
+
+This committed run was produced by `scripts/meridian_replay.py`'s scripted
+operator/supervisor stand-in (`operator_id: scripted-supervisor` /
+`scripted-operator` in `run.jsonl`) — a small watcher that calls the exact
+same `HandoffManager.take_control`/`resume` API a human clicking Take
+Control/Resume in the operator console would, so it exercises the real
+handoff state machine end to end without a person physically present for
+this rehearsal. The operator console UI itself (Take Control / Resume /
+Abort) is the same one a live supervisor uses; it is simply not who produced
+this particular piece of evidence.
 
 ### Run tests
 
@@ -307,6 +317,13 @@ simulated.
   markup this occasionally duplicates that row as the first data row too.
   The data itself is correct — one extra row, not corrupted values. Not
   fixed in P9 per instruction.
+- **`meridian.member_inquiry` declares two output fields
+  (`member_results`, `member_results_table`) that carry equivalent data.**
+  The canonical discovery run issued the same table extract twice before
+  calling `done`; the compiler faithfully recorded both as separate
+  contract outputs rather than collapsing them. Not a data-integrity bug —
+  both fields report the same correct rows — but a caller only needs one of
+  them. Not fixed here per instruction not to rediscover this capability.
 - **Chatbot NLU is deterministic regex/keywords, not a model call** (D037).
   Intentionally thin per the P7 instruction; swapping in a structured-output
   LLM call is a documented, scoped future change behind the same
@@ -326,7 +343,7 @@ inspect any of them.
 
 | Scenario | Run id | What it shows |
 |---|---|---|
-| Successful balance read | `evidence/runs/api-645b4c28d7` (also `api-4c95f56f66`, `api-60d17ba0b6`) | real API/chatbot/dashboard invocations of `meridian.get_member_balances` for member 100234, `result.json` + redacted `run.jsonl` + masked screenshot |
+| Successful balance read | `evidence/meridian/runs/api-645b4c28d7` | real API/chatbot/dashboard invocation of `meridian.get_member_balances` for member 100234 — `result.json` (currency values redacted by `RunStore` before persistence, same target-profile patterns as redacted DOM/screenshots; structure/share ids/status untouched) + `run.jsonl` + masked screenshot. Representative of several identical-shape P6–P8 verification calls (`api-4c95f56f66`, `api-60c967171b`, `api-60d17ba0b6`) that were not all committed. |
 | Successful transaction / review→post | `evidence/meridian/runs/disc-887e90fe6a` | genuine live $1 transfer reaching MERIDIAN's TRANSACTION COMPLETE page (discovery evidence — see D035 for why this isn't also the canonical replay artifact) |
 | Supervisor escalation | `evidence/meridian/runs/rep-2b1dd06224` | teller→supervisor Place Hold: `policy_escalation` (`SUPERVISOR_REQUIRED`) → intervention → human step → resume → second irreversible-approval gate → `replay_succeeded` |
 | Exceptional state | `evidence/meridian/runs/exc-permission-098b61` (also `exc-notfound-53171f`, `exc-timeout-0691a3`, `exc-maintenance-6de384`, `exc-server-06a05b`, `exc-validation-cc1ab8`) | one of the six live `?inject=` states classified correctly, with screenshot + redacted DOM snapshot |

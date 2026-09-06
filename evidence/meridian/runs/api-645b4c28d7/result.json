@@ -1,0 +1,228 @@
+{
+  "run_id": "api-645b4c28d7",
+  "capability_id": "meridian.get_member_balances",
+  "capability_version": "1.0.0",
+  "capability_name": "Meridian Get Member Balances",
+  "status": "success",
+  "code": null,
+  "started_at": "2026-09-06T01:37:27.919044+00:00",
+  "finished_at": "2026-09-06T01:37:32.082994+00:00",
+  "duration_ms": 4163,
+  "inputs": {
+    "member_number": "[REDACTED]"
+  },
+  "result": {
+    "status": "success",
+    "run_id": "api-645b4c28d7",
+    "capability_id": "meridian.get_member_balances",
+    "capability_version": "1.0.0",
+    "outputs": {
+      "shares": [
+        {
+          "Share ID": "100234-S0001",
+          "Type": "Regular Shares",
+          "Balance": "[REDACTED]",
+          "Status": "HOLD [HOLD]"
+        },
+        {
+          "Share ID": "100234-S0070",
+          "Type": "Share Draft (Checking)",
+          "Balance": "[REDACTED]",
+          "Status": "HOLD [HOLD]"
+        },
+        {
+          "Share ID": "100234-MMKT-3",
+          "Type": "Money Market",
+          "Balance": "[REDACTED]",
+          "Status": "HOLD [HOLD]"
+        },
+        {
+          "Share ID": "100234-MMKT-4",
+          "Type": "Money Market",
+          "Balance": "[REDACTED]",
+          "Status": "HOLD [HOLD]"
+        },
+        {
+          "Share ID": "100234-S0001-5",
+          "Type": "Regular Shares",
+          "Balance": "[REDACTED]",
+          "Status": "HOLD [HOLD]"
+        },
+        {
+          "Share ID": "100234-S0001-6",
+          "Type": "Regular Shares",
+          "Balance": "[REDACTED]",
+          "Status": "HOLD [HOLD]"
+        },
+        {
+          "Share ID": "100234-MMKT-7",
+          "Type": "Money Market",
+          "Balance": "[REDACTED]",
+          "Status": "HOLD [HOLD]"
+        },
+        {
+          "Share ID": "100234-MMKT-8",
+          "Type": "Money Market",
+          "Balance": "[REDACTED]",
+          "Status": "HOLD [HOLD]"
+        },
+        {
+          "Share ID": "100234-MMKT-9",
+          "Type": "Money Market",
+          "Balance": "[REDACTED]",
+          "Status": "HOLD [HOLD]"
+        },
+        {
+          "Share ID": "100234-MMKT-10",
+          "Type": "Money Market",
+          "Balance": "[REDACTED]",
+          "Status": "HOLD [HOLD]"
+        },
+        {
+          "Share ID": "100234-MMKT-11",
+          "Type": "Money Market",
+          "Balance": "[REDACTED]",
+          "Status": "HOLD [HOLD]"
+        },
+        {
+          "Share ID": "100234-S0001-12",
+          "Type": "Regular Shares",
+          "Balance": "[REDACTED]",
+          "Status": "OPEN"
+        },
+        {
+          "Share ID": "100234-S0001-13",
+          "Type": "Regular Shares",
+          "Balance": "[REDACTED]",
+          "Status": "HOLD [HOLD]"
+        },
+        {
+          "Share ID": "100234-S0001-14",
+          "Type": "Regular Shares",
+          "Balance": "[REDACTED]",
+          "Status": "OPEN"
+        },
+        {
+          "Share ID": "100234-CERT-15",
+          "Type": "Certificate",
+          "Balance": "[REDACTED]",
+          "Status": "HOLD [HOLD]"
+        },
+        {
+          "Share ID": "100234-MMKT-16",
+          "Type": "Money Market",
+          "Balance": "[REDACTED]",
+          "Status": "OPEN"
+        },
+        {
+          "Share ID": "100234-S0070-17",
+          "Type": "Share Draft (Checking)",
+          "Balance": "[REDACTED]",
+          "Status": "OPEN"
+        },
+        {
+          "Share ID": "100234-S0001-18",
+          "Type": "Regular Shares",
+          "Balance": "[REDACTED]",
+          "Status": "HOLD [HOLD]"
+        },
+        {
+          "Share ID": "100234-S0001-19",
+          "Type": "Regular Shares",
+          "Balance": "[REDACTED]",
+          "Status": "OPEN"
+        },
+        {
+          "Share ID": "100234-S0001-20",
+          "Type": "Regular Shares",
+          "Balance": "[REDACTED]",
+          "Status": "OPEN"
+        },
+        {
+          "Share ID": "100234-MMKT-21",
+          "Type": "Money Market",
+          "Balance": "[REDACTED]",
+          "Status": "OPEN"
+        },
+        {
+          "Share ID": "100234-MMKT-22",
+          "Type": "Money Market",
+          "Balance": "[REDACTED]",
+          "Status": "HOLD [HOLD]"
+        },
+        {
+          "Share ID": "100234-S0001-23",
+          "Type": "Regular Shares",
+          "Balance": "[REDACTED]",
+          "Status": "HOLD [HOLD]"
+        },
+        {
+          "Share ID": "100234-S0001-24",
+          "Type": "Regular Shares",
+          "Balance": "[REDACTED]",
+          "Status": "OPEN"
+        },
+        {
+          "Share ID": "100234-S0001-25",
+          "Type": "Regular Shares",
+          "Balance": "[REDACTED]",
+          "Status": "OPEN"
+        },
+        {
+          "Share ID": "100234-S0001-26",
+          "Type": "Regular Shares",
+          "Balance": "[REDACTED]",
+          "Status": "OPEN"
+        },
+        {
+          "Share ID": "100234-S0001-27",
+          "Type": "Regular Shares",
+          "Balance": "[REDACTED]",
+          "Status": "OPEN"
+        },
+        {
+          "Share ID": "100234-S0001-28",
+          "Type": "Regular Shares",
+          "Balance": "[REDACTED]",
+          "Status": "OPEN"
+        },
+        {
+          "Share ID": "100234-S0001-29",
+          "Type": "Regular Shares",
+          "Balance": "[REDACTED]",
+          "Status": "OPEN"
+        },
+        {
+          "Share ID": "100234-S0001-30",
+          "Type": "Regular Shares",
+          "Balance": "[REDACTED]",
+          "Status": "OPEN"
+        },
+        {
+          "Share ID": "100234-MMKT-31",
+          "Type": "Money Market",
+          "Balance": "[REDACTED]",
+          "Status": "OPEN"
+        },
+        {
+          "Share ID": "100234-MMKT-32",
+          "Type": "Money Market",
+          "Balance": "[REDACTED]",
+          "Status": "OPEN"
+        },
+        {
+          "Share ID": "100234-MMKT-33",
+          "Type": "Money Market",
+          "Balance": "[REDACTED]",
+          "Status": "OPEN"
+        }
+      ]
+    },
+    "recoveries": [],
+    "human_completions": [],
+    "evidence": [
+      "evidence/runs/api-645b4c28d7/run.jsonl",
+      "evidence/runs/api-645b4c28d7/screenshots/fingerprint.png"
+    ]
+  }
+}
