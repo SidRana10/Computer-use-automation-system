@@ -52,10 +52,10 @@ form.addEventListener('submit', async (event) => {
     });
     const data = await response.json();
     sessionId = data.session_id;
+    // The reply text already carries the run id and dashboard path as
+    // secondary metadata (see router.py::_run_metadata) — no separate
+    // "run: ... (status: ...)" line needed here.
     append('bot', data.reply);
-    if (data.result) {
-      append('bot', 'run: ' + data.result.run_id + ' (status: ' + data.result.status + ')');
-    }
   } catch (err) {
     append('bot', 'request failed: ' + err);
   }
