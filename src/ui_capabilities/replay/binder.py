@@ -29,6 +29,17 @@ def validate_and_bind(contract: CapabilityContract, provided: dict[str, str]) ->
         if name not in provided or provided[name] == "":
             if spec.required:
                 raise InvocationError(f"missing required input {name!r}")
+            # An omitted/explicitly-empty optional string is a valid empty
+            # value for that field (e.g. an optional memo/notes box left
+            # blank), not an absent one — a declared step may still
+            # unconditionally reference it (`Fill Memo`, `Fill Notes`), and
+            # `resolve_value` requires every referenced input to be bound.
+            # Only `string` gets this treatment: there is no single safe
+            # "empty" value for decimal/integer/boolean/json, and no
+            # optional input of those types exists in the current contracts
+            # to require one.
+            if spec.type == "string":
+                bound[name] = ""
             continue
         raw = provided[name].strip()
         _validate_type(name, raw, spec.type)

@@ -486,3 +486,23 @@ def test_chat_page_does_not_duplicate_the_run_status_line(tmp_path):
     assert "data.result.run_id" not in html
     # the reply itself (which already carries the run id) is still rendered
     assert "data.reply" in html
+
+
+def test_chat_page_handles_non_json_http_errors_without_a_raw_syntax_error(tmp_path):
+    """An uncaught server exception returns a plain-text 500 body, not JSON
+    (e.g. FastAPI's own "Internal Server Error"). The page must not call
+    `response.json()` blindly on it — it should read the body defensively,
+    detect the failure, and show a concise message instead of surfacing a
+    raw `SyntaxError` to the user or a stack trace."""
+    client, _ = _client(tmp_path)
+    response = client.get("/chatbot/")
+    assert response.status_code == 200
+    html = response.text
+    # reads the body as text before attempting to parse it as JSON
+    assert "response.text()" in html
+    assert "JSON.parse(raw)" in html
+    # a non-2xx or unparseable response is detected explicitly
+    assert "response.ok" in html
+    assert "The capability request failed unexpectedly. Check the run/server logs." in html
+    # never falls back to rendering server-supplied error content as markup
+    assert "innerHTML" not in html

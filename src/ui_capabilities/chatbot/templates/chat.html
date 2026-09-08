@@ -285,12 +285,26 @@ form.addEventListener('submit', async (event) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ session_id: sessionId, message: text }),
     });
-    const data = await response.json();
-    sessionId = data.session_id;
-    // The reply text already carries the run id and dashboard path as
-    // secondary metadata (see router.py::_run_metadata) — no separate
-    // "run: ... (status: ...)" line needed here.
-    append('bot', data.reply);
+    // An uncaught server-side exception returns a plain-text body (e.g.
+    // FastAPI's own "Internal Server Error"), not JSON — read as text
+    // first and parse defensively so that case shows a clean message
+    // instead of a raw SyntaxError from a blind response.json() call.
+    const raw = await response.text();
+    let data = null;
+    try {
+      data = JSON.parse(raw);
+    } catch (parseErr) {
+      data = null;
+    }
+    if (!response.ok || !data || typeof data.reply !== 'string') {
+      append('bot', 'The capability request failed unexpectedly. Check the run/server logs.', true);
+    } else {
+      sessionId = data.session_id;
+      // The reply text already carries the run id and dashboard path as
+      // secondary metadata (see router.py::_run_metadata) — no separate
+      // "run: ... (status: ...)" line needed here.
+      append('bot', data.reply);
+    }
   } catch (err) {
     append('bot', 'Request failed: ' + err, true);
   } finally {
